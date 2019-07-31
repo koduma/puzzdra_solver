@@ -153,8 +153,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						memcpy(field, f_field, sizeof(field));//盤面をもどす
 						operation(field, cand.movei);
 						cand.score = sum_e(field);
-						memcpy(field, f_field, sizeof(field));//盤面をもどす
-						operation(field, cand.movei);
 						part1 += DLT(st, clock());
 						cand.prev = j;
 						st = clock();
