@@ -1,12 +1,14 @@
 /*
 puzzdra_solver
 
-パズドラソルバです。
+パズドラのルート解析プログラムです。
+
+なるべく少ない時間でなるべく大きいコンボを出したいです。
 
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.Combo #:%lf\n", avg / (double)i);
 
-これが改善されればpull request受け付けます。
+これらが改善されればpull request受け付けます。
 
 */
 
