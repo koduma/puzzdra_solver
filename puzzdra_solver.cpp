@@ -1,15 +1,10 @@
 /*
 puzzdra_solver
-
 パズドラのルート解析プログラムです。
-
 なるべく少ない時間でなるべく大きいコンボを出したいです。
-
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.Combo #:%lf\n", avg / (double)i);
-
 これらが改善されればpull request受け付けます。
-
 */
 
 #pragma warning(disable:4710)
@@ -48,6 +43,7 @@ using namespace std;
 #define DIR 4//方向
 #define ROW 5//縦
 #define COL 6//横
+#define DROP 6//ドロップの種類
 #define TRN  44//手数
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 40//最大ルート長
@@ -95,13 +91,15 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	int stop = 0;//理論最大コンボ数
 
-	int drop[7] = { 0 };
+	int drop[DROP+1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
-			drop[f_field[row][col]]++;
+			if (1 <= f_field[row][col] && f_field[row][col] <= DROP) {
+				drop[f_field[row][col]]++;
+			}
 		}
 	}
-	for (int i = 1; i <= 6; i++) {
+	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
 	}
 
@@ -226,7 +224,7 @@ void set(F_T field[ROW][COL], int force) {
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
 			if (field[i][j] == 0 || force) {//空マスだったらうめる
-				field[i][j] = (F_T)rnd(force ? 0 : 1, 6);//1-6の整数乱数
+				field[i][j] = (F_T)rnd(force ? 0 : 1, DROP);//1-DROPの整数乱数
 			}
 		}
 	}
@@ -234,12 +232,11 @@ void set(F_T field[ROW][COL], int force) {
 int chain(int nrw, int ncl, int d, F_T field[ROW][COL],
 	F_T chkflag[ROW][COL], F_T delflag[ROW][COL]) {
 	int count = 0;
-#define CHK_CF(Y,X) (field[Y][X] == d && chkflag[Y][X] == 0)
-	//連結している同じ色のドロップが未探索だったら
+#define CHK_CF(Y,X) (field[Y][X] == d && chkflag[Y][X] == 0 && delflag[Y][X] > 0)
+	//連結している同じ色の消去ドロップが未探索だったら
 	if (CHK_CF(nrw, ncl)) {
 		++count; //連結ドロップ数の更新
-		chkflag[nrw][ncl] =   //探索済みにする
-			delflag[nrw][ncl] = 1;//コンボがつながる可能性があるので、1に設定
+		chkflag[nrw][ncl] = 1; //探索済みにする
 			//以下上下左右に連結しているドロップを再帰的に探索していく
 		if (0 < nrw && CHK_CF(nrw - 1, ncl)) {
 			count += chain(nrw - 1, ncl, d, field, chkflag, delflag);
@@ -262,7 +259,6 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		int cmb = 0;
 		F_T chkflag[ROW][COL] = { 0 };
 		F_T delflag[ROW][COL] = { 0 };
-		F_T t_erase[ROW][COL] = { 0 };
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (col <= COL - 3 && field[row][col] == field[row][col + 1] && field[row][col] == field[row][col + 2] && field[row][col] > 0) {
@@ -280,7 +276,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (delflag[row][col] > 0) {
-					if (chain(row, col, field[row][col], field, chkflag, t_erase) >= 3) {
+					if (chain(row, col, field[row][col], field, chkflag, delflag) >= 3) {
 						cmb++;
 					}
 				}
@@ -292,7 +288,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				//コンボになったドロップは空になる。
-				if (t_erase[row][col] != 0 && delflag[row][col] > 0) { field[row][col] = 0; }
+				if (delflag[row][col] > 0) { field[row][col] = 0; }
 			}
 		}
 
