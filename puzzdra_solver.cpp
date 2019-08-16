@@ -5,7 +5,7 @@ puzzdra_solver
 なるべく少ない時間でなるべく大きいコンボを出したいです。
 
 printf("TotalDuration:%fSec\n", t_sum);
-printf("Avg.Combo #:%.4lf/%.4lf\n", avg / (double)i,MAXCOMBO/(double)i);
+printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 
 これらが改善されればpull request受け付けます。
 */
@@ -364,7 +364,7 @@ int main() {
 		avg += (double)combo;
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("Avg.Combo #:%.4lf/%.4lf\n", avg / (double)i,MAXCOMBO/(double)i);
+	printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
 	//j = getchar();
 	return 0;
