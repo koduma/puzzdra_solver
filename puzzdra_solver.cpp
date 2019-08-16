@@ -5,7 +5,7 @@ puzzdra_solver
 なるべく少ない時間でなるべく大きいコンボを出したいです。
 
 printf("TotalDuration:%fSec\n", t_sum);
-printf("Avg.Combo #:%lf\n", avg / (double)i);
+printf("Avg.Combo #:%.4lf/%.4lf\n", avg / (double)i,MAXCOMBO/(double)i);
 
 これらが改善されればpull request受け付けます。
 */
@@ -89,7 +89,7 @@ struct Action {//最終的に探索された手
 	}
 };
 Action BEAM_SEARCH(F_T f_field[ROW][COL]); //ルート探索関数
-double part1 = 0, part2 = 0, part3 = 0, part4 = 0;
+double part1 = 0, part2 = 0, part3 = 0, part4 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	int stop = 0;//理論最大コンボ数
@@ -105,6 +105,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
 	}
+	MAXCOMBO += (double)stop;
 
 	deque<member>dque;
 	clock_t start, st;
@@ -363,7 +364,7 @@ int main() {
 		avg += (double)combo;
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("Avg.Combo #:%lf\n", avg / (double)i);
+	printf("Avg.Combo #:%.4lf/%.4lf\n", avg / (double)i,MAXCOMBO/(double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
 	//j = getchar();
 	return 0;
