@@ -1,12 +1,3 @@
-/*
-puzzdra_solver
-パズドラのルート解析プログラムです。
-なるべく少ない時間でなるべく大きいコンボを出したいです。
-printf("TotalDuration:%fSec\n", t_sum);
-printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
-これらが改善されればpull request受け付けます。
-*/
-
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
