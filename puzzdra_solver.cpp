@@ -10,6 +10,7 @@ printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 これらが改善されればpull request受け付けます。
 */
 
+
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
@@ -94,7 +95,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	int stop = 0;//理論最大コンボ数
 
-	int drop[DROP+1] = { 0 };
+	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
 			if (1 <= f_field[row][col] && f_field[row][col] <= DROP) {
@@ -108,7 +109,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	MAXCOMBO += (double)stop;
 
 	deque<member>dque;
-	clock_t start, st;
+	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
 	for (int i = 0; i < ROW; i++) {
@@ -131,8 +132,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	for (int i = 1; i < MAX_TURN; i++) {
 		//priority_queue<member, vector<member>, less<member> >pque;
 		int ks = (int)dque.size();
-		start = clock();
-#pragma omp parallel for reduction(+:part1,part4)
+		start = omp_get_wtime();
+#pragma omp parallel for private(st),reduction(+:part1,part4)
 		for (int k = 0; k < ks; k++) {
 #ifdef _OPENMP
 			if (i == 1 && k == 0) {
@@ -150,18 +151,18 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i] = (T_T)YX(cand.nowR, cand.nowC);
-						st = clock();
+						st = omp_get_wtime();
 						F_T field[ROW][COL]; //盤面
 						memcpy(field, f_field, sizeof(field));//盤面をもどす
 						operation(field, cand.movei);
 						cand.score = sum_e(field);
-						part1 += DLT(st, clock());
+						part1 += omp_get_wtime() - st;
 						cand.prev = j;
-						st = clock();
+						st = omp_get_wtime();
 						//#pragma omp critical
 											//{ pque.push(cand); }
 						fff[(4 * k) + j] = cand;
-						part4 += DLT(st, clock());
+						part4 += omp_get_wtime() - st;
 					}
 					else {
 						cand.score = -114514;
@@ -174,8 +175,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				}
 			}
 		}
-		part2 += DLT(start, clock());
-		start = clock();
+		part2 += omp_get_wtime() - start;
+		start = omp_get_wtime();
 		dque.clear();
 		vector<pair<int, int> >vec;
 		for (int j = 0; j < 4 * ks; j++) {
@@ -197,7 +198,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				dque.push_back(temp);
 			}
 		}
-		part3 += DLT(start, clock());
+		part3 += omp_get_wtime() - start;
 	}
 	return bestAction;
 }
@@ -330,13 +331,12 @@ unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
 
 	uniform_int_distribution<int> dice(mini, maxi);
 	return dice(mt);
-	//return (((double)w / ((double)UINT_MAX + 1)) * (maxi - mini)) + mini;
 }
 int main() {
 
 	int i, j;
 	double avg = 0;//平均コンボ数
-	clock_t start, end;
+	double start;
 	double t_sum = 0;
 	for (i = 0; i < 1000; i++) {//1000問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
@@ -344,11 +344,11 @@ int main() {
 		printf("problem:%d\n", i + 1);
 		init(f_field); set(f_field, 0);//初期盤面生成
 		show_field(f_field);//盤面表示
-		start = clock();
+		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
-		end = clock();
-		printf("%fSec\n", DLT(start, end));
-		t_sum += DLT(start, end);
+		double diff = omp_get_wtime() - start;
+		printf("%fSec\n", diff);
+		t_sum += diff;
 		printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
 		for (j = 1; j < MAX_TURN; j++) {//y座標は下にいくほど大きくなる
 			if (tmp.moving[j] == STP) { break; }
@@ -364,8 +364,8 @@ int main() {
 		avg += (double)combo;
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
+	printf("Avg.Combo #:%lf/%lf\n", avg / (double)i, MAXCOMBO / (double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
-	//j = getchar();
+	j = getchar();
 	return 0;
 }
