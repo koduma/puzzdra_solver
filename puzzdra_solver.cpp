@@ -6,11 +6,8 @@ printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 これらが改善されればpull request受け付けます。
 
-914769
-264812
-379934
-355886
-951279
+パズドラ検定クエスト対策君
+https://ideone.com/9s2pbn
 
 */
 
