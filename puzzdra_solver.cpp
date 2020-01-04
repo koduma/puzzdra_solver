@@ -1,13 +1,17 @@
 /*
 puzzdra_solver
-
 パズドラのルート解析プログラムです。
 なるべく少ない時間でなるべく大きいコンボを出したいです。
-
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
-
 これらが改善されればpull request受け付けます。
+
+914769
+264812
+379934
+355886
+951279
+
 */
 
 
@@ -47,11 +51,11 @@ using namespace std;
 #define DIR 4//方向
 #define ROW 5//縦
 #define COL 6//横
-#define DROP 6//ドロップの種類
-#define TRN  44//手数
+#define DROP 6//ドロップの種類//MAX9
+#define TRN  44//手数//MAX305
 #define STP YX(7,7)//無効手[無効座標]
-#define MAX_TURN 40//最大ルート長
-#define BEAM_WIDTH 50000//ビーム幅
+#define MAX_TURN 40//最大ルート長//MAX300
+#define BEAM_WIDTH 42000//ビーム幅//MAX500000
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
@@ -66,9 +70,14 @@ int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T route[TRN]); //スワイプ処理関数
+
+int evaluate2(F_T field[ROW][COL], int flag,int *combo);//落とし減点評価関数
+int sum_e2(F_T field[ROW][COL],int *combo);//評価関数
+
 struct member {//どういう手かの構造体
 	T_T movei[TRN];//スワイプ移動座標
-	int score;//コンボ数
+	int score;//評価値
+	int combo;//コンボ数
 	int nowC;//今どのx座標にいるか
 	int nowR;//今どのy座標にいるか
 	int prev;//1手前は上下左右のどっちを選んだか
@@ -155,7 +164,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						F_T field[ROW][COL]; //盤面
 						memcpy(field, f_field, sizeof(field));//盤面をもどす
 						operation(field, cand.movei);
-						cand.score = sum_e(field);
+						int cmb;
+						cand.score = sum_e2(field,&cmb);
+						cand.combo = cmb;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						st = omp_get_wtime();
@@ -187,12 +198,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		for (int j = 0; j < BEAM_WIDTH && j < 4 * ks; j++) {
 			member temp = fff[vec[j].second];
 			if (temp.score == -114514) { continue; }
-			if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
-				maxValue = temp.score;
+			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
+				maxValue = temp.combo;
 				bestAction.score = maxValue;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 				//コンボ数が理論値になったらreturn
-				if (temp.score == stop) { return bestAction; }
+				if (temp.combo == stop) { return bestAction; }
 			}
 			if (i < MAX_TURN - 1) {
 				dque.push_back(temp);
@@ -304,6 +315,72 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	return combo;
 }
 
+int evaluate2(F_T field[ROW][COL], int flag,int *combo) {
+	int ev = 0;
+	*combo = 0;
+	while (1) {
+		int cmb = 0;
+		int cmb2 = 0;
+		F_T chkflag[ROW][COL] = { 0 };
+		F_T delflag[ROW][COL] = { 0 };
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COL; col++) {
+				if (col <= COL - 3 && field[row][col] == field[row][col + 1] && field[row][col] == field[row][col + 2] && field[row][col] > 0) {
+					delflag[row][col] = field[row][col];
+					delflag[row][col + 1] = field[row][col];
+					delflag[row][col + 2] = field[row][col];
+				}
+				if (row <= ROW - 3 && field[row][col] == field[row + 1][col] && field[row][col] == field[row + 2][col] && field[row][col] > 0) {
+					delflag[row][col] = field[row][col];
+					delflag[row + 1][col] = field[row][col];
+					delflag[row + 2][col] = field[row][col];
+				}
+			}
+		}
+		char cnt[DROP + 1] = { 0 };
+		char drop[DROP + 1][ROW * COL][2] = { 0 };
+
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COL; col++) {
+				drop[field[row][col]][cnt[field[row][col]]][0] = (char)row;
+				drop[field[row][col]][cnt[field[row][col]]][1] = (char)col;
+				cnt[field[row][col]]++;
+				if (delflag[row][col] > 0) {
+					int c = chain(row, col, field[row][col], field, chkflag, delflag);
+					if (c >= 3) {
+						cmb++;
+						if (c == 3) { cmb2 += 30; }
+						else { cmb2 += 20; }
+					}
+				}
+			}
+		}
+		for (int i = 1; i <= DROP; i++) {
+			for (int j = 0; j < cnt[i] - 1; j++) {
+				char add = max(drop[i][j + 1][0] - drop[i][j][0], drop[i][j][0] - drop[i][j + 1][0]) + max(drop[i][j + 1][1] - drop[i][j][1], drop[i][j][1] - drop[i][j + 1][1]);
+				cmb2 -= (int)add;
+			}
+		}
+		*combo += cmb;
+		ev += cmb2;
+		//コンボが発生しなかったら終了
+		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COL; col++) {
+				//コンボになったドロップは空になる。
+				if (delflag[row][col] > 0) { field[row][col] = 0; }
+			}
+		}
+
+		if (flag & EVAL_FALL)fall(field);//落下処理発生
+		if (flag & EVAL_SET)set(field, 0);//落ちコン発生
+
+	}
+	return ev;
+}
+int sum_e2(F_T field[ROW][COL],int* combo) {//落とし有り、落ちコン無し評価関数
+	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo);
+}
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
 }
@@ -334,16 +411,26 @@ unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
 }
 int main() {
 
-	int i, j;
+	int i, j, k;
+
 	double avg = 0;//平均コンボ数
 	double start;
 	double t_sum = 0;
 	for (i = 0; i < 1000; i++) {//1000問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
-		printf("problem:%d\n", i + 1);
+		printf("input:No.%d\n", i + 1);
 		init(f_field); set(f_field, 0);//初期盤面生成
 		show_field(f_field);//盤面表示
+		/*
+		for (j = 0; j < ROW; j++) {
+			string s = "";
+			cin >> s;
+			for (k = 0; k < COL; k++) {
+				f_field[j][k] = s[k] - '0';
+			}
+		}
+		*/
 		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
 		double diff = omp_get_wtime() - start;
@@ -359,6 +446,8 @@ int main() {
 		} printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
 		operation(field, tmp.moving);
+		printf("output:No.%d\n",i+1);
+		show_field(field);
 		int combo = sum_e(field);
 		printf("%dCombo\n", combo);
 		avg += (double)combo;
