@@ -9,7 +9,7 @@ printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/A1gzwY
+https://ideone.com/nyUGSi
 
 チェック1：これを10コンボできるか
 
@@ -71,9 +71,9 @@ using namespace std;
 #define ROW 5//縦
 #define COL 6//横
 #define DROP 6//ドロップの種類//MAX9
-#define TRN  44//手数//MAX105
+#define TRN  44//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
-#define MAX_TURN 40//最大ルート長//MAX100
+#define MAX_TURN 40//最大ルート長//MAX150
 #define BEAM_WIDTH 42000//ビーム幅//MAX1000000
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
@@ -481,8 +481,8 @@ int main() {
 		oti_avg += (double)oti;
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("Avg.NormalCombo #:%lf/%lf\n", avg / (double)i, MAXCOMBO / (double)i);
-	printf("Avg.OtiCombo #%lf\n", oti_avg / (double)i);
+	printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
+	printf("Avg.OtiCombo #:%f\n", oti_avg / (double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
 	j = getchar();
 	return 0;
