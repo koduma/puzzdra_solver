@@ -1,13 +1,35 @@
 /*
 puzzdra_solver
+
 パズドラのルート解析プログラムです。
 なるべく少ない時間でなるべく大きいコンボを出したいです。
+
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.Combo #:%lf/%lf\n", avg / (double)i,MAXCOMBO/(double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/9s2pbn
+https://ideone.com/A1gzwY
+
+チェック1：これを10コンボできるか
+
+962679
+381515
+489942
+763852
+917439
+
+914769
+264812
+379934
+355886
+951279
+
+チェック2：1000盤面落ちコン入り、平均コンボ数が9.18付近か
+
+チェック3：1000盤面落ちコンなし、理論値-平均コンボ数が0.1付近か
+
+全チェック達成したら合格
 
 */
 
@@ -49,10 +71,10 @@ using namespace std;
 #define ROW 5//縦
 #define COL 6//横
 #define DROP 6//ドロップの種類//MAX9
-#define TRN  44//手数//MAX305
+#define TRN  44//手数//MAX105
 #define STP YX(7,7)//無効手[無効座標]
-#define MAX_TURN 40//最大ルート長//MAX300
-#define BEAM_WIDTH 42000//ビーム幅//MAX500000
+#define MAX_TURN 40//最大ルート長//MAX100
+#define BEAM_WIDTH 42000//ビーム幅//MAX1000000
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
@@ -68,8 +90,8 @@ int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ�
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T route[TRN]); //スワイプ処理関数
 
-int evaluate2(F_T field[ROW][COL], int flag,int *combo);//落とし減点評価関数
-int sum_e2(F_T field[ROW][COL],int *combo);//評価関数
+int evaluate2(F_T field[ROW][COL], int flag, int* combo);//落とし減点評価関数
+int sum_e2(F_T field[ROW][COL], int* combo);//評価関数
 
 struct member {//どういう手かの構造体
 	T_T movei[TRN];//スワイプ移動座標
@@ -162,7 +184,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						memcpy(field, f_field, sizeof(field));//盤面をもどす
 						operation(field, cand.movei);
 						int cmb;
-						cand.score = sum_e2(field,&cmb);
+						cand.score = sum_e2(field, &cmb);
 						cand.combo = cmb;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -268,6 +290,7 @@ int chain(int nrw, int ncl, int d, F_T field[ROW][COL],
 }
 int evaluate(F_T field[ROW][COL], int flag) {
 	int combo = 0;
+
 	while (1) {
 		int cmb = 0;
 		F_T chkflag[ROW][COL] = { 0 };
@@ -312,9 +335,10 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	return combo;
 }
 
-int evaluate2(F_T field[ROW][COL], int flag,int *combo) {
+int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 	int ev = 0;
 	*combo = 0;
+	int oti = 0;
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -354,28 +378,29 @@ int evaluate2(F_T field[ROW][COL], int flag,int *combo) {
 		}
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
-				char add = max(drop[i][j + 1][0] - drop[i][j][0], drop[i][j][0] - drop[i][j + 1][0]) + max(drop[i][j + 1][1] - drop[i][j][1], drop[i][j][1] - drop[i][j + 1][1]);
+				char add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
 				cmb2 -= (int)add;
+				if (delflag[drop[i][j][0]][drop[i][j][1]] > 0) {
+					field[drop[i][j][0]][drop[i][j][1]] = 0;
+				}
+				if (delflag[drop[i][j + 1][0]][drop[i][j + 1][1]] > 0) {
+					field[drop[i][j + 1][0]][drop[i][j + 1][1]] = 0;
+				}
 			}
 		}
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
-		for (int row = 0; row < ROW; row++) {
-			for (int col = 0; col < COL; col++) {
-				//コンボになったドロップは空になる。
-				if (delflag[row][col] > 0) { field[row][col] = 0; }
-			}
-		}
-
+		oti++;
 		if (flag & EVAL_FALL)fall(field);//落下処理発生
 		if (flag & EVAL_SET)set(field, 0);//落ちコン発生
 
 	}
+	ev += oti;
 	return ev;
 }
-int sum_e2(F_T field[ROW][COL],int* combo) {//落とし有り、落ちコン無し評価関数
+int sum_e2(F_T field[ROW][COL], int* combo) {//落とし有り、落ちコン無し評価関数
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo);
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
@@ -413,9 +438,11 @@ int main() {
 	double avg = 0;//平均コンボ数
 	double start;
 	double t_sum = 0;
+	double oti_avg = 0;//平均落ちコンボ数
 	for (i = 0; i < 1000; i++) {//1000問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
+		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d\n", i + 1);
 		init(f_field); set(f_field, 0);//初期盤面生成
 		show_field(f_field);//盤面表示
@@ -443,14 +470,19 @@ int main() {
 		} printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
 		operation(field, tmp.moving);
-		printf("output:No.%d\n",i+1);
+		printf("output:No.%d\n", i + 1);
 		show_field(field);
+		memcpy(oti_field, field, sizeof(field));
 		int combo = sum_e(field);
-		printf("%dCombo\n", combo);
+		int oti = sum_evaluate(oti_field);
+		printf("Normal:%dCombo\n", combo);
+		printf("Oti:%dCombo\n",oti);
 		avg += (double)combo;
+		oti_avg += (double)oti;
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("Avg.Combo #:%lf/%lf\n", avg / (double)i, MAXCOMBO / (double)i);
+	printf("Avg.NormalCombo #:%lf/%lf\n", avg / (double)i, MAXCOMBO / (double)i);
+	printf("Avg.OtiCombo #%lf\n", oti_avg / (double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
 	j = getchar();
 	return 0;
