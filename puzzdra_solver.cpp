@@ -1,3 +1,4 @@
+
 /*
 puzzdra_solver
 
@@ -10,7 +11,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/ym9mQO
+https://ideone.com/6PqZBk
 
 チェック1：これを10コンボできるか
 
@@ -27,11 +28,8 @@ https://ideone.com/ym9mQO
 951279
 
 チェック2：1000盤面落ちコン入り、平均コンボ数が9.18付近か
-
 チェック3：1000盤面落ちコンなし、理論値-平均コンボ数が0.1付近か
-
 全チェック達成したら合格
-
 */
 
 
@@ -380,6 +378,8 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
 				char add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
+				add += add;
+				add /= (char)3;
 				cmb2 -= (int)add;
 				if (delflag[drop[i][j][0]][drop[i][j][1]] > 0) {
 					field[drop[i][j][0]][drop[i][j][1]] = 0;
@@ -477,7 +477,7 @@ int main() {
 		int combo = sum_e(field);
 		int oti = sum_evaluate(oti_field);
 		printf("Normal:%dCombo\n", combo);
-		printf("Oti:%dCombo\n",oti);
+		printf("Oti:%dCombo\n", oti);
 		avg += (double)combo;
 		oti_avg += (double)oti;
 	}
