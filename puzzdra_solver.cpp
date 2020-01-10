@@ -11,7 +11,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/6PqZBk
+https://ideone.com/tS5uNE
 
 チェック1：これを10コンボできるか
 
@@ -31,7 +31,6 @@ https://ideone.com/6PqZBk
 チェック3：1000盤面落ちコンなし、理論値-平均コンボ数が0.1付近か
 全チェック達成したら合格
 */
-
 
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -83,7 +82,7 @@ void set(F_T field[ROW][COL], int force); //空マスを埋める関数
 void show_field(F_T field[ROW][COL]); //盤面表示関数
 unsigned int rnd(int mini, int maxi); //整数乱数
 //上下左右に連結しているドロップを再帰的に探索していく関数
-int chain(int nrw, int ncl, int d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F_T delflag[ROW][COL]);
+int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F_T delflag[ROW][COL]);
 int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
@@ -145,8 +144,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			cand.nowR = i;//y座標
 			cand.nowC = j;//x座標
 			cand.prev = -1;//1手前はない
-			memset(cand.movei, STP, sizeof(cand.movei));
 			cand.movei[0] = (T_T)YX(i, j);//1手目のyx座標
+			for (int trn = 1; trn < TRN; trn++) {
+				cand.movei[trn] = STP;
+			}
 			dque.push_back(cand);
 		}
 	}         // L, U,D,R //
@@ -263,7 +264,7 @@ void set(F_T field[ROW][COL], int force) {
 		}
 	}
 }
-int chain(int nrw, int ncl, int d, F_T field[ROW][COL],
+int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 	F_T chkflag[ROW][COL], F_T delflag[ROW][COL]) {
 	int count = 0;
 #define CHK_CF(Y,X) (field[Y][X] == d && chkflag[Y][X] == 0 && delflag[Y][X] > 0)
@@ -357,13 +358,14 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 				}
 			}
 		}
-		char cnt[DROP + 1] = { 0 };
-		char drop[DROP + 1][ROW * COL][2] = { 0 };
+
+		F_T cnt[DROP + 1] = { 0 };
+		F_T drop[DROP + 1][ROW * COL][2] = { 0 };
 
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				drop[field[row][col]][cnt[field[row][col]]][0] = (char)row;
-				drop[field[row][col]][cnt[field[row][col]]][1] = (char)col;
+				drop[field[row][col]][cnt[field[row][col]]][0] = (F_T)row;
+				drop[field[row][col]][cnt[field[row][col]]][1] = (F_T)col;
 				cnt[field[row][col]]++;
 				if (delflag[row][col] > 0) {
 					int c = chain(row, col, field[row][col], field, chkflag, delflag);
@@ -377,9 +379,9 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 		}
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
-				char add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
+				F_T add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
 				add += add;
-				add /= (char)3;
+				add /= (F_T)3;
 				cmb2 -= (int)add;
 				if (delflag[drop[i][j][0]][drop[i][j][1]] > 0) {
 					field[drop[i][j][0]][drop[i][j][1]] = 0;
