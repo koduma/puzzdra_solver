@@ -1,4 +1,3 @@
-
 /*
 puzzdra_solver
 
@@ -11,7 +10,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/tS5uNE
+https://ideone.com/9MhQi3
 
 チェック1：これを10コンボできるか
 
@@ -29,6 +28,7 @@ https://ideone.com/tS5uNE
 
 チェック2：1000盤面落ちコン入り、平均コンボ数が9.18付近か
 チェック3：1000盤面落ちコンなし、理論値-平均コンボ数が0.1付近か
+
 全チェック達成したら合格
 */
 
@@ -109,6 +109,7 @@ struct member {//どういう手かの構造体
 }fff[BEAM_WIDTH * 4];
 struct Action {//最終的に探索された手
 	int score;//コンボ数
+	int maxcombo;//理論コンボ数
 	T_T moving[TRN];//スワイプ移動座標
 	Action() {//初期化
 		this->score = 0;
@@ -155,6 +156,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
 	int maxValue = 0;//最高スコア
+
+	bestAction.maxcombo = stop;
 
 	//2手目以降をビームサーチで探索
 	for (int i = 1; i < MAX_TURN; i++) {
@@ -461,7 +464,6 @@ int main() {
 		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
 		double diff = omp_get_wtime() - start;
-		printf("%fSec\n", diff);
 		t_sum += diff;
 		printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
 		for (j = 1; j < MAX_TURN; j++) {//y座標は下にいくほど大きくなる
@@ -478,8 +480,10 @@ int main() {
 		memcpy(oti_field, field, sizeof(field));
 		int combo = sum_e(field);
 		int oti = sum_evaluate(oti_field);
-		printf("Normal:%dCombo\n", combo);
+		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
+		printf("elapsed time:%fSec\n", diff);
+		printf("------------\n");
 		avg += (double)combo;
 		oti_avg += (double)oti;
 	}
