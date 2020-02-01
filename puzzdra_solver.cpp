@@ -10,7 +10,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/9MhQi3
+https://ideone.com/tasfNL
 
 チェック1：これを10コンボできるか
 
@@ -73,6 +73,7 @@ using namespace std;
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 40//最大ルート長//MAX150
 #define BEAM_WIDTH 42000//ビーム幅//MAX1000000
+#define PROBLEM 1000//問題数
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
@@ -445,11 +446,11 @@ int main() {
 	double start;
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
-	for (i = 0; i < 1000; i++) {//1000問解く
+	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
-		printf("input:No.%d\n", i + 1);
+		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		init(f_field); set(f_field, 0);//初期盤面生成
 		show_field(f_field);//盤面表示
 		/*
@@ -475,7 +476,7 @@ int main() {
 		} printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
 		operation(field, tmp.moving);
-		printf("output:No.%d\n", i + 1);
+		printf("output:No.%d/%d\n", i + 1, PROBLEM);
 		show_field(field);
 		memcpy(oti_field, field, sizeof(field));
 		int combo = sum_e(field);
