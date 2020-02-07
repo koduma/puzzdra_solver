@@ -10,7 +10,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/tasfNL
+https://ideone.com/WkRW7q
 
 チェック1：これを10コンボできるか
 
@@ -213,12 +213,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		start = omp_get_wtime();
 		dque.clear();
 		vector<pair<int, int> >vec;
+		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
-			vec.push_back(make_pair(fff[j].score, j));
+			if (fff[j].score != -114514) {
+				vec.push_back(make_pair(fff[j].score, j));
+				ks2++;
+			}
 		}
 		sort(vec.begin(), vec.end());
 		reverse(vec.begin(), vec.end());
-		for (int j = 0; j < BEAM_WIDTH && j < 4 * ks; j++) {
+		for (int j = 0; j < BEAM_WIDTH && j < ks2; j++) {
 			member temp = fff[vec[j].second];
 			if (temp.score == -114514) { continue; }
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
