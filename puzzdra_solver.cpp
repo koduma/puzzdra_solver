@@ -69,9 +69,9 @@ using namespace std;
 #define ROW 5//縦
 #define COL 6//横
 #define DROP 6//ドロップの種類//MAX9
-#define TRN  44//手数//MAX155
+#define TRN  155//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
-#define MAX_TURN 40//最大ルート長//MAX150
+#define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 42000//ビーム幅//MAX1000000
 #define PROBLEM 1000//問題数
 typedef char F_T;//盤面型
