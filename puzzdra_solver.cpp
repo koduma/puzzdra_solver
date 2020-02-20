@@ -31,7 +31,7 @@ https://ideone.com/WkRW7q
 
 全チェック達成したら合格
 */
-
+#define _CRT_RAND_S
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
@@ -435,12 +435,10 @@ void operation(F_T field[ROW][COL], T_T route[TRN]) {
 }
 //double d_rnd(double mini, double maxi) {//xorshift実数乱数、おまじない
 unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
-	random_device rd;
+	unsigned int dice;
+	rand_s(&dice);
 
-	mt19937 mt(rd());
-
-	uniform_int_distribution<int> dice(mini, maxi);
-	return dice(mt);
+	return (unsigned int)((double)dice / ((double)UINT_MAX + 1) * (maxi - mini + 1)) + mini;
 }
 int main() {
 
