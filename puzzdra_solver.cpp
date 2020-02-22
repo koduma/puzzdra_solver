@@ -31,7 +31,6 @@ https://ideone.com/WkRW7q
 
 全チェック達成したら合格
 */
-#define _CRT_RAND_S
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
