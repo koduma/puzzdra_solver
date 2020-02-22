@@ -435,10 +435,10 @@ void operation(F_T field[ROW][COL], T_T route[TRN]) {
 }
 //double d_rnd(double mini, double maxi) {//xorshift実数乱数、おまじない
 unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
-	unsigned int dice;
-	rand_s(&dice);
-
-	return (unsigned int)((double)dice / ((double)UINT_MAX + 1) * (maxi - mini + 1)) + mini;
+	static random_device rd;
+	static mt19937 mt(rd());
+	uniform_int_distribution<int> dice(mini, maxi);
+	return dice(mt);
 }
 int main() {
 
