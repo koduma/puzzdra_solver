@@ -1,7 +1,7 @@
 /*
 puzzdra_solver
 
-パズドラのルート解析プログラムです。
+パズドラのルート解析プログラムです。コンパイラはMinGWを推奨します。
 なるべく少ない時間でなるべく大きいコンボを出したいです。
 
 printf("TotalDuration:%fSec\n", t_sum);
@@ -10,7 +10,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/WkRW7q
+https://ideone.com/iHcPFG
 
 チェック1：これを10コンボできるか
 
