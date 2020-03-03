@@ -10,7 +10,8 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/iHcPFG
+https://ideone.com/gep8qo
+
 
 チェック1：これを10コンボできるか
 
@@ -73,6 +74,7 @@ using namespace std;
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 42000//ビーム幅//MAX1000000
 #define PROBLEM 1000//問題数
+#define BONUS 10//評価値改善係数
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
@@ -98,6 +100,8 @@ struct member {//どういう手かの構造体
 	int nowC;//今どのx座標にいるか
 	int nowR;//今どのy座標にいるか
 	int prev;//1手前は上下左右のどっちを選んだか
+	int prev_score;//1手前の評価値
+	int improving;//評価値改善回数
 	member() {//初期化
 		this->score = 0;
 		this->prev = -1;
@@ -149,6 +153,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			for (int trn = 1; trn < TRN; trn++) {
 				cand.movei[trn] = STP;
 			}
+			F_T ff_field[ROW][COL];
+			memcpy(ff_field,f_field,sizeof(ff_field));
+			int cmb;
+			cand.prev_score=sum_e2(ff_field,&cmb);
+			cand.improving=0;
 			dque.push_back(cand);
 		}
 	}         // L, U,D,R //
@@ -215,7 +224,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].score != -114514) {
-				vec.push_back(make_pair(fff[j].score, j));
+				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+				fff[j].prev_score=fff[j].score;
+				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
 				ks2++;
 			}
 		}
