@@ -1,7 +1,7 @@
 /*
 puzzdra_solver
 
-パズドラのルート解析プログラムです。
+パズドラのルート解析プログラムです
 
 コンパイラはMinGWを推奨します
  
@@ -345,7 +345,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				//コンボになったドロップは空になる。
+				//コンボになったドロップは空になる
 				if (delflag[row][col] > 0) { field[row][col] = 0; }
 			}
 		}
@@ -439,7 +439,7 @@ void operation(F_T field[ROW][COL], T_T route[TRN]) {
 	int prw = (int)YY(route[0]), pcl = (int)XX(route[0]), i;
 	for (i = 1; i < MAX_TURN; i++) {
 		if (route[i] == STP) { break; }
-		//移動したら、移動前ドロップと移動後ドロップを交換する。
+		//移動したら、移動前ドロップと移動後ドロップを交換する
 		int row = (int)YY(route[i]), col = (int)XX(route[i]);
 		F_T c = field[prw][pcl];
 		field[prw][pcl] = field[row][col];
