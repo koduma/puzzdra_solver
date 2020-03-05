@@ -8,12 +8,12 @@ puzzdra_solver
 コマンドは以下の通りです
 g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver
 
-なるべく少ない時間でなるべく大きいコンボを出したいです。
+なるべく少ない時間でなるべく大きいコンボを出したいです
 
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
-これらが改善されればpull request受け付けます。
+これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
 https://ideone.com/bovGKN
