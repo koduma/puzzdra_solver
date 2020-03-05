@@ -1,7 +1,13 @@
 /*
 puzzdra_solver
 
-パズドラのルート解析プログラムです。コンパイラはMinGWを推奨します。
+パズドラのルート解析プログラムです。
+
+コンパイラはMinGWを推奨します
+ 
+コマンドは以下の通りです
+g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver
+
 なるべく少ない時間でなるべく大きいコンボを出したいです。
 
 printf("TotalDuration:%fSec\n", t_sum);
@@ -10,8 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます。
 
 パズドラ検定クエスト対策君
-https://ideone.com/gep8qo
-
+https://ideone.com/bovGKN
 
 チェック1：これを10コンボできるか
 
@@ -207,12 +212,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						part4 += omp_get_wtime() - st;
 					}
 					else {
-						cand.score = -114514;
+						cand.combo = -1;
 						fff[(4 * k) + j] = cand;
 					}
 				}
 				else {
-					cand.score = -114514;
+					cand.combo = -1;
 					fff[(4 * k) + j] = cand;
 				}
 			}
@@ -223,7 +228,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		vector<pair<int, int> >vec;
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
-			if (fff[j].score != -114514) {
+			if (fff[j].combo != -1) {
 				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 				fff[j].prev_score=fff[j].score;
 				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
@@ -234,7 +239,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		reverse(vec.begin(), vec.end());
 		for (int j = 0; j < BEAM_WIDTH && j < ks2; j++) {
 			member temp = fff[vec[j].second];
-			if (temp.score == -114514) { continue; }
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
