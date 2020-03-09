@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/bovGKN
+https://ideone.com/SPWiZC
 
 チェック1：これを10コンボできるか
 
@@ -236,9 +236,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 		}
 		sort(vec.begin(), vec.end());
-		reverse(vec.begin(), vec.end());
 		for (int j = 0; j < BEAM_WIDTH && j < ks2; j++) {
-			member temp = fff[vec[j].second];
+			member temp = fff[vec[ks2-1-j].second];
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
