@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/SPWiZC
+https://ideone.com/bY9xnK
 
 チェック1：これを10コンボできるか
 
@@ -62,6 +62,7 @@ https://ideone.com/SPWiZC
 #include <chrono>
 #include <fstream>
 #include <functional>
+#include <unordered_map>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -77,11 +78,12 @@ using namespace std;
 #define TRN  155//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 42000//ビーム幅//MAX1000000
+#define BEAM_WIDTH 30000//ビーム幅//MAX200000
 #define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
+typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
 void init(F_T field[ROW][COL]); //初期配置生成関数
 void fall(F_T field[ROW][COL]); //ドロップの落下処理関数
@@ -95,8 +97,12 @@ int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ�
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T route[TRN]); //スワイプ処理関数
 
-int evaluate2(F_T field[ROW][COL], int flag, int* combo);//落とし減点評価関数
-int sum_e2(F_T field[ROW][COL], int* combo);//評価関数
+int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//落とし減点評価関数
+int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//評価関数
+
+ll xor128();
+ll zoblish_field[ROW][COL][DROP+1];
+
 
 struct member {//どういう手かの構造体
 	T_T movei[TRN];//スワイプ移動座標
@@ -107,6 +113,7 @@ struct member {//どういう手かの構造体
 	int prev;//1手前は上下左右のどっちを選んだか
 	int prev_score;//1手前の評価値
 	int improving;//評価値改善回数
+	ll hash;
 	member() {//初期化
 		this->score = 0;
 		this->prev = -1;
@@ -161,8 +168,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			F_T ff_field[ROW][COL];
 			memcpy(ff_field,f_field,sizeof(ff_field));
 			int cmb;
-			cand.prev_score=sum_e2(ff_field,&cmb);
+			ll ha;
+			cand.prev_score=sum_e2(ff_field,&cmb,&ha);
 			cand.improving=0;
+			cand.hash=ha;
 			dque.push_back(cand);
 		}
 	}         // L, U,D,R //
@@ -172,6 +181,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	int maxValue = 0;//最高スコア
 
 	bestAction.maxcombo = stop;
+	
+	unordered_map<ll, bool> checkNodeList[ROW*COL];
 
 	//2手目以降をビームサーチで探索
 	for (int i = 1; i < MAX_TURN; i++) {
@@ -201,8 +212,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						memcpy(field, f_field, sizeof(field));//盤面をもどす
 						operation(field, cand.movei);
 						int cmb;
-						cand.score = sum_e2(field, &cmb);
+						ll ha;
+						cand.score = sum_e2(field, &cmb,&ha);
 						cand.combo = cmb;
+						cand.hash=ha;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						st = omp_get_wtime();
@@ -246,7 +259,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				if (temp.combo == stop) { return bestAction; }
 			}
 			if (i < MAX_TURN - 1) {
+			int pos=(temp.nowR*COL)+temp.nowC;
+			if(!checkNodeList[pos][temp.hash]){
+				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
+			}
 			}
 		}
 		part3 += omp_get_wtime() - start;
@@ -356,9 +373,10 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	return combo;
 }
 
-int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
+int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 	int ev = 0;
 	*combo = 0;
+	ll ha=0;
 	int oti = 0;
 	while (1) {
 		int cmb = 0;
@@ -367,6 +385,10 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 		F_T delflag[ROW][COL] = { 0 };
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
+			if(oti==0){
+			int num = (int)field[row][col];
+			ha ^= zoblish_field[row][col][num];
+			}
 				if (col <= COL - 3 && field[row][col] == field[row][col + 1] && field[row][col] == field[row][col + 2] && field[row][col] > 0) {
 					delflag[row][col] = field[row][col];
 					delflag[row][col + 1] = field[row][col];
@@ -422,10 +444,11 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo) {
 
 	}
 	ev += oti;
+	*hash=ha;
 	return ev;
 }
-int sum_e2(F_T field[ROW][COL], int* combo) {//落とし有り、落ちコン無し評価関数
-	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo);
+int sum_e2(F_T field[ROW][COL], int* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
+	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash);
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
@@ -452,9 +475,23 @@ unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
 	uniform_int_distribution<int> dice(mini, maxi);
 	return dice(mt);
 }
+ll xor128() {
+	static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
+	ll rt = (rx ^ (rx << 11));
+	rx = ry; ry = rz; rz = rw;
+	return (rw = (rw ^ (rw >> 19)) ^ (rt ^ (rt >> 8)));
+}
 int main() {
 
 	int i, j, k;
+	
+	for(i=0;i<ROW;++i){
+	for(j=0;j<COL;++j){
+	for(k=0;k<=DROP;k++){
+	zoblish_field[i][j][k]=xor128();
+	}
+	}
+	}
 
 	double avg = 0;//平均コンボ数
 	double start;
