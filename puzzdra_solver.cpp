@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/bY9xnK
+https://ideone.com/ZrchYE
 
 チェック1：これを10コンボできるか
 
