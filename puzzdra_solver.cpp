@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/ZrchYE
+https://ideone.com/la3twY
 
 チェック1：これを10コンボできるか
 
@@ -72,13 +72,13 @@ using namespace std;
 #define YY(PT)  XX((PT)>>4)
 #define YX(Y,X) ((Y)<<4|(X))
 #define DIR 4//方向
-#define ROW 5//縦
-#define COL 6//横
+#define ROW 5//縦//MAX6
+#define COL 6//横//MAX7
 #define DROP 6//ドロップの種類//MAX9
 #define TRN  155//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 30000//ビーム幅//MAX200000
+#define BEAM_WIDTH 10000//ビーム幅//MAX200000
 #define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 typedef char F_T;//盤面型
@@ -104,7 +104,7 @@ ll xor128();
 ll zoblish_field[ROW][COL][DROP+1];
 
 
-struct member {//どういう手かの構造体
+struct node {//どういう手かの構造体
 	T_T movei[TRN];//スワイプ移動座標
 	int score;//評価値
 	int combo;//コンボ数
@@ -114,12 +114,12 @@ struct member {//どういう手かの構造体
 	int prev_score;//1手前の評価値
 	int improving;//評価値改善回数
 	ll hash;
-	member() {//初期化
+	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
-	bool operator < (const member& n)const {//スコアが高い方が優先される
+	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
 }fff[BEAM_WIDTH * 4];
@@ -151,13 +151,13 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	}
 	MAXCOMBO += (double)stop;
 
-	deque<member>dque;
+	deque<node>dque;
 	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
-			member cand;
+			node cand;
 			cand.nowR = i;//y座標
 			cand.nowC = j;//x座標
 			cand.prev = -1;//1手前はない
@@ -186,7 +186,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	//2手目以降をビームサーチで探索
 	for (int i = 1; i < MAX_TURN; i++) {
-		//priority_queue<member, vector<member>, less<member> >pque;
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for private(st),reduction(+:part1,part4)
@@ -198,9 +197,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 					omp_get_max_threads());
 			}
 #endif
-			member temp = dque[k];//que.front(); que.pop();
+			node temp = dque[k];//que.front(); que.pop();
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
-				member cand = temp;
+				node cand = temp;
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
 					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
@@ -249,8 +248,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 		}
 		sort(vec.begin(), vec.end());
-		for (int j = 0; j < BEAM_WIDTH && j < ks2; j++) {
-			member temp = fff[vec[ks2-1-j].second];
+		int push_node=0;
+		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
+			node temp = fff[vec[ks2-1-j].second];
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
@@ -263,6 +263,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
+				push_node++;
 			}
 			}
 		}
