@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/la3twY
+https://ideone.com/S8TomW
 
 チェック1：これを10コンボできるか
 
@@ -81,6 +81,8 @@ using namespace std;
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
 #define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define node_size MAX(150,4*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef unsigned long long ll;
@@ -122,7 +124,7 @@ struct node {//どういう手かの構造体
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
-}fff[BEAM_WIDTH * 4];
+}fff[node_size];
 struct Action {//最終的に探索された手
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
@@ -470,13 +472,12 @@ void operation(F_T field[ROW][COL], T_T route[TRN]) {
 		prw = row, pcl = col;
 	}
 }
-//double d_rnd(double mini, double maxi) {//xorshift実数乱数、おまじない
-unsigned int rnd(int mini, int maxi) {//xorshift整数乱数、おまじない
+unsigned int rnd(int mini, int maxi) {
 	static mt19937 mt((int)time(0));
 	uniform_int_distribution<int> dice(mini, maxi);
 	return dice(mt);
 }
-ll xor128() {
+ll xor128() {//xorshift整数乱数
 	static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
 	ll rt = (rx ^ (rx << 11));
 	rx = ry; ry = rz; rz = rw;
