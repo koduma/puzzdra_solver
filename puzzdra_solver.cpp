@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/S8TomW
+https://ideone.com/06tKFZ
 
 チェック1：これを10コンボできるか
 
@@ -32,8 +32,8 @@ https://ideone.com/S8TomW
 355886
 951279
 
-チェック2：1000盤面落ちコン入り、平均コンボ数が9.18付近か
-チェック3：1000盤面落ちコンなし、理論値-平均コンボ数が0.1付近か
+チェック2：1000盤面平均落ちコンボ数が9.20付近か
+チェック3：1000盤面平均コンボ数が理論値付近か
 
 全チェック達成したら合格
 */
@@ -82,7 +82,7 @@ using namespace std;
 #define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define node_size MAX(150,4*BEAM_WIDTH)
+#define NODE_SIZE MAX(150,4*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef unsigned long long ll;
@@ -102,7 +102,7 @@ void operation(F_T field[ROW][COL], T_T route[TRN]); //スワイプ処理関数
 int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//落とし減点評価関数
 int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//評価関数
 
-ll xor128();
+ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 
@@ -115,7 +115,7 @@ struct node {//どういう手かの構造体
 	int prev;//1手前は上下左右のどっちを選んだか
 	int prev_score;//1手前の評価値
 	int improving;//評価値改善回数
-	ll hash;
+	ll hash;//盤面のハッシュ値
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
@@ -124,7 +124,7 @@ struct node {//どういう手かの構造体
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
-}fff[node_size];
+}fff[NODE_SIZE];
 struct Action {//最終的に探索された手
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
