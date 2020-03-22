@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/06tKFZ
+https://ideone.com/jUVbV8
 
 チェック1：これを10コンボできるか
 
@@ -200,18 +200,23 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 #endif
 			node temp = dque[k];//que.front(); que.pop();
+			F_T temp_field[ROW][COL]; 
+			memcpy(temp_field, f_field, sizeof(temp_field));
+			operation(temp_field, temp.movei);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
 				node cand = temp;
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
 					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
+						F_T field[ROW][COL];//盤面
+						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
+						F_T tmp=field[cand.nowR][cand.nowC];
+						field[cand.nowR][cand.nowC]=field[cand.nowR+dy[j]][cand.nowC+dx[j]];
+						field[cand.nowR+dy[j]][cand.nowC+dx[j]]=tmp;
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i] = (T_T)YX(cand.nowR, cand.nowC);
 						st = omp_get_wtime();
-						F_T field[ROW][COL]; //盤面
-						memcpy(field, f_field, sizeof(field));//盤面をもどす
-						operation(field, cand.movei);
 						int cmb;
 						ll ha;
 						cand.score = sum_e2(field, &cmb,&ha);
