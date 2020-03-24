@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/jUVbV8
+https://ideone.com/AhEyAW
 
 チェック1：これを10コンボできるか
 
@@ -88,7 +88,7 @@ typedef char T_T;//手数型
 typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
 void init(F_T field[ROW][COL]); //初期配置生成関数
-void fall(F_T field[ROW][COL]); //ドロップの落下処理関数
+void fall(int x,F_T field[ROW][COL]); //ドロップの落下処理関数
 void set(F_T field[ROW][COL], int force); //空マスを埋める関数
 void show_field(F_T field[ROW][COL]); //盤面表示関数
 unsigned int rnd(int mini, int maxi); //整数乱数
@@ -286,19 +286,17 @@ void show_field(F_T field[ROW][COL]) {
 		printf("\n");
 	}
 }
-void fall(F_T field[ROW][COL]) {
-	for (int j = 0; j < COL; j++) {
+void fall(int x,F_T field[ROW][COL]) {
 		int tgt;
-		for (tgt = ROW - 1; tgt >= 0 && field[tgt][j] != 0; tgt--);
+		for (tgt = ROW - 1; tgt >= 0 && field[tgt][x] != 0; tgt--);
 		for (int i = tgt - 1; i >= 0; i--) {
-			if (field[i][j] != 0) {
-				F_T c = field[i][j];
-				field[i][j] = 0;
-				field[tgt][j] = c;
+			if (field[i][x] != 0) {
+				F_T c = field[i][x];
+				field[i][x] = 0;
+				field[tgt][x] = c;
 				tgt--;
 			}
 		}
-	}
 }
 void init(F_T field[ROW][COL]) { set(field, !0); }
 void set(F_T field[ROW][COL], int force) {
@@ -374,8 +372,12 @@ int evaluate(F_T field[ROW][COL], int flag) {
 			}
 		}
 
-		if (flag & EVAL_FALL)fall(field);//落下処理発生
-		if (flag & EVAL_SET)set(field, 0);//落ちコン発生
+		if (flag & EVAL_FALL){
+		for(int x=0;x<COL;x++){
+		fall(x,field);
+		}
+		}//落下処理発生
+		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
 
 	}
 	return combo;
@@ -428,6 +430,8 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				}
 			}
 		}
+		bool erase_x[COL];
+		fill(erase_x, erase_x+COL, false);
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
 				F_T add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
@@ -436,9 +440,11 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				cmb2 -= (int)add;
 				if (delflag[drop[i][j][0]][drop[i][j][1]] > 0) {
 					field[drop[i][j][0]][drop[i][j][1]] = 0;
+					erase_x[drop[i][j][1]]=true;
 				}
 				if (delflag[drop[i][j + 1][0]][drop[i][j + 1][1]] > 0) {
 					field[drop[i][j + 1][0]][drop[i][j + 1][1]] = 0;
+					erase_x[drop[i][j+1][1]]=true;
 				}
 			}
 		}
@@ -447,8 +453,14 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
-		if (flag & EVAL_FALL)fall(field);//落下処理発生
-		if (flag & EVAL_SET)set(field, 0);//落ちコン発生
+		if (flag & EVAL_FALL){//落下処理発生
+		for(int x=0;x<COL;x++){
+		if(erase_x[x]){
+		fall(x,field);
+		}
+		}
+		}
+		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
 
 	}
 	ev += oti;
