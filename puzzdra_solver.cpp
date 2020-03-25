@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/bbq6Ki
+https://ideone.com/6r6mg9
 
 チェック1：これを10コンボできるか
 
@@ -430,8 +430,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				}
 			}
 		}
-		bool erase_x[COL];
-		fill(erase_x, erase_x+COL, false);
+		F_T erase_x[COL]={0};
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
 				F_T add = max(drop[i][j][0] - drop[i][j + 1][0], drop[i][j + 1][0] - drop[i][j][0]) + max(drop[i][j][1] - drop[i][j + 1][1], drop[i][j + 1][1] - drop[i][j][1]);
@@ -440,11 +439,11 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				cmb2 -= (int)add;
 				if (delflag[drop[i][j][0]][drop[i][j][1]] > 0) {
 					field[drop[i][j][0]][drop[i][j][1]] = 0;
-					erase_x[drop[i][j][1]]=true;
+					erase_x[drop[i][j][1]]=1;
 				}
 				if (delflag[drop[i][j + 1][0]][drop[i][j + 1][1]] > 0) {
 					field[drop[i][j + 1][0]][drop[i][j + 1][1]] = 0;
-					erase_x[drop[i][j+1][1]]=true;
+					erase_x[drop[i][j+1][1]]=1;
 				}
 			}
 		}
@@ -455,7 +454,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		oti++;
 		if (flag & EVAL_FALL){//落下処理発生
 		for(int x=0;x<COL;x++){
-		if(erase_x[x]){
+		if(erase_x[x]==1){
 		fall(x,field);
 		}
 		}
