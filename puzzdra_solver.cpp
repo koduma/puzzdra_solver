@@ -16,7 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/AhEyAW
+https://ideone.com/bbq6Ki
 
 チェック1：これを10コンボできるか
 
@@ -82,7 +82,7 @@ using namespace std;
 #define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define NODE_SIZE MAX(150,4*BEAM_WIDTH)
+#define NODE_SIZE MAX(500,4*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef unsigned long long ll;
