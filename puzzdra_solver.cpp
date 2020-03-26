@@ -1,3 +1,4 @@
+
 /*
 puzzdra_solver
 
@@ -16,7 +17,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/x1c72e
+https://ideone.com/sK0w0n
 
 チェック1：これを10コンボできるか
 
@@ -94,7 +95,7 @@ void set(F_T field[ROW][COL], int force); //空マスを埋める関数
 void show_field(F_T field[ROW][COL]); //盤面表示関数
 unsigned int rnd(int mini, int maxi); //整数乱数
 //上下左右に連結しているドロップを再帰的に探索していく関数
-int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], ll* chkflag, ll delflag);
+int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F_T delflag[ROW][COL]);
 int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
@@ -310,13 +311,13 @@ void set(F_T field[ROW][COL], int force) {
 	}
 }
 int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
-	ll* chkflag, ll delflag) {
+	F_T chkflag[ROW][COL], F_T delflag[ROW][COL]) {
 	int count = 0;
-#define CHK_CF(Y,X) (field[Y][X] == d && !((*chkflag) & (1ll<<(((Y)*COL)+X))) && (delflag & (1ll<<(((Y)*COL)+X))) != 0)
+#define CHK_CF(Y,X) (field[Y][X] == d && chkflag[Y][X]==0 && delflag[Y][X] > 0)
 	//連結している同じ色の消去ドロップが未探索だったら
 	if (CHK_CF(nrw, ncl)) {
 		++count; //連結ドロップ数の更新
-		(*chkflag) |= (1ll << (((nrw) * COL) + ncl));//探索済みにする
+		chkflag[nrw][ncl]=1;//探索済みにする
 			//以下上下左右に連結しているドロップを再帰的に探索していく
 		if (0 < nrw && CHK_CF(nrw - 1, ncl)) {
 			count += chain(nrw - 1, ncl, d, field, chkflag, delflag);
@@ -338,26 +339,27 @@ int evaluate(F_T field[ROW][COL], int flag) {
 
 	while (1) {
 		int cmb = 0;
-		ll chkflag=0;
-		ll delflag=0;
+		F_T chkflag[ROW][COL]={0};
+		F_T delflag[ROW][COL]={0};
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				if (col <= COL - 3 && field[row][col] == field[row][col + 1] && field[row][col] == field[row][col + 2] && field[row][col] > 0) {
-					delflag |= (1ll << (((row) * COL) + col));
-					delflag |= (1ll << (((row) * COL) + col + 1));
-					delflag |= (1ll << (((row) * COL) + col + 2));
+				F_T num=field[row][col];
+				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row][col+1]=1;
+					delflag[row][col+2]=1;
 				}
-				if (row <= ROW - 3 && field[row][col] == field[row + 1][col] && field[row][col] == field[row + 2][col] && field[row][col] > 0) {
-					delflag |= (1ll << (((row) * COL) + col));
-					delflag |= (1ll << (((row + 1) * COL) + col));
-					delflag |= (1ll << (((row + 2) * COL) + col));
+				if (row <= ROW - 3 && num == field[row + 1][col] && num == field[row + 2][col] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row+1][col]=1;
+					delflag[row+2][col]=1;
 				}
 			}
 		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				if ((delflag & (1ll << (((row) * COL) + col))) != 0) {
-					if (chain(row, col, field[row][col], field, &chkflag, delflag) >= 3) {
+				if (delflag[row][col] > 0) {
+					if (chain(row, col, field[row][col], field, chkflag, delflag) >= 3) {
 						cmb++;
 					}
 				}
@@ -369,7 +371,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				//コンボになったドロップは空になる
-				if ((delflag & (1ll << (((row) * COL) + col))) != 0) { field[row][col] = 0; }
+				if (delflag[row][col]> 0) { field[row][col] = 0; }
 			}
 		}
 
@@ -391,23 +393,23 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
-		ll chkflag=0;
-		ll delflag=0;
+		F_T chkflag[ROW][COL]={0};
+		F_T delflag[ROW][COL]={0};
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-			if(oti==0){
-			int num = (int)field[row][col];
-			ha ^= zoblish_field[row][col][num];
-			}
-				if (col <= COL - 3 && field[row][col] == field[row][col + 1] && field[row][col] == field[row][col + 2] && field[row][col] > 0) {
-					delflag |= (1ll << (((row) * COL) + col));
-					delflag |= (1ll << (((row) * COL) + col + 1));
-					delflag |= (1ll << (((row) * COL) + col + 2));
+				F_T num = field[row][col];
+				if(oti==0){
+					ha ^= zoblish_field[row][col][(int)num];
 				}
-				if (row <= ROW - 3 && field[row][col] == field[row + 1][col] && field[row][col] == field[row + 2][col] && field[row][col] > 0) {
-					delflag |= (1ll << (((row) * COL) + col));
-					delflag |= (1ll << (((row + 1) * COL) + col));
-					delflag |= (1ll << (((row + 2) * COL) + col));
+				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row][col+1]=1;
+					delflag[row][col+2]=1;
+				}
+				if (row <= ROW - 3 && num == field[row + 1][col] && num == field[row + 2][col] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row+1][col]=1;
+					delflag[row+2][col]=1;
 				}
 			}
 		}
@@ -420,8 +422,8 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				drop[field[row][col]][cnt[field[row][col]]][0] = (F_T)row;
 				drop[field[row][col]][cnt[field[row][col]]][1] = (F_T)col;
 				cnt[field[row][col]]++;
-				if ((delflag & (1ll << (((row) * COL) + col))) != 0) {
-					int c = chain(row, col, field[row][col], field, &chkflag, delflag);
+				if (delflag[row][col]>0) {
+					int c = chain(row, col, field[row][col], field, chkflag, delflag);
 					if (c >= 3) {
 						cmb++;
 						if (c == 3) { cmb2 += 30; }
@@ -441,11 +443,11 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				add += add;
 				add /= 3;
 				cmb2 -= add;
-				if ((delflag & (1ll << (((d1) * COL) + d2))) != 0) {
+				if (delflag[d1][d2]> 0) {
 					field[d1][d2] = 0;
 					erase_x[d2]=1;
 				}
-				if ((delflag & (1ll << (((d3) * COL) + d4))) != 0) {
+				if (delflag[d3][d4] > 0) {
 					field[d3][d4] = 0;
 					erase_x[d4]=1;
 				}
