@@ -17,7 +17,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 パズドラ検定クエスト対策君
-https://ideone.com/sK0w0n
+https://ideone.com/Sgjd02
 
 チェック1：これを10コンボできるか
 
@@ -90,7 +90,7 @@ typedef char T_T;//手数型
 typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
 void init(F_T field[ROW][COL]); //初期配置生成関数
-void fall(int x,F_T field[ROW][COL]); //ドロップの落下処理関数
+void fall(int x,int h,F_T field[ROW][COL]); //ドロップの落下処理関数
 void set(F_T field[ROW][COL], int force); //空マスを埋める関数
 void show_field(F_T field[ROW][COL]); //盤面表示関数
 unsigned int rnd(int mini, int maxi); //整数乱数
@@ -288,10 +288,10 @@ void show_field(F_T field[ROW][COL]) {
 		printf("\n");
 	}
 }
-void fall(int x,F_T field[ROW][COL]) {
+void fall(int x,int h,F_T field[ROW][COL]) {
 		int tgt;
-		for (tgt = ROW - 1; tgt >= 0 && field[tgt][x] != 0; tgt--);
-		for (int i = tgt - 1; i >= 0; i--) {
+		for (tgt = ROW - 1; tgt >= h && field[tgt][x] != 0; tgt--);
+		for (int i = tgt - 1; i >= h; i--) {
 			if (field[i][x] != 0) {
 				F_T c = field[i][x];
 				field[i][x] = 0;
@@ -341,9 +341,16 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		int cmb = 0;
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
+		F_T GetHeight[COL];
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num=field[row][col];
+				if(row==0){
+				GetHeight[col]=(F_T)ROW;
+				}
+				if(num>0 && GetHeight[col]==(F_T)ROW){
+				GetHeight[col]=(F_T)row;
+				}
 				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
 					delflag[row][col]=1;
 					delflag[row][col+1]=1;
@@ -377,7 +384,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 
 		if (flag & EVAL_FALL){
 		for(int x=0;x<COL;x++){
-		fall(x,field);
+		fall(x,GetHeight[x],field);
 		}
 		}//落下処理発生
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
@@ -395,9 +402,16 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		int cmb2 = 0;
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
+		F_T GetHeight[COL];
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
+				if(row==0){
+				GetHeight[col]=(F_T)ROW;
+				}
+				if(num>0 && GetHeight[col]==(F_T)ROW){
+				GetHeight[col]=(F_T)row;
+				}
 				if(oti==0){
 					ha ^= zoblish_field[row][col][(int)num];
 				}
@@ -461,7 +475,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		if (flag & EVAL_FALL){//落下処理発生
 		for(int x=0;x<COL;x++){
 		if(erase_x[x]==1){
-		fall(x,field);
+		fall(x,GetHeight[x],field);
 		}
 		}
 		}
