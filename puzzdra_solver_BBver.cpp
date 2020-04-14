@@ -1,41 +1,28 @@
+
 /*
 puzzdra_solver
-
 パズドラのルート解析プログラムです
-
 コンパイラはMinGWを推奨します
-
 コマンドは以下の通りです
 g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
-
 なるべく少ない時間でなるべく大きいコンボを出したいです
-
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
-
 これらが改善されればpull request受け付けます
-
 チェック1：これを10コンボできるか
-
 962679
 381515
 489942
 763852
 917439
-
 914769
 264812
 379934
 355886
 951279
-
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
-
 チェック3：1000盤面平均コンボ数が理論値付近か
-
 全チェック達成したら合格
-
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -69,14 +56,14 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 #endif
 using namespace std;
 #define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//時間差分
-#define XX(PT)? ((PT)&15)
-#define YY(PT)? XX((PT)>>4)
+#define XX(PT) ((PT)&15)
+#define YY(PT) XX((PT)>>4)
 #define YX(Y,X) ((Y)<<4|(X))
 #define DIR 4//方向
 #define ROW 5//変更不可
 #define COL 6//変更不可
 #define DROP 6//ドロップの種類//MAX9
-#define TRN? 155//手数//MAX155
+#define TRN 155//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
@@ -186,7 +173,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			cand.hash=ha;
 			dque.push_back(cand);
 		}
-	}? ? ? ?  // L, U,D,R //
+	}// L, U,D,R //
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
@@ -608,10 +595,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		occBB=fallBB(occBB,occBB,mask);
 
 		/*
-
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
-
 		F_T GetHeight[COL];
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -637,8 +622,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 				}
 			}
 		}
-
-
 		F_T cnt[DROP + 1] = { 0 };
 		F_T drop[DROP + 1][ROW * COL][2] = { 0 };
 		for (int row = 0; row < ROW; row++) {
@@ -656,7 +639,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 				}
 			}
 		}
-
 		F_T erase_x[COL]={0};
 		for (int i = 1; i <= DROP; i++) {
 			for (int j = 0; j < cnt[i] - 1; j++) {
