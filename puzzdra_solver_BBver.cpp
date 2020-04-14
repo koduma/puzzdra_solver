@@ -517,7 +517,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 	*combo = 0;
 	ll ha=0;
 	int oti = 0;
-	ll ha2;
 	ll occBB=0;
 
 	for(int i=1;i<=DROP;i++){
@@ -619,7 +618,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 				GetHeight[col]=(F_T)row;
 				}
 				if(oti==0){
-					ha2 ^= zoblish_field[row][col][(int)num];
+					ha ^= zoblish_field[row][col][(int)num];
 				}
 				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
 					delflag[row][col]=1;
