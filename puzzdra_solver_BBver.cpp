@@ -780,7 +780,7 @@ int main() {
 	ll ha = 0x03F566ED27179461ULL;
 	for (i = 0; i < 64; i++){
 	table[ ha >> 58 ] = i;
-? ? 	ha <<= 1;
+	ha <<= 1;
 	}
 
 	ll res=2ll;
