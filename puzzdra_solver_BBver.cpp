@@ -541,13 +541,14 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		while(1){
 		long long chainBB=tmp_linked&(-tmp_linked);
 		if(chainBB==0ll){break;}
-		long long tmp=chainBB;
+		long long peek=chainBB;
 		while (1) {
-		if(tmp==(tmp_linked&(long long)around(tmp))){break;}
-		tmp=tmp_linked&(long long)around(tmp);
+		long long tmp=tmp_linked&((long long)around(peek));
+		if(peek==tmp){break;}
+		peek=tmp;
 		}
-		int c=__builtin_popcountll(tmp);
-		tmp_linked^=tmp;
+		int c=__builtin_popcountll(peek);
+		tmp_linked^=peek;
 		if(c>=3){
 		cmb++;
 		if(c==3){cmb2+=30;}
