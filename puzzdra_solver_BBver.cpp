@@ -1,4 +1,3 @@
-
 /*
 puzzdra_solver
 
@@ -17,6 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 これらが改善されればpull request受け付けます
 
 チェック1：これを10コンボできるか
+
 962679
 381515
 489942
@@ -71,8 +71,8 @@ using namespace std;
 #define YY(PT) XX((PT)>>4)
 #define YX(Y,X) ((Y)<<4|(X))
 #define DIR 4//方向
-#define ROW 5//変更不可
-#define COL 6//変更不可
+#define ROW 5//縦//MAX6
+#define COL 6//横//MAX7
 #define DROP 6//ドロップの種類//MAX9
 #define TRN 155//手数//MAX155
 #define STP YX(7,7)//無効手[無効座標]
@@ -146,6 +146,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, part4 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
+	int po=9+(8*(COL-1))+ROW-1;
+
 	int stop = 0;//理論最大コンボ数
 
 	int drop[DROP + 1] = { 0 };
@@ -197,7 +199,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	for(int row=0;row<ROW;row++){
 	for(int col=0;col<COL;col++){
-	int pos=63-((8*col)+row+10);
+	int pos=po-((8*col)+row);
 	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
 	}
@@ -234,9 +236,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
 						F_T tmp=field[cand.nowR][cand.nowC];
 						int pre_drop=(int)tmp;
-						int pre_pos=63-((8*cand.nowC)+cand.nowR+10);
+						int pre_pos=po-((8*cand.nowC)+cand.nowR);
 						int next_drop=(int)field[ny][nx];
-						int next_pos=63-((8*nx)+ny+10);
+						int next_pos=po-((8*nx)+ny);
 						dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						field[cand.nowR][cand.nowC]=field[ny][nx];
@@ -523,6 +525,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 	occBB|=dropBB[i];
 	}
 
+	int po=9+(8*(COL-1))+ROW-1;
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -571,8 +575,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		if(exist==0ll){break;}
 		int h=( int ) ( ( exist * 0x03F566ED27179461ULL ) >> 58 );
 		int pos=table[h];
-		int pos_x=(53-pos)/8;
-		int pos_y=(53-pos)%8;
+		int pos_x=(po-pos)/8;
+		int pos_y=(po-pos)%8;
 		if(oti==0){
 		ha ^= zoblish_field[pos_y][pos_x][i];
 		}
@@ -706,14 +710,15 @@ int sum_evaluate(F_T field[ROW][COL]) {//落としも落ちコンも有りコン
 //移動した後の盤面を生成する関数
 void operation(F_T field[ROW][COL], T_T route[TRN],ll dropBB[DROP+1]) {
 	int prw = (int)YY(route[0]), pcl = (int)XX(route[0]), i;
+	int po=9+(8*(COL-1))+ROW-1;
 	for (i = 1; i < MAX_TURN; i++) {
 		if (route[i] == STP) { break; }
 		//移動したら、移動前ドロップと移動後ドロップを交換する
 		int row = (int)YY(route[i]), col = (int)XX(route[i]);
 		int pre_drop=(int)field[prw][pcl];
-		int pre_pos=63-((8*pcl)+prw+10);
+		int pre_pos=po-((8*pcl)+prw);
 		int next_drop=(int)field[row][col];
-		int next_pos=63-((8*col)+row+10);
+		int next_pos=po-((8*col)+row);
 		dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 		dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 		F_T c = field[prw][pcl];
@@ -738,11 +743,13 @@ ll xor128() {//xorshift整数乱数
 }
 ll calc_mask(ll bitboard){
 
-ll result = (fill_64[__builtin_popcountll((bitboard & file_bb[0]))] << 48)|(fill_64[__builtin_popcountll((bitboard & file_bb[1]))] << 40) |
-(fill_64[__builtin_popcountll((bitboard & file_bb[2]))] << 32) | (fill_64[__builtin_popcountll((bitboard & file_bb[3]))] << 24) |
-(fill_64[__builtin_popcountll((bitboard & file_bb[4]))] << 16) | (fill_64[__builtin_popcountll((bitboard & file_bb[5]))] << 8);
+ll ret=0;
 
-return result;
+for(int i=0;i<COL;i++){
+ret|=fill_64[__builtin_popcountll((bitboard & file_bb[i]))] << (8*(COL-i));
+}
+
+return ret;
 
 }
 ll fallBB(ll p,ll rest, ll mask)
@@ -762,10 +769,10 @@ int main() {
 	}
 	}
 	}
-
+	int po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
-	int pos=63-((8*j)+i+10);
+	int pos=po-(8*j)-i;
 	sqBB[pos]|=1ll<<pos;
 	}
 	}
@@ -782,7 +789,6 @@ int main() {
 	res=fill_64[i];
 	}
 
-	int po=53;
 	for(i=0;i<COL;i++){
 	for(j=0;j<ROW;j++){
 	file_bb[i] |= (1ll << (po-j));
