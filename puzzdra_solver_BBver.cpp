@@ -590,8 +590,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		prev_y=pos_y;
 		tmp_drop=tmp_drop & ~(1ll<<(pos));
 		}
-		}
-		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
