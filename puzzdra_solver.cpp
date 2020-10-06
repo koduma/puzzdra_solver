@@ -1,29 +1,37 @@
 /*
 puzzdra_solver
+
 パズドラのルート解析プログラムです
 コンパイラはMinGWを推奨します
  
 コマンドは以下の通りです
 g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver
+
 なるべく少ない時間でなるべく大きいコンボを出したいです
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
+
 これらが改善されればpull request受け付けます
+
 パズドラ検定クエスト対策君
 https://ideone.com/Sgjd02
+
 チェック1：これを10コンボできるか
 962679
 381515
 489942
 763852
 917439
+
 914769
 264812
 379934
 355886
 951279
+
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
 チェック3：1000盤面平均コンボ数が理論値付近か
+
 全チェック達成したら合格
 */
 #pragma warning(disable:4710)
@@ -52,6 +60,9 @@ https://ideone.com/Sgjd02
 #include <fstream>
 #include <functional>
 #include <unordered_map>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 using namespace std;
 #define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//時間差分
 #define XX(PT)  ((PT)&15)
@@ -65,7 +76,7 @@ using namespace std;
 #define STP YX(7,7)//無効手[無効座標]
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
-#define PROBLEM 10//問題数
+#define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -175,7 +186,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	//2手目以降をビームサーチで探索
 	for (int i = 1; i < MAX_TURN; i++) {
 		int ks = (int)dque.size();
+		start = omp_get_wtime();
+#pragma omp parallel for private(st),reduction(+:part1,part4)
 		for (int k = 0; k < ks; k++) {
+#ifdef _OPENMP
+			if (i == 1 && k == 0) {
+				printf("Threads[%d/%d]\n",
+					omp_get_num_threads(),
+					omp_get_max_threads());
+			}
+#endif
 			node temp = dque[k];//que.front(); que.pop();
 			F_T temp_field[ROW][COL]; 
 			memcpy(temp_field, f_field, sizeof(temp_field));
@@ -193,15 +213,19 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i] = (T_T)YX(cand.nowR, cand.nowC);
+						st = omp_get_wtime();
 						int cmb;
 						ll ha;
 						cand.score = sum_e2(field, &cmb,&ha);
 						cand.combo = cmb;
 						cand.hash=ha;
+						part1 += omp_get_wtime() - st;
 						cand.prev = j;
+						st = omp_get_wtime();
 						//#pragma omp critical
 											//{ pque.push(cand); }
 						fff[(4 * k) + j] = cand;
+						part4 += omp_get_wtime() - st;
 					}
 					else {
 						cand.combo = -1;
@@ -214,6 +238,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				}
 			}
 		}
+		part2 += omp_get_wtime() - start;
+		start = omp_get_wtime();
 		dque.clear();
 		vector<pair<int, int> >vec;
 		int ks2 = 0;
@@ -245,6 +271,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			}
 		}
+		part3 += omp_get_wtime() - start;
 	}
 	return bestAction;
 }
@@ -519,7 +546,10 @@ int main() {
 			}
 		}
 		*/
+		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
+		double diff = omp_get_wtime() - start;
+		t_sum += diff;
 		printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
 		for (j = 1; j < MAX_TURN; j++) {//y座標は下にいくほど大きくなる
 			if (tmp.moving[j] == STP) { break; }
@@ -537,6 +567,7 @@ int main() {
 		int oti = sum_evaluate(oti_field);
 		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
+		printf("elapsed time:%fSec\n", diff);
 		printf("------------\n");
 		avg += (double)combo;
 		oti_avg += (double)oti;
@@ -545,5 +576,6 @@ int main() {
 	printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 	printf("Avg.OtiCombo #:%f\n", oti_avg / (double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
+	j = getchar();
 	return 0;
 }
