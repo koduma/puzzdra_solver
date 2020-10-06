@@ -545,6 +545,5 @@ int main() {
 	printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 	printf("Avg.OtiCombo #:%f\n", oti_avg / (double)i);
 	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
-	j = getchar();
 	return 0;
 }
