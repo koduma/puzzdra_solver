@@ -12,6 +12,8 @@ Benchmark
 
 Intel(R) Core(TM) i7-3770 CPU
 
+1000 PROBLEM
+
 TotalDuration:268.723005Sec
 Avg.NormalCombo #:7.991000/7.991000
 
@@ -202,7 +204,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 #pragma omp parallel for private(st),reduction(+:part1,part4)
 		for (int k = 0; k < ks; k++) {
 #ifdef _OPENMP
-			if (i == 1 && k == 0) {
+			if (i == 0 && k == 0) {
 				printf("Threads[%d/%d]\n",
 					omp_get_num_threads(),
 					omp_get_max_threads());
