@@ -2,14 +2,24 @@
 puzzdra_solver
 
 パズドラのルート解析プログラムです
+
 コンパイラはMinGWを推奨します
  
 コマンドは以下の通りです
 g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver
 
+Benchmark
+
+Intel(R) Core(TM) i7-3770 CPU
+
+TotalDuration:268.723005Sec
+Avg.NormalCombo #:7.991000/7.991000
+
 なるべく少ない時間でなるべく大きいコンボを出したいです
+
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
+
 
 これらが改善されればpull request受け付けます
 
@@ -30,6 +40,7 @@ https://ideone.com/Sgjd02
 951279
 
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
+
 チェック3：1000盤面平均コンボ数が理論値付近か
 
 全チェック達成したら合格
@@ -72,8 +83,7 @@ using namespace std;
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
 #define DROP 6//ドロップの種類//MAX9
-#define TRN  155//手数//MAX155
-#define STP YX(7,7)//無効手[無効座標]
+#define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
 #define PROBLEM 1000//問題数
@@ -94,7 +104,7 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F
 int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
-void operation(F_T field[ROW][COL], T_T route[TRN]); //スワイプ処理関数
+void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1]); //スワイプ処理関数
 
 int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//落とし減点評価関数
 int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//評価関数
@@ -104,7 +114,8 @@ ll zoblish_field[ROW][COL][DROP+1];
 
 
 struct node {//どういう手かの構造体
-	T_T movei[TRN];//スワイプ移動座標
+	T_T first_te;
+	ll movei[(TRN/21)+1];//スワイプ移動座標
 	int score;//評価値
 	int combo;//コンボ数
 	int nowC;//今どのx座標にいるか
@@ -123,9 +134,10 @@ struct node {//どういう手かの構造体
 	}
 }fff[NODE_SIZE];
 struct Action {//最終的に探索された手
+	T_T first_te;
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
-	T_T moving[TRN];//スワイプ移動座標
+	ll moving[(TRN/21)+1];//スワイプ移動座標
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
@@ -160,9 +172,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			cand.nowR = i;//y座標
 			cand.nowC = j;//x座標
 			cand.prev = -1;//1手前はない
-			cand.movei[0] = (T_T)YX(i, j);//1手目のyx座標
-			for (int trn = 1; trn < TRN; trn++) {
-				cand.movei[trn] = STP;
+			cand.first_te = (T_T)YX(i, j);//1手目のyx座標
+			for (int trn = 0; trn <= TRN/21; trn++) {
+				cand.movei[trn] = 0ll;
 			}
 			F_T ff_field[ROW][COL];
 			memcpy(ff_field,f_field,sizeof(ff_field));
@@ -184,7 +196,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	unordered_map<ll, bool> checkNodeList[ROW*COL];
 
 	//2手目以降をビームサーチで探索
-	for (int i = 1; i < MAX_TURN; i++) {
+	for (int i = 0; i < MAX_TURN; i++) {
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for private(st),reduction(+:part1,part4)
@@ -199,7 +211,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			node temp = dque[k];//que.front(); que.pop();
 			F_T temp_field[ROW][COL]; 
 			memcpy(temp_field, f_field, sizeof(temp_field));
-			operation(temp_field, temp.movei);
+			operation(temp_field, temp.first_te,temp.movei);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
 				node cand = temp;
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
@@ -212,7 +224,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						field[cand.nowR+dy[j]][cand.nowC+dx[j]]=tmp;
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
-						cand.movei[i] = (T_T)YX(cand.nowR, cand.nowC);
+						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						st = omp_get_wtime();
 						int cmb;
 						ll ha;
@@ -258,6 +270,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
+				bestAction.first_te=temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 				//コンボ数が理論値になったらreturn
 				if (temp.combo == stop) { return bestAction; }
@@ -491,16 +504,23 @@ int sum_evaluate(F_T field[ROW][COL]) {//落としも落ちコンも有りコン
 	return evaluate(field, EVAL_FS | EVAL_COMBO);
 }
 //移動した後の盤面を生成する関数
-void operation(F_T field[ROW][COL], T_T route[TRN]) {
-	int prw = (int)YY(route[0]), pcl = (int)XX(route[0]), i;
-	for (i = 1; i < MAX_TURN; i++) {
-		if (route[i] == STP) { break; }
+void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1]) {
+	int prw = (int)YY(first_te), pcl = (int)XX(first_te), i,j;
+	int dx[DIR] = { -1, 0,0,1 };
+	int dy[DIR] = { 0,-1,1,0 };
+	for (i = 0; i <= TRN/21; i++) {
+		if (route[i] == 0ll) { break; }
 		//移動したら、移動前ドロップと移動後ドロップを交換する
-		int row = (int)YY(route[i]), col = (int)XX(route[i]);
+		for(j=0;j<21;j++){
+		int dir = (int)(7ll&(route[i]>>(3*j)));
+		if(dir==0){break;}
+		int row=prw+dy[dir-1];
+		int col=pcl+dx[dir-1];
 		F_T c = field[prw][pcl];
 		field[prw][pcl] = field[row][col];
 		field[row][col] = c;
 		prw = row, pcl = col;
+		}
 	}
 }
 unsigned int rnd(int mini, int maxi) {
@@ -536,30 +556,34 @@ int main() {
 		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		init(f_field); set(f_field, 0);//初期盤面生成
-		show_field(f_field);//盤面表示
 		/*
+		string str="";
+		cin>>str;
 		for (j = 0; j < ROW; j++) {
-			string s = "";
-			cin >> s;
 			for (k = 0; k < COL; k++) {
-				f_field[j][k] = s[k] - '0';
+				f_field[j][k] = (str[k+(COL*j)] - '0')+1;
 			}
 		}
 		*/
+		show_field(f_field);//盤面表示
 		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
 		double diff = omp_get_wtime() - start;
 		t_sum += diff;
-		printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
-		for (j = 1; j < MAX_TURN; j++) {//y座標は下にいくほど大きくなる
-			if (tmp.moving[j] == STP) { break; }
-			if (XX(tmp.moving[j]) == XX(tmp.moving[j - 1]) + 1) { printf("R"); } //"RIGHT"); }
-			if (XX(tmp.moving[j]) == XX(tmp.moving[j - 1]) - 1) { printf("L"); } //"LEFT"); }
-			if (YY(tmp.moving[j]) == YY(tmp.moving[j - 1]) + 1) { printf("D"); } //"DOWN"); }
-			if (YY(tmp.moving[j]) == YY(tmp.moving[j - 1]) - 1) { printf("U"); } //"UP"); }
+		printf("(x,y)=(%d,%d)", XX(tmp.first_te), YY(tmp.first_te));
+		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
+			if (tmp.moving[j] == 0ll) { break; }
+			for(k=0;k<21;k++){
+			int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
+			if (dir==0){break;}
+			if (dir==1) { printf("L"); } //"LEFT"); }
+			if (dir==2) { printf("U"); } //"UP"); }
+			if (dir==3) { printf("D"); } //"DOWN"); }
+			if (dir==4) { printf("R"); } //"RIGHT"); }
+			}
 		} printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
-		operation(field, tmp.moving);
+		operation(field, tmp.first_te,tmp.moving);
 		printf("output:No.%d/%d\n", i + 1, PROBLEM);
 		show_field(field);
 		memcpy(oti_field, field, sizeof(field));
