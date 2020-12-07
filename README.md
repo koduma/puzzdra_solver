@@ -11,6 +11,7 @@
 
 ## Parameters
 
+- PROBLEM = 1000
 - BEAM_WIDTH = 10000
 - MAX_TURN = 150
 
