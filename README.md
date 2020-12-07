@@ -1,0 +1,15 @@
+# Puzzle & Dragons Solver
+
+## Compiler:MinGW
+
+## Command 
+
+g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver  
+g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
+
+## Benchmark
+
+| Version | CPU | Average Time | Average Combo |
+| --- | --- | --- | --- |
+| puzzdra_solver.cpp | Intel(R) Core(TM) i7-3770 | 0.268s | 7.991/7.991 |
+| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.199s | 7.96/7.96 |
