@@ -4,8 +4,8 @@
 
 ## Command 
 
-g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver  
-g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
+- g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver  
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
 
 # Benchmark
 
