@@ -7,7 +7,13 @@
 g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver  
 g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
 
-## Benchmark
+# Benchmark
+
+## Parameters
+
+- BEAM_WIDTH = 10000
+- MAX_TURN = 150
+
 
 | Version | CPU | Average Time | Average Combo |
 | --- | --- | --- | --- |
