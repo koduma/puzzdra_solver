@@ -4,24 +4,11 @@ puzzdra_solver
 パズドラのルート解析プログラムです
 
 コンパイラはMinGWを推奨します
- 
-コマンドは以下の通りです
-g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver
-
-Benchmark
-
-Intel(R) Core(TM) i7-3770 CPU
-
-1000 PROBLEM
-
-TotalDuration:268.723005Sec
-Avg.NormalCombo #:7.991000/7.991000
 
 なるべく少ない時間でなるべく大きいコンボを出したいです
 
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
-
 
 これらが改善されればpull request受け付けます
 
@@ -29,6 +16,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 https://ideone.com/Sgjd02
 
 チェック1：これを10コンボできるか
+
 962679
 381515
 489942
@@ -40,7 +28,6 @@ https://ideone.com/Sgjd02
 379934
 355886
 951279
-
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
 
 チェック3：1000盤面平均コンボ数が理論値付近か
@@ -88,7 +75,7 @@ using namespace std;
 #define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
-#define PROBLEM 1000//問題数
+#define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -259,10 +246,18 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
-				fff[j].prev_score=fff[j].score;
-				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
-				ks2++;
+			if (fff[j].combo==stop) {//コンボ数が増えたらその手を記憶する
+				maxValue = stop;
+				bestAction.score = maxValue;
+				bestAction.first_te=fff[j].first_te;
+				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				//コンボ数が理論値になったらreturn
+				return bestAction;
+			}
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			fff[j].prev_score=fff[j].score;
+			vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
+			ks2++;
 			}
 		}
 		sort(vec.begin(), vec.end());
@@ -274,8 +269,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				bestAction.score = maxValue;
 				bestAction.first_te=temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				//コンボ数が理論値になったらreturn
-				if (temp.combo == stop) { return bestAction; }
 			}
 			if (i < MAX_TURN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
