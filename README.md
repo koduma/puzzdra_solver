@@ -1,6 +1,6 @@
 # Puzzle & Dragons Solver
 
-## Compiler:MinGW
+## Compiler MinGW-W64
 
 ## Command 
 
