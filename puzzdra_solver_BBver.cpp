@@ -5,19 +5,6 @@ puzzdra_solver
 
 コンパイラはMinGWを推奨します
 
-コマンドは以下の通りです
-g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
-
-Benchmark
-
-Intel(R) Core(TM) i5-8250U CPU
-
-1000 PROBLEM
-
-TotalDuration:199.006993Sec
-Avg.NormalCombo #:7.960000/7.960000
-
-
 なるべく少ない時間でなるべく大きいコンボを出したいです
 
 printf("TotalDuration:%fSec\n", t_sum);
@@ -87,7 +74,7 @@ using namespace std;
 #define TRN 150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
-#define PROBLEM 1000//問題数
+#define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -289,6 +276,13 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
+			if (fff[j].combo == stop) {
+				maxValue = stop;
+				bestAction.score = maxValue;
+				bestAction.first_te = fff[j].first_te;
+				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				return bestAction;
+			}
 				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 				fff[j].prev_score=fff[j].score;
 				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
@@ -304,8 +298,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				//コンボ数が理論値になったらreturn
-				if (temp.combo == stop) { return bestAction; }
 			}
 			if (i < MAX_TURN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
