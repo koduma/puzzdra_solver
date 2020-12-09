@@ -11,12 +11,12 @@
 
 ## Parameters
 
-- BOARD = 5x6
-- DROP = 6
-- DIRECTION = 4 (UP,DOWN,LEFT,RIGHT)
-- PROBLEM = 10000
-- BEAM_WIDTH = 10000
-- MAX_TURN = 150
+- Board = 5x6
+- Drop = 6 (fire, water, wood, light, dark, recovery)
+- Direction = 4 (up,down,left,right)
+- Problem = 10000
+- Beam_width = 10000
+- Max_turn = 150
 
 
 | Version | CPU | Average Time | Average Combo |
