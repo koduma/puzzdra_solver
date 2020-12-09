@@ -11,7 +11,7 @@
 
 ## Parameters
 
-- 5x6 BOARD
+- BOARD = 5x6
 - PROBLEM = 10000
 - BEAM_WIDTH = 10000
 - MAX_TURN = 150
