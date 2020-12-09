@@ -12,6 +12,7 @@
 ## Parameters
 
 - BOARD = 5x6
+- DROP = 6
 - DIRECTION = 4 (UP,DOWN,LEFT,RIGHT)
 - PROBLEM = 10000
 - BEAM_WIDTH = 10000
