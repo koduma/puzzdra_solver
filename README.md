@@ -11,6 +11,7 @@
 
 ## Parameters
 
+- 5x6 BORAD
 - PROBLEM = 10000
 - BEAM_WIDTH = 10000
 - MAX_TURN = 150
