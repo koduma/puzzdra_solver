@@ -1,26 +1,38 @@
 /*
 puzzdra_solver
+
 パズドラのルート解析プログラムです
+
 コンパイラはMinGWを推奨します
+
 なるべく少ない時間でなるべく大きいコンボを出したいです
+
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
+
 これらが改善されればpull request受け付けます
+
 パズドラ検定クエスト対策君
 https://ideone.com/Sgjd02
+
 チェック1：これを10コンボできるか
+
 962679
 381515
 489942
 763852
 917439
+
 914769
 264812
 379934
 355886
 951279
+
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
+
 チェック3：1000盤面平均コンボ数が理論値付近か
+
 全チェック達成したら合格
 */
 #pragma warning(disable:4710)
