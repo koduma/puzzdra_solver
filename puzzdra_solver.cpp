@@ -247,7 +247,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo==stop) {//コンボ数が増えたらその手を記憶する
+			if (fff[j].combo==stop) {
 				maxValue = stop;
 				bestAction.score = maxValue;
 				bestAction.first_te=fff[j].first_te;
