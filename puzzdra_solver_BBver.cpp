@@ -25,7 +25,6 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 379934
 355886
 951279
-
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
 
 チェック3：1000盤面平均コンボ数が理論値付近か
@@ -829,18 +828,30 @@ int main() {
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
 		double diff = omp_get_wtime() - start;
 		t_sum += diff;
-		printf("(x,y)=(%d,%d)", XX(tmp.first_te), YY(tmp.first_te));
+		string layout="";		
+		for(int v=0;v<ROW;v++){
+		for(int u=0;u<COL;u++){
+		layout+=to_string(f_field[v][u]-1);
+		}
+		}
+		string route="";
+		int path_length=0;
+		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";		
 		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
 			if (tmp.moving[j] == 0ll) { break; }
 			for(k=0;k<21;k++){
 			int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
 			if (dir==0){break;}
-			if (dir==1) { printf("L"); } //"LEFT"); }
-			if (dir==2) { printf("U"); } //"UP"); }
-			if (dir==3) { printf("D"); } //"DOWN"); }
-			if (dir==4) { printf("R"); } //"RIGHT"); }
+			if (dir==1) { route+=to_string(3);}//printf("L"); } //"LEFT"); }
+			if (dir==2) { route+=to_string(6);}//printf("U"); } //"UP"); }
+			if (dir==3) { route+=to_string(1);}//printf("D"); } //"DOWN"); }
+			if (dir==4) { route+=to_string(4);}//printf("R"); } //"RIGHT"); }
+			path_length++;
 			}
-		} printf("\n");
+		}
+		string url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+route+"&ctwMode=false";
+		cout<<url<<endl;
+		printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
 		ll BB[DROP+1];
 		operation(field, tmp.first_te,tmp.moving,BB);
@@ -849,6 +860,7 @@ int main() {
 		memcpy(oti_field, field, sizeof(field));
 		int combo = sum_e(field);
 		int oti = sum_evaluate(oti_field);
+		printf("path_length=%d\n",path_length);
 		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
 		printf("elapsed time:%fSec\n", diff);
