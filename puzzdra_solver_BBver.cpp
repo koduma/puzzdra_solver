@@ -484,9 +484,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				int d2 = (int)drop[i][j][1];
 				int d3 = (int)drop[i][j + 1][0];
 				int d4 = (int)drop[i][j + 1][1];
-				int add = max(d1 - d3, d3 - d1) + max(d2 - d4, d4 - d2);
-				add += add;
-				add /= 3;
+				int add = max(d2 - d4, d4 - d2);
 				cmb2 -= add;
 				if (delflag[d1][d2]> 0) {
 					field[d1][d2] = 0;
@@ -584,9 +582,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		ha ^= zoblish_field[pos_y][pos_x][i];
 		}
 		if(j>0){
-		int add=max(pos_x-prev_x,prev_x-pos_x)+max(pos_y-prev_y,prev_y-pos_y);
-		add+=add;
-		add/=3;
+		int add=max(pos_x-prev_x,prev_x-pos_x);
 		cmb2-=add;
 		}
 		prev_x=pos_x;
