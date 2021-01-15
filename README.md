@@ -12,16 +12,16 @@
 ## Parameters
 
 - Board = 5x6
-- Drop = 6 (fire, water, wood, light, dark, recovery)
+- Drop = 6 (fire, water, wood, light, dark, heal)
 - Direction = 4 (up,down,left,right)
 - Problem = 10000
 - Beam_width = 10000
-- Max_turn = 150
+- Max_turn = Trn = 150
 
 
 | Version | CPU | Average Time | Average Combo |
 | --- | --- | --- | --- |
-| puzzdra_solver.cpp | Intel(R) Core(TM) i7-3770 | 0.2843s | 8.0010/8.0010 |
-| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.2130s | 8.0143/8.0143 |
+| puzzdra_solver.cpp | Intel(R) Core(TM) i7-3770 | 0.2732s | 7.9996/7.9996 |
+| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.1851s | 7.9982/7.9982 |
 
 <img src="https://user-images.githubusercontent.com/47982907/101321654-0b96e900-38a9-11eb-9c70-a8d9fa3d491d.jpg" width="300px" height="500px">
