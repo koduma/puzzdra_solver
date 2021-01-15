@@ -457,9 +457,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				int d2 = (int)drop[i][j][1];
 				int d3 = (int)drop[i][j + 1][0];
 				int d4 = (int)drop[i][j + 1][1];
-				int add = max(d1 - d3, d3 - d1) + max(d2 - d4, d4 - d2);
-				add += add;
-				add /= 3;
+				int add = max(d2 - d4, d4 - d2);
 				cmb2 -= add;
 				if (delflag[d1][d2]> 0) {
 					field[d1][d2] = 0;
