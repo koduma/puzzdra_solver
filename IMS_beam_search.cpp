@@ -1,18 +1,18 @@
 /*
 puzzdra_solver
 
-ƒpƒYƒhƒ‰‚Ìƒ‹[ƒg‰ğÍƒvƒƒOƒ‰ƒ€‚Å‚·
+ãƒ‘ã‚ºãƒ‰ãƒ©ã®ãƒ«ãƒ¼ãƒˆè§£æãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã™
 
-ƒRƒ“ƒpƒCƒ‰‚ÍMinGW‚ğ„§‚µ‚Ü‚·
+ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã¯MinGWã‚’æ¨å¥¨ã—ã¾ã™
 
-‚È‚é‚×‚­­‚È‚¢ŠÔ‚Å‚È‚é‚×‚­‘å‚«‚¢ƒRƒ“ƒ{‚ğo‚µ‚½‚¢‚Å‚·
+ãªã‚‹ã¹ãå°‘ãªã„æ™‚é–“ã§ãªã‚‹ã¹ãå¤§ãã„ã‚³ãƒ³ãƒœã‚’å‡ºã—ãŸã„ã§ã™
 
 printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
-‚±‚ê‚ç‚ª‰ü‘P‚³‚ê‚ê‚Îpull requestó‚¯•t‚¯‚Ü‚·
+ã“ã‚Œã‚‰ãŒæ”¹å–„ã•ã‚Œã‚Œã°pull requestå—ã‘ä»˜ã‘ã¾ã™
 
-ƒ`ƒFƒbƒN1F‚±‚ê‚ğ10ƒRƒ“ƒ{‚Å‚«‚é‚©
+ãƒã‚§ãƒƒã‚¯1ï¼šã“ã‚Œã‚’10ã‚³ãƒ³ãƒœã§ãã‚‹ã‹
 
 962679
 381515
@@ -26,11 +26,11 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 355886
 951279
 
-ƒ`ƒFƒbƒN2F1000”Õ–Ê•½‹Ï—‚¿ƒRƒ“ƒ{”‚ª9.20•t‹ß‚©
+ãƒã‚§ãƒƒã‚¯2ï¼š1000ç›¤é¢å¹³å‡è½ã¡ã‚³ãƒ³ãƒœæ•°ãŒ9.20ä»˜è¿‘ã‹
 
-ƒ`ƒFƒbƒN3F1000”Õ–Ê•½‹ÏƒRƒ“ƒ{”‚ª—˜_’l•t‹ß‚©
+ãƒã‚§ãƒƒã‚¯3ï¼š1000ç›¤é¢å¹³å‡ã‚³ãƒ³ãƒœæ•°ãŒç†è«–å€¤ä»˜è¿‘ã‹
 
-‘Sƒ`ƒFƒbƒN’B¬‚µ‚½‚ç‡Ši
+å…¨ãƒã‚§ãƒƒã‚¯é”æˆã—ãŸã‚‰åˆæ ¼
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -63,46 +63,46 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 #include <omp.h>
 #endif
 using namespace std;
-#define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//ŠÔ·•ª
+#define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//æ™‚é–“å·®åˆ†
 #define XX(PT) ((PT)&15)
 #define YY(PT) XX((PT)>>4)
 #define YX(Y,X) ((Y)<<4|(X))
-#define DIR 4//•ûŒü
-#define ROW 5//c//MAX6
-#define COL 6//‰¡//MAX7
-#define DROP 8//ƒhƒƒbƒv‚Ìí—Ş//MAX9
-#define TRN 55//è”//MAX155
-#define MAX_TURN 55//Å‘åƒ‹[ƒg’·//MAX150
-#define BEAM_WIDTH 2500000//ƒr[ƒ€•//MAX200000
-#define PROBLEM 10000//–â‘è”
-#define BONUS 10//•]‰¿’l‰ü‘PŒW”
+#define DIR 4//æ–¹å‘
+#define ROW 5//ç¸¦//MAX6
+#define COL 6//æ¨ª//MAX7
+#define DROP 8//ãƒ‰ãƒ­ãƒƒãƒ—ã®ç¨®é¡//MAX9
+#define TRN 55//æ‰‹æ•°//MAX155
+#define MAX_TURN 55//æœ€å¤§ãƒ«ãƒ¼ãƒˆé•·//MAX150
+#define BEAM_WIDTH 2500000//ãƒ“ãƒ¼ãƒ å¹…//MAX200000
+#define PROBLEM 10000//å•é¡Œæ•°
+#define BONUS 10//è©•ä¾¡å€¤æ”¹å–„ä¿‚æ•°
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-typedef char F_T;//”Õ–ÊŒ^
-typedef char T_T;//è”Œ^
+typedef char F_T;//ç›¤é¢å‹
+typedef char T_T;//æ‰‹æ•°å‹
 typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
-void init(F_T field[ROW][COL]); //‰Šú”z’u¶¬ŠÖ”
-void fall(int x,int h,F_T field[ROW][COL]); //ƒhƒƒbƒv‚Ì—‰ºˆ—ŠÖ”
-void set(F_T field[ROW][COL], int force); //‹óƒ}ƒX‚ğ–„‚ß‚éŠÖ”
-void show_field(F_T field[ROW][COL]); //”Õ–Ê•\¦ŠÖ”
-int rnd(int mini, int maxi); //®”—”
-//ã‰º¶‰E‚É˜AŒ‹‚µ‚Ä‚¢‚éƒhƒƒbƒv‚ğÄ‹A“I‚É’Tõ‚µ‚Ä‚¢‚­ŠÖ”
+void init(F_T field[ROW][COL]); //åˆæœŸé…ç½®ç”Ÿæˆé–¢æ•°
+void fall(int x,int h,F_T field[ROW][COL]); //ãƒ‰ãƒ­ãƒƒãƒ—ã®è½ä¸‹å‡¦ç†é–¢æ•°
+void set(F_T field[ROW][COL], int force); //ç©ºãƒã‚¹ã‚’åŸ‹ã‚ã‚‹é–¢æ•°
+void show_field(F_T field[ROW][COL]); //ç›¤é¢è¡¨ç¤ºé–¢æ•°
+int rnd(int mini, int maxi); //æ•´æ•°ä¹±æ•°
+//ä¸Šä¸‹å·¦å³ã«é€£çµã—ã¦ã„ã‚‹ãƒ‰ãƒ­ãƒƒãƒ—ã‚’å†å¸°çš„ã«æ¢ç´¢ã—ã¦ã„ãé–¢æ•°
 int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F_T delflag[ROW][COL]);
-int evaluate(F_T field[ROW][COL], int flag); //ƒRƒ“ƒ{””»’èŠÖ”
-int sum_e(F_T field[ROW][COL]);//—‚Æ‚µ—L‚èA—‚¿ƒRƒ“–³‚µƒRƒ“ƒ{””»’èŠÖ”
-int sum_evaluate(F_T field[ROW][COL]);//—‚Æ‚µ‚à—‚¿ƒRƒ“‚à—L‚èƒRƒ“ƒ{””»’èŠÖ”
-void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //ƒXƒƒCƒvˆ—ŠÖ”
+int evaluate(F_T field[ROW][COL], int flag); //ã‚³ãƒ³ãƒœæ•°åˆ¤å®šé–¢æ•°
+int sum_e(F_T field[ROW][COL]);//è½ã¨ã—æœ‰ã‚Šã€è½ã¡ã‚³ãƒ³ç„¡ã—ã‚³ãƒ³ãƒœæ•°åˆ¤å®šé–¢æ•°
+int sum_evaluate(F_T field[ROW][COL]);//è½ã¨ã—ã‚‚è½ã¡ã‚³ãƒ³ã‚‚æœ‰ã‚Šã‚³ãƒ³ãƒœæ•°åˆ¤å®šé–¢æ•°
+void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //ã‚¹ãƒ¯ã‚¤ãƒ—å‡¦ç†é–¢æ•°
 
-int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//—‚Æ‚µŒ¸“_•]‰¿ŠÖ”
-int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//•]‰¿ŠÖ”
+int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//è½ã¨ã—æ¸›ç‚¹è©•ä¾¡é–¢æ•°
+int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//è©•ä¾¡é–¢æ•°
 
-ll xor128();//xorshift®”—”
+ll xor128();//xorshiftæ•´æ•°ä¹±æ•°
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
-int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash);//—‚Æ‚µŒ¸“_•]‰¿ŠÖ”
-int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash);//•]‰¿ŠÖ”
+int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash);//è½ã¨ã—æ¸›ç‚¹è©•ä¾¡é–¢æ•°
+int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash);//è©•ä¾¡é–¢æ•°
 ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
@@ -110,43 +110,43 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-struct node {//‚Ç‚¤‚¢‚¤è‚©‚Ì\‘¢‘Ì
+struct node {//ã©ã†ã„ã†æ‰‹ã‹ã®æ§‹é€ ä½“
 	T_T first_te;
-	ll movei[(TRN/21)+1];//ƒXƒƒCƒvˆÚ“®À•W
-	int score;//•]‰¿’l
-	int combo;//ƒRƒ“ƒ{”
-	int nowC;//¡‚Ç‚ÌxÀ•W‚É‚¢‚é‚©
-	int nowR;//¡‚Ç‚ÌyÀ•W‚É‚¢‚é‚©
-	int prev;//1è‘O‚Íã‰º¶‰E‚Ì‚Ç‚Á‚¿‚ğ‘I‚ñ‚¾‚©
-	int prev_score;//1è‘O‚Ì•]‰¿’l
-	int improving;//•]‰¿’l‰ü‘P‰ñ”
-	ll hash;//”Õ–Ê‚ÌƒnƒbƒVƒ…’l
-	node() {//‰Šú‰»
+	ll movei[(TRN/21)+1];//ã‚¹ãƒ¯ã‚¤ãƒ—ç§»å‹•åº§æ¨™
+	int score;//è©•ä¾¡å€¤
+	int combo;//ã‚³ãƒ³ãƒœæ•°
+	int nowC;//ä»Šã©ã®xåº§æ¨™ã«ã„ã‚‹ã‹
+	int nowR;//ä»Šã©ã®yåº§æ¨™ã«ã„ã‚‹ã‹
+	int prev;//1æ‰‹å‰ã¯ä¸Šä¸‹å·¦å³ã®ã©ã£ã¡ã‚’é¸ã‚“ã ã‹
+	int prev_score;//1æ‰‹å‰ã®è©•ä¾¡å€¤
+	int improving;//è©•ä¾¡å€¤æ”¹å–„å›æ•°
+	ll hash;//ç›¤é¢ã®ãƒãƒƒã‚·ãƒ¥å€¤
+	node() {//åˆæœŸåŒ–
 		this->score = 0;
 		this->prev = -1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
-	bool operator < (const node& n)const {//ƒXƒRƒA‚ª‚‚¢•û‚ª—Dæ‚³‚ê‚é
+	bool operator < (const node& n)const {//ã‚¹ã‚³ã‚¢ãŒé«˜ã„æ–¹ãŒå„ªå…ˆã•ã‚Œã‚‹
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
-struct Action {//ÅI“I‚É’Tõ‚³‚ê‚½è
+struct Action {//æœ€çµ‚çš„ã«æ¢ç´¢ã•ã‚ŒãŸæ‰‹
 	T_T first_te;
-	int score;//ƒRƒ“ƒ{”
-	int maxcombo;//—˜_ƒRƒ“ƒ{”
-	ll moving[(TRN/21)+1];//ƒXƒƒCƒvˆÚ“®À•W
-	Action() {//‰Šú‰»
+	int score;//ã‚³ãƒ³ãƒœæ•°
+	int maxcombo;//ç†è«–ã‚³ãƒ³ãƒœæ•°
+	ll moving[(TRN/21)+1];//ã‚¹ãƒ¯ã‚¤ãƒ—ç§»å‹•åº§æ¨™
+	Action() {//åˆæœŸåŒ–
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi); //ƒ‹[ƒg’TõŠÖ”
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi); //ãƒ«ãƒ¼ãƒˆæ¢ç´¢é–¢æ•°
 double part1 = 0, part2 = 0, part3 = 0, part4 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 
 	int po=9+(8*(COL-1))+ROW-1;
 
-	int stop = 0;//—˜_Å‘åƒRƒ“ƒ{”
+	int stop = 0;//ç†è«–æœ€å¤§ã‚³ãƒ³ãƒœæ•°
 
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
@@ -163,15 +163,15 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 
 	deque<node>dque;
 	double start, st;
-	//1è–Ú‚ğ‘S’Ê‚è’Tõ‚·‚é
+	//1æ‰‹ç›®ã‚’å…¨é€šã‚Šæ¢ç´¢ã™ã‚‹
 	dque.clear();
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
 			node cand;
-			cand.nowR = i;//yÀ•W
-			cand.nowC = j;//xÀ•W
-			cand.prev = -1;//1è‘O‚Í‚È‚¢
-			cand.first_te = (T_T)YX(i, j);//1è–Ú‚ÌyxÀ•W
+			cand.nowR = i;//yåº§æ¨™
+			cand.nowC = j;//xåº§æ¨™
+			cand.prev = -1;//1æ‰‹å‰ã¯ãªã„
+			cand.first_te = (T_T)YX(i, j);//1æ‰‹ç›®ã®yxåº§æ¨™
 			for (int trn = 0; trn <= TRN/21; trn++) {
 				cand.movei[trn] = 0ll;
 			}
@@ -187,8 +187,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 	}// L, U,D,R //
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
-	Action bestAction;//Å‘Pè
-	int maxValue = 0;//Å‚ƒXƒRƒA
+	Action bestAction;//æœ€å–„æ‰‹
+	int maxValue = 0;//æœ€é«˜ã‚¹ã‚³ã‚¢
 
 	bestAction.maxcombo = stop;
 	unordered_map<ll, bool> checkNodeList[ROW*COL];
@@ -202,7 +202,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 	}
 	}
 
-	//2è–ÚˆÈ~‚ğƒr[ƒ€ƒT[ƒ`‚Å’Tõ
+	//2æ‰‹ç›®ä»¥é™ã‚’ãƒ“ãƒ¼ãƒ ã‚µãƒ¼ãƒã§æ¢ç´¢
 	for (int i = 0; i < MAX_TURN; i++) {
 		printf("depth=%d/%d\n",i+1,MAX_TURN);
 		int ks = (int)dque.size();
@@ -222,16 +222,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 			memcpy(temp_field, f_field, sizeof(temp_field));
 			memcpy(temp_dropBB,rootBB,sizeof(rootBB));
 			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
-			for (int j = 0; j < DIR; j++) {//ã‰º¶‰E‚Ì4•ûŒü‚ª”­¶
+			for (int j = 0; j < DIR; j++) {//ä¸Šä¸‹å·¦å³ã®4æ–¹å‘ãŒç™ºç”Ÿ
 				node cand = temp;
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
 					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
 						int ny=cand.nowR + dy[j];
 						int nx=cand.nowC + dx[j];
-						F_T field[ROW][COL];//”Õ–Ê
+						F_T field[ROW][COL];//ç›¤é¢
 						ll dropBB[DROP+1]={0};
-						memcpy(field,temp_field,sizeof(temp_field));//”Õ–Ê‚ğ‚à‚Ç‚·
+						memcpy(field,temp_field,sizeof(temp_field));//ç›¤é¢ã‚’ã‚‚ã©ã™
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
 						F_T tmp=field[cand.nowR][cand.nowC];
 						int pre_drop=(int)tmp;
@@ -294,7 +294,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 		int push_node=0;
 		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
 			node temp = fff[vec[ks2-1-j].second];
-			if (maxValue < temp.combo) {//ƒRƒ“ƒ{”‚ª‘‚¦‚½‚ç‚»‚Ìè‚ğ‹L‰¯‚·‚é
+			if (maxValue < temp.combo) {//ã‚³ãƒ³ãƒœæ•°ãŒå¢—ãˆãŸã‚‰ãã®æ‰‹ã‚’è¨˜æ†¶ã™ã‚‹
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
@@ -337,8 +337,8 @@ void init(F_T field[ROW][COL]) { set(field, !0); }
 void set(F_T field[ROW][COL], int force) {
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
-			if (field[i][j] == 0 || force) {//‹óƒ}ƒX‚¾‚Á‚½‚ç‚¤‚ß‚é
-				field[i][j] = (F_T)rnd(force ? 0 : 1, DROP);//1-DROP‚Ì®”—”
+			if (field[i][j] == 0 || force) {//ç©ºãƒã‚¹ã ã£ãŸã‚‰ã†ã‚ã‚‹
+				field[i][j] = (F_T)rnd(force ? 0 : 1, DROP);//1-DROPã®æ•´æ•°ä¹±æ•°
 			}
 		}
 	}
@@ -347,11 +347,11 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 	F_T chkflag[ROW][COL], F_T delflag[ROW][COL]) {
 	int count = 0;
 #define CHK_CF(Y,X) (field[Y][X] == d && chkflag[Y][X]==0 && delflag[Y][X] > 0)
-	//˜AŒ‹‚µ‚Ä‚¢‚é“¯‚¶F‚ÌÁ‹ƒhƒƒbƒv‚ª–¢’Tõ‚¾‚Á‚½‚ç
+	//é€£çµã—ã¦ã„ã‚‹åŒã˜è‰²ã®æ¶ˆå»ãƒ‰ãƒ­ãƒƒãƒ—ãŒæœªæ¢ç´¢ã ã£ãŸã‚‰
 	if (CHK_CF(nrw, ncl)) {
-		++count; //˜AŒ‹ƒhƒƒbƒv”‚ÌXV
-		chkflag[nrw][ncl]=1;//’TõÏ‚İ‚É‚·‚é
-			//ˆÈ‰ºã‰º¶‰E‚É˜AŒ‹‚µ‚Ä‚¢‚éƒhƒƒbƒv‚ğÄ‹A“I‚É’Tõ‚µ‚Ä‚¢‚­
+		++count; //é€£çµãƒ‰ãƒ­ãƒƒãƒ—æ•°ã®æ›´æ–°
+		chkflag[nrw][ncl]=1;//æ¢ç´¢æ¸ˆã¿ã«ã™ã‚‹
+			//ä»¥ä¸‹ä¸Šä¸‹å·¦å³ã«é€£çµã—ã¦ã„ã‚‹ãƒ‰ãƒ­ãƒƒãƒ—ã‚’å†å¸°çš„ã«æ¢ç´¢ã—ã¦ã„ã
 		if (0 < nrw && CHK_CF(nrw - 1, ncl)) {
 			count += chain(nrw - 1, ncl, d, field, chkflag, delflag);
 		}
@@ -406,11 +406,11 @@ int evaluate(F_T field[ROW][COL], int flag) {
 			}
 		}
 		combo += cmb;
-		//ƒRƒ“ƒ{‚ª”­¶‚µ‚È‚©‚Á‚½‚çI—¹
+		//ã‚³ãƒ³ãƒœãŒç™ºç”Ÿã—ãªã‹ã£ãŸã‚‰çµ‚äº†
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				//ƒRƒ“ƒ{‚É‚È‚Á‚½ƒhƒƒbƒv‚Í‹ó‚É‚È‚é
+				//ã‚³ãƒ³ãƒœã«ãªã£ãŸãƒ‰ãƒ­ãƒƒãƒ—ã¯ç©ºã«ãªã‚‹
 				if (delflag[row][col]> 0) { field[row][col] = 0; }
 			}
 		}
@@ -419,8 +419,8 @@ int evaluate(F_T field[ROW][COL], int flag) {
 		for(int x=0;x<COL;x++){
 		fall(x,GetHeight[x],field);
 		}
-		}//—‰ºˆ—”­¶
-		if (flag & EVAL_SET){set(field, 0);}//—‚¿ƒRƒ“”­¶
+		}//è½ä¸‹å‡¦ç†ç™ºç”Ÿ
+		if (flag & EVAL_SET){set(field, 0);}//è½ã¡ã‚³ãƒ³ç™ºç”Ÿ
 
 	}
 	return combo;
@@ -502,17 +502,17 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		}
 		*combo += cmb;
 		ev += cmb2;
-		//ƒRƒ“ƒ{‚ª”­¶‚µ‚È‚©‚Á‚½‚çI—¹
+		//ã‚³ãƒ³ãƒœãŒç™ºç”Ÿã—ãªã‹ã£ãŸã‚‰çµ‚äº†
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
-		if (flag & EVAL_FALL){//—‰ºˆ—”­¶
+		if (flag & EVAL_FALL){//è½ä¸‹å‡¦ç†ç™ºç”Ÿ
 		for(int x=0;x<COL;x++){
 		if(erase_x[x]==1){
 		fall(x,GetHeight[x],field);
 		}
 		}
 		}
-		if (flag & EVAL_SET){set(field, 0);}//—‚¿ƒRƒ“”­¶
+		if (flag & EVAL_SET){set(field, 0);}//è½ã¡ã‚³ãƒ³ç™ºç”Ÿ
 
 	}
 	ev += oti;
@@ -601,7 +601,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 
 		*combo += cmb;
 		ev += cmb2;
-		//ƒRƒ“ƒ{‚ª”­¶‚µ‚È‚©‚Á‚½‚çI—¹
+		//ã‚³ãƒ³ãƒœãŒç™ºç”Ÿã—ãªã‹ã£ãŸã‚‰çµ‚äº†
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
 
@@ -680,17 +680,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		}
 		*combo += cmb;
 		ev += cmb2;
-		//ƒRƒ“ƒ{‚ª”­¶‚µ‚È‚©‚Á‚½‚çI—¹
+		//ã‚³ãƒ³ãƒœãŒç™ºç”Ÿã—ãªã‹ã£ãŸã‚‰çµ‚äº†
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
-		if (flag & EVAL_FALL){//—‰ºˆ—”­¶
+		if (flag & EVAL_FALL){//è½ä¸‹å‡¦ç†ç™ºç”Ÿ
 		for(int x=0;x<COL;x++){
 		if(erase_x[x]==1){
 		fall(x,GetHeight[x],field);
 		}
 		}
 		}
-		if (flag & EVAL_SET){set(field, 0);}//—‚¿ƒRƒ“”­¶
+		if (flag & EVAL_SET){set(field, 0);}//è½ã¡ã‚³ãƒ³ç™ºç”Ÿ
 */
 
 	}
@@ -698,19 +698,19 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 	*hash=ha;
 	return ev;
 }
-int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash) {//—‚Æ‚µ—L‚èA—‚¿ƒRƒ“–³‚µ•]‰¿ŠÖ”
+int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash) {//è½ã¨ã—æœ‰ã‚Šã€è½ã¡ã‚³ãƒ³ç„¡ã—è©•ä¾¡é–¢æ•°
 	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,hash);
 }
-int sum_e2(F_T field[ROW][COL], int* combo, ll* hash) {//—‚Æ‚µ—L‚èA—‚¿ƒRƒ“–³‚µ•]‰¿ŠÖ”
+int sum_e2(F_T field[ROW][COL], int* combo, ll* hash) {//è½ã¨ã—æœ‰ã‚Šã€è½ã¡ã‚³ãƒ³ç„¡ã—è©•ä¾¡é–¢æ•°
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash);
 }
-int sum_e(F_T field[ROW][COL]) {//—‚Æ‚µ—L‚èA—‚¿ƒRƒ“–³‚µƒRƒ“ƒ{””»’èŠÖ”
+int sum_e(F_T field[ROW][COL]) {//è½ã¨ã—æœ‰ã‚Šã€è½ã¡ã‚³ãƒ³ç„¡ã—ã‚³ãƒ³ãƒœæ•°åˆ¤å®šé–¢æ•°
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
 }
-int sum_evaluate(F_T field[ROW][COL]) {//—‚Æ‚µ‚à—‚¿ƒRƒ“‚à—L‚èƒRƒ“ƒ{””»’èŠÖ”
+int sum_evaluate(F_T field[ROW][COL]) {//è½ã¨ã—ã‚‚è½ã¡ã‚³ãƒ³ã‚‚æœ‰ã‚Šã‚³ãƒ³ãƒœæ•°åˆ¤å®šé–¢æ•°
 	return evaluate(field, EVAL_FS | EVAL_COMBO);
 }
-//ˆÚ“®‚µ‚½Œã‚Ì”Õ–Ê‚ğ¶¬‚·‚éŠÖ”
+//ç§»å‹•ã—ãŸå¾Œã®ç›¤é¢ã‚’ç”Ÿæˆã™ã‚‹é–¢æ•°
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]) {
 	int prw = (int)YY(first_te), pcl = (int)XX(first_te), i,j;
 	int dx[DIR] = { -1, 0,0,1 };
@@ -718,7 +718,7 @@ void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[
 	int po=9+(8*(COL-1))+ROW-1;
 	for (i = 0; i <= TRN/21; i++) {
 		if (route[i] == 0ll) { break; }
-		//ˆÚ“®‚µ‚½‚çAˆÚ“®‘Oƒhƒƒbƒv‚ÆˆÚ“®Œãƒhƒƒbƒv‚ğŒğŠ·‚·‚é
+		//ç§»å‹•ã—ãŸã‚‰ã€ç§»å‹•å‰ãƒ‰ãƒ­ãƒƒãƒ—ã¨ç§»å‹•å¾Œãƒ‰ãƒ­ãƒƒãƒ—ã‚’äº¤æ›ã™ã‚‹
 		for(j=0;j<21;j++){
 		int dir = (int)(7ll&(route[i]>>(3*j)));
 		if(dir==0){break;}
@@ -745,7 +745,7 @@ int rnd(int mini, int maxi) {
 	uniform_int_distribution<int> dice(mini, maxi);
 	return dice(mt);
 }
-ll xor128() {//xorshift®”—”
+ll xor128() {//xorshiftæ•´æ•°ä¹±æ•°
 	static unsigned long long rx = 123456789, ry = 362436069, rz = 521288629, rw = 88675123;
 	ll rt = (rx ^ (rx << 11));
 	rx = ry; ry = rz; rz = rw;
@@ -772,7 +772,7 @@ return p;
 int main() {
 
 //layout=053241405407470557104053134522
-//No1:43è
+//No1:41æ‰‹
 
 	int i, j, k;
 	for(i=0;i<ROW;++i){
@@ -809,19 +809,19 @@ int main() {
 	po-=8;
 	}
 
-	double avg = 0;//•½‹ÏƒRƒ“ƒ{”
+	double avg = 0;//å¹³å‡ã‚³ãƒ³ãƒœæ•°
 	double start;
 	double t_sum = 0;
-	double oti_avg = 0;//•½‹Ï—‚¿ƒRƒ“ƒ{”
-	for (i = 0; i < PROBLEM; i++) {//PROBLEM–â‰ğ‚­
-		F_T f_field[ROW][COL]; //ƒXƒƒCƒv‘O‚Ì”Õ–Ê
-		F_T field[ROW][COL]; //”Õ–Ê
-		F_T oti_field[ROW][COL];//—‚¿ƒRƒ“—p”Õ–Ê
+	double oti_avg = 0;//å¹³å‡è½ã¡ã‚³ãƒ³ãƒœæ•°
+	for (i = 0; i < PROBLEM; i++) {//PROBLEMå•è§£ã
+		F_T f_field[ROW][COL]; //ã‚¹ãƒ¯ã‚¤ãƒ—å‰ã®ç›¤é¢
+		F_T field[ROW][COL]; //ç›¤é¢
+		F_T oti_field[ROW][COL];//è½ã¡ã‚³ãƒ³ç”¨ç›¤é¢
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		string date="";
 		printf("date=");
 		cin>>date;
-		//init(f_field); set(f_field, 0);//‰Šú”Õ–Ê¶¬
+		//init(f_field); set(f_field, 0);//åˆæœŸç›¤é¢ç”Ÿæˆ
 		string str="";
 		cin>>str;
 		for (j = 0; j < ROW; j++) {
@@ -829,7 +829,7 @@ int main() {
 				f_field[j][k] = (str[k+(COL*j)] - '0')+1;
 			}
 		}
-		show_field(f_field);//”Õ–Ê•\¦
+		show_field(f_field);//ç›¤é¢è¡¨ç¤º
 		Action tmp,tmp2;
 		double diff;
 		int tesuu_min=10000;
@@ -839,7 +839,7 @@ int main() {
 		printf("loop=%d/%d\n",loop+1,10000);
 		printf("tesuu_min=%d\n",tesuu_min);
 		start = omp_get_wtime();
-		tmp = BEAM_SEARCH(f_field,loop);//ƒr[ƒ€ƒT[ƒ`‚µ‚Ätmp‚ÉÅ‘Pè‚ğ•Û‘¶
+		tmp = BEAM_SEARCH(f_field,loop);//ãƒ“ãƒ¼ãƒ ã‚µãƒ¼ãƒã—ã¦tmpã«æœ€å–„æ‰‹ã‚’ä¿å­˜
 		diff = omp_get_wtime() - start;
 		t_sum += diff;
 		//printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
@@ -847,7 +847,7 @@ int main() {
 		if(tmp.score==tmp.maxcombo){
 		string route="";
 		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";
-		for (j = 0; j <= TRN/21; j++) {//yÀ•W‚Í‰º‚É‚¢‚­‚Ù‚Ç‘å‚«‚­‚È‚é
+		for (j = 0; j <= TRN/21; j++) {//yåº§æ¨™ã¯ä¸‹ã«ã„ãã»ã©å¤§ãããªã‚‹
 			if (tmp.moving[j] == 0ll) { break; }
 			for(k=0;k<21;k++){
 			int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
