@@ -71,9 +71,9 @@ using namespace std;
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
-#define TRN 55//手数//MAX155
-#define MAX_TURN 55//最大ルート長//MAX150
-#define BEAM_WIDTH 2500000//ビーム幅//MAX200000
+#define TRN 49//手数//MAX155
+#define MAX_TURN 49//最大ルート長//MAX150
+#define BEAM_WIDTH 2800000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -586,9 +586,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		ha ^= zoblish_field[pos_y][pos_x][i];
 		}
 		if(j>0){
-		int add=max(pos_x-prev_x,prev_x-pos_x)+max(pos_y-prev_y,prev_y-pos_y);
-		add+=add;
-		add/=3;
+		int add=max(pos_x-prev_x,prev_x-pos_x);
 		cmb2-=add;
 		}
 		prev_x=pos_x;
