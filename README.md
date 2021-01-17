@@ -21,7 +21,7 @@
 
 | Version | CPU | Average Time | Average Combo |
 | --- | --- | --- | --- |
-| puzzdra_solver.cpp | Intel(R) Core(TM) i7-3770 | 0.2732s | 7.9996/7.9996 |
-| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.1851s | 7.9982/7.9982 |
+| puzzdra_solver.cpp | Intel(R) Core(TM) i7-3770 | 0.2284s | 8.0022/8.0022 |
+| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.1760s | 8.0061/8.0061 |
 
 <img src="https://user-images.githubusercontent.com/47982907/101321654-0b96e900-38a9-11eb-9c70-a8d9fa3d491d.jpg" width="300px" height="500px">
