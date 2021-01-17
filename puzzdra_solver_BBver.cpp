@@ -25,6 +25,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 379934
 355886
 951279
+
 チェック2：1000盤面平均落ちコンボ数が9.20付近か
 
 チェック3：1000盤面平均コンボ数が理論値付近か
@@ -108,6 +109,12 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
+
+int MSB64bit(ll v) {
+   if(v == 0ll){return 0;}
+   int out =63-__builtin_clzll(v);
+   return out;
+}
 
 struct node {//どういう手かの構造体
 	T_T first_te;
@@ -434,9 +441,17 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
 		F_T GetHeight[COL];
+		int right[DROP+1];
+		int left[DROP+1];
+		for(int i=0;i<=DROP;i++){
+		right[i]=-1;
+		left[i]=10;
+		}	
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
+				right[(int)num]=max(right[(int)num],col);
+				left[(int)num]=min(left[(int)num],col);
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
 				}
@@ -460,7 +475,8 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		}
 
 		F_T cnt[DROP + 1] = { 0 };
-		F_T drop[DROP + 1][ROW * COL][2] = { 0 };
+		F_T drop[DROP + 1][ROW * COL][2] = { 0 };		
+		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -474,27 +490,15 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 						if (c == 3) { cmb2 += 30; }
 						else { cmb2 += 20; }
 					}
+					field[row][col]=0;
+					erase_x[col]=1;
 				}
 			}
 		}
-		F_T erase_x[COL]={0};
-		for (int i = 1; i <= DROP; i++) {
-			for (int j = 0; j < cnt[i] - 1; j++) {
-				int d1 = (int)drop[i][j][0];
-				int d2 = (int)drop[i][j][1];
-				int d3 = (int)drop[i][j + 1][0];
-				int d4 = (int)drop[i][j + 1][1];
-				int add = max(d2 - d4, d4 - d2);
-				cmb2 -= add;
-				if (delflag[d1][d2]> 0) {
-					field[d1][d2] = 0;
-					erase_x[d2]=1;
-				}
-				if (delflag[d3][d4] > 0) {
-					field[d3][d4] = 0;
-					erase_x[d4]=1;
-				}
-			}
+		for(int i=1;i<=DROP;i++){
+		if(right[i]!=-1&&left[i]!=10){
+		cmb2-=right[i]-left[i];
+		}
 		}
 		*combo += cmb;
 		ev += cmb2;
@@ -535,10 +539,23 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		ll linked[DROP+1]={0};
 
 		for(int i=1;i<=DROP;i++){
+
 		ll vert = (dropBB[i]) & (dropBB[i] << 1) & (dropBB[i] << 2);
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
 
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
+
+		long long tmp_drop=(long long)dropBB[i];
+		long long t=tmp_drop&(-tmp_drop);
+		ll exist=(ll)t;
+		if(exist==0ll){continue;}
+		int h=( int ) ( ( exist * 0x03F566ED27179461ULL ) >> 58 );
+		int pos=table[h];
+		int LSB=(po-pos)/8;
+		int MSB=MSB64bit(dropBB[i]);
+		if(MSB==0){continue;}
+		MSB=(po-MSB)/8;
+		cmb2-=LSB-MSB;
 		}
 
 		for(int i=1;i<=DROP;i++){
@@ -562,7 +579,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		}
 		}
 
-
+		if(oti==0){
 		for(int i=1;i<=DROP;i++){
 
 		long long tmp_drop=(long long)dropBB[i];
@@ -578,19 +595,20 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		int pos=table[h];
 		int pos_x=(po-pos)/8;
 		int pos_y=(po-pos)%8;
-		if(oti==0){
 		ha ^= zoblish_field[pos_y][pos_x][i];
-		}
-		if(j>0){
-		int add=max(pos_x-prev_x,prev_x-pos_x);
-		cmb2-=add;
-		}
 		prev_x=pos_x;
 		prev_y=pos_y;
 		tmp_drop=tmp_drop & ~(1ll<<(pos));
-		}
+		}//j
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
+		}//i
+		}//if
+		else{
+		for(int i=1;i<=DROP;i++){
+		dropBB[i]^=linked[i];
+		occBB^=linked[i];
+		}
 		}
 
 		*combo += cmb;
