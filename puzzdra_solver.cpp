@@ -407,9 +407,17 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
 		F_T GetHeight[COL];
+		int right[DROP+1];
+		int left[DROP+1];
+		for(int i=0;i<=DROP;i++){
+		right[i]=-1;
+		left[i]=10;
+		}	
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
+				right[(int)num]=max(right[(int)num],col);
+				left[(int)num]=min(left[(int)num],col);
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
 				}
@@ -433,7 +441,8 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		}
 
 		F_T cnt[DROP + 1] = { 0 };
-		F_T drop[DROP + 1][ROW * COL][2] = { 0 };
+		F_T drop[DROP + 1][ROW * COL][2] = { 0 };		
+		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -447,27 +456,15 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 						if (c == 3) { cmb2 += 30; }
 						else { cmb2 += 20; }
 					}
+					field[row][col]=0;
+					erase_x[col]=1;
 				}
 			}
 		}
-		F_T erase_x[COL]={0};
-		for (int i = 1; i <= DROP; i++) {
-			for (int j = 0; j < cnt[i] - 1; j++) {
-				int d1 = (int)drop[i][j][0];
-				int d2 = (int)drop[i][j][1];
-				int d3 = (int)drop[i][j + 1][0];
-				int d4 = (int)drop[i][j + 1][1];
-				int add = max(d2 - d4, d4 - d2);
-				cmb2 -= add;
-				if (delflag[d1][d2]> 0) {
-					field[d1][d2] = 0;
-					erase_x[d2]=1;
-				}
-				if (delflag[d3][d4] > 0) {
-					field[d3][d4] = 0;
-					erase_x[d4]=1;
-				}
-			}
+		for(int i=1;i<=DROP;i++){
+		if(right[i]!=-1&&left[i]!=10){
+		cmb2-=right[i]-left[i];
+		}
 		}
 		*combo += cmb;
 		ev += cmb2;
