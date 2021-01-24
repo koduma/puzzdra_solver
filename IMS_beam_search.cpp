@@ -836,6 +836,7 @@ int main() {
 		printf("date=");
 		cin>>date;
 		//init(f_field); set(f_field, 0);//初期盤面生成
+		printf("layout=");
 		string str="";
 		cin>>str;
 		for (j = 0; j < ROW; j++) {
@@ -848,7 +849,7 @@ int main() {
 		double diff;
 		int tesuu_min=10000;
 		int tesuu;
-		string ans;
+		string ans="please wait...";
 		for(int loop=0;loop<10000;loop++){
 		printf("loop=%d/%d\n",loop+1,10000);
 		printf("tesuu_min=%d\n",tesuu_min);
