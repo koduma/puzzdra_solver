@@ -291,7 +291,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 				fff[j].prev_score=fff[j].score;
-				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving), j));
+				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3), j));
 				ks2++;
 			}
 		}
@@ -473,16 +473,11 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 				}
 			}
 		}
-
-		F_T cnt[DROP + 1] = { 0 };
-		F_T drop[DROP + 1][ROW * COL][2] = { 0 };		
+		
 		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
-				drop[field[row][col]][cnt[field[row][col]]][0] = (F_T)row;
-				drop[field[row][col]][cnt[field[row][col]]][1] = (F_T)col;
-				cnt[field[row][col]]++;
 				if (delflag[row][col]>0) {
 					int c = chain(row, col, field[row][col], field, chkflag, delflag);
 					if (c >= 3) {
