@@ -210,7 +210,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TURN; i++) {
-		printf("depth=%d/%d\n",i+1,MAX_TURN);
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for private(st),reduction(+:part1,part4)
@@ -276,6 +275,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 				}
 			}
 		}
+		printf("depth=%d/%d\n",i+1,MAX_TURN);
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
@@ -781,6 +781,9 @@ int main() {
 
 //layout=053241405407470557104053134522
 //No1:41手
+
+//layout=015315151020442313510540210411
+//No1:手
 
 	int i, j, k;
 	for(i=0;i<ROW;++i){
