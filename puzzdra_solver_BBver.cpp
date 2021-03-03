@@ -12,25 +12,6 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
 これらが改善されればpull request受け付けます
 
-チェック1：これを10コンボできるか
-
-962679
-381515
-489942
-763852
-917439
-
-914769
-264812
-379934
-355886
-951279
-
-チェック2：1000盤面平均落ちコンボ数が9.20付近か
-
-チェック3：1000盤面平均コンボ数が理論値付近か
-
-全チェック達成したら合格
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -441,17 +422,19 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
 		F_T GetHeight[COL];
+		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
-		left[i]=10;
+		left[i]=COL;
 		}	
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
 				right[(int)num]=max(right[(int)num],col);
 				left[(int)num]=min(left[(int)num],col);
+				cnt_drop[(int)num]++;
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
 				}
@@ -491,7 +474,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 			}
 		}
 		for(int i=1;i<=DROP;i++){
-		if(right[i]!=-1&&left[i]!=10){
+		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3){
 		cmb2-=right[i]-left[i];
 		}
 		}
@@ -539,6 +522,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
 
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
+
+		if(dropBB[i]==0ll){continue;}
+
+		int c=__builtin_popcountll(dropBB[i]);
+
+		if(c<3){continue;}
 
 		long long tmp_drop=(long long)dropBB[i];
 		long long t=tmp_drop&(-tmp_drop);
@@ -618,88 +607,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		dropBB[i]=fallBB(dropBB[i],occBB,mask);
 		}
 		occBB=fallBB(occBB,occBB,mask);
-
-		/*
-		F_T chkflag[ROW][COL]={0};
-		F_T delflag[ROW][COL]={0};
-		F_T GetHeight[COL];
-		for (int row = 0; row < ROW; row++) {
-			for (int col = 0; col < COL; col++) {
-				F_T num = field[row][col];
-				if(row==0){
-				GetHeight[col]=(F_T)ROW;
-				}
-				if(num>0 && GetHeight[col]==(F_T)ROW){
-				GetHeight[col]=(F_T)row;
-				}
-				if(oti==0){
-					ha ^= zoblish_field[row][col][(int)num];
-				}
-				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
-					delflag[row][col]=1;
-					delflag[row][col+1]=1;
-					delflag[row][col+2]=1;
-				}
-				if (row <= ROW - 3 && num == field[row + 1][col] && num == field[row + 2][col] && num > 0) {
-					delflag[row][col]=1;
-					delflag[row+1][col]=1;
-					delflag[row+2][col]=1;
-				}
-			}
-		}
-		F_T cnt[DROP + 1] = { 0 };
-		F_T drop[DROP + 1][ROW * COL][2] = { 0 };
-		for (int row = 0; row < ROW; row++) {
-			for (int col = 0; col < COL; col++) {
-				drop[field[row][col]][cnt[field[row][col]]][0] = (F_T)row;
-				drop[field[row][col]][cnt[field[row][col]]][1] = (F_T)col;
-				cnt[field[row][col]]++;
-				if (delflag[row][col]>0) {
-					int c = chain(row, col, field[row][col], field, chkflag, delflag);
-					if (c >= 3) {
-						cmb++;
-						if (c == 3) { cmb2 += 30; }
-						else { cmb2 += 20; }
-					}
-				}
-			}
-		}
-		F_T erase_x[COL]={0};
-		for (int i = 1; i <= DROP; i++) {
-			for (int j = 0; j < cnt[i] - 1; j++) {
-				int d1 = (int)drop[i][j][0];
-				int d2 = (int)drop[i][j][1];
-				int d3 = (int)drop[i][j + 1][0];
-				int d4 = (int)drop[i][j + 1][1];
-				int add = max(d1 - d3, d3 - d1) + max(d2 - d4, d4 - d2);
-				add += add;
-				add /= 3;
-				cmb2 -= add;
-				if (delflag[d1][d2]> 0) {
-					field[d1][d2] = 0;
-					erase_x[d2]=1;
-				}
-				if (delflag[d3][d4] > 0) {
-					field[d3][d4] = 0;
-					erase_x[d4]=1;
-				}
-			}
-		}
-		*combo += cmb;
-		ev += cmb2;
-		//コンボが発生しなかったら終了
-		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
-		oti++;
-		if (flag & EVAL_FALL){//落下処理発生
-		for(int x=0;x<COL;x++){
-		if(erase_x[x]==1){
-		fall(x,GetHeight[x],field);
-		}
-		}
-		}
-		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
-*/
-
 	}
 	ev += oti;
 	*hash=ha;
@@ -813,6 +720,8 @@ int main() {
 	po-=8;
 	}
 
+	int mistake = 0;
+
 	double avg = 0;//平均コンボ数
 	double start;
 	double t_sum = 0;
@@ -869,6 +778,8 @@ int main() {
 		memcpy(oti_field, field, sizeof(field));
 		int combo = sum_e(field);
 		int oti = sum_evaluate(oti_field);
+		if(combo!=tmp.maxcombo){mistake++;}
+		printf("mistake=%d\n",mistake);
 		printf("path_length=%d\n",path_length);
 		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
