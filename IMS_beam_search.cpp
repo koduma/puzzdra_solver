@@ -12,25 +12,6 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
 これらが改善されればpull request受け付けます
 
-チェック1：これを10コンボできるか
-
-962679
-381515
-489942
-763852
-917439
-
-914769
-264812
-379934
-355886
-951279
-
-チェック2：1000盤面平均落ちコンボ数が9.20付近か
-
-チェック3：1000盤面平均コンボ数が理論値付近か
-
-全チェック達成したら合格
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -442,17 +423,19 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 		F_T chkflag[ROW][COL]={0};
 		F_T delflag[ROW][COL]={0};
 		F_T GetHeight[COL];
+		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
-		left[i]=10;
+		left[i]=COL;
 		}	
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
 				right[(int)num]=max(right[(int)num],col);
 				left[(int)num]=min(left[(int)num],col);
+				cnt_drop[(int)num]++;
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
 				}
@@ -492,7 +475,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 			}
 		}
 		for(int i=1;i<=DROP;i++){
-		if(right[i]!=-1&&left[i]!=10){
+		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3){
 		cmb2-=right[i]-left[i];
 		}
 		}
@@ -540,6 +523,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
 
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
+
+		if(dropBB[i]==0ll){continue;}
+
+		int c=__builtin_popcountll(dropBB[i]);
+
+		if(c<3){continue;}
 
 		long long tmp_drop=(long long)dropBB[i];
 		long long t=tmp_drop&(-tmp_drop);
@@ -848,8 +837,9 @@ int main() {
 		int tesuu;
 		string ans="please wait...";
 		for(int loop=0;loop<10000;loop++){
+		if(tesuu_min==10000){printf("path_length=INF\n");}
+		else{printf("path_length=%d\n",tesuu_min);}
 		printf("loop=%d/%d\n",loop+1,10000);
-		printf("tesuu_min=%d\n",tesuu_min);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,loop);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
