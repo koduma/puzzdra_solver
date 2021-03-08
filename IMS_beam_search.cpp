@@ -11,7 +11,6 @@ printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
 これらが改善されればpull request受け付けます
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -52,8 +51,7 @@ using namespace std;
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
-#define TRN 45//手数//MAX155
-#define MAX_TURN 45//最大ルート長//MAX150
+#define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
@@ -127,9 +125,9 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi); //ルート探索関数
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, part4 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 
 	int po=9+(8*(COL-1))+ROW-1;
 
@@ -190,7 +188,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 	}
 
 	//2手目以降をビームサーチで探索
-	for (int i = 0; i < MAX_TURN; i++) {
+	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for private(st),reduction(+:part1,part4)
@@ -256,7 +254,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 				}
 			}
 		}
-		printf("depth=%d/%d\n",i+1,MAX_TURN);
+		printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
@@ -287,7 +285,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi) {
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 			}
-			if (i < MAX_TURN - 1) {
+			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
@@ -751,15 +749,15 @@ int main() {
 		show_field(f_field);//盤面表示
 		Action tmp,tmp2;
 		double diff;
-		int tesuu_min=10000;
+		int tesuu_min=TRN;
 		int tesuu;
 		string ans="please wait...";
-		for(int loop=0;loop<10000;loop++){
-		if(tesuu_min==10000){printf("path_length=INF\n");}
+		for(int shots=0;shots<10000;shots++){
+		if(tesuu_min==TRN){printf("path_length=INF\n");}
 		else{printf("path_length=%d\n",tesuu_min);}
-		printf("loop=%d/%d\n",loop+1,10000);
+		printf("shots=%d/%d\n",shots+1,10000);
 		start = omp_get_wtime();
-		tmp = BEAM_SEARCH(f_field,loop);//ビームサーチしてtmpに最善手を保存
+		tmp = BEAM_SEARCH(f_field,shots,tesuu_min);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
 		t_sum += diff;
 		//printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
@@ -787,7 +785,7 @@ int main() {
 		}
 		}//if(tmp
 		cout<<ans<<endl;
-		}//loop
+		}//shots
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
