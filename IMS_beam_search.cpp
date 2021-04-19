@@ -275,6 +275,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 				ks2++;
 			}
 		}
+		if(i==MAX_TRN-1){return bestAction;}
 		sort(vec.begin(), vec.end());
 		int push_node=0;
 		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
@@ -685,10 +686,10 @@ return p;
 int main() {
 
 //layout=053241405407470557104053134522
-//No1:41手
+//TARGET:path_length=41
 
 //layout=015315151020442313510540210411
-//No1:27手
+//TARGET:path_length=27
 
 	int i, j, k;
 	for(i=0;i<ROW;++i){
@@ -757,7 +758,7 @@ int main() {
 		else{printf("path_length=%d\n",tesuu_min);}
 		printf("shots=%d/%d\n",shots+1,10000);
 		start = omp_get_wtime();
-		tmp = BEAM_SEARCH(f_field,shots,tesuu_min);//ビームサーチしてtmpに最善手を保存
+		tmp = BEAM_SEARCH(f_field,shots,tesuu_min-1);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
 		t_sum += diff;
 		//printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
