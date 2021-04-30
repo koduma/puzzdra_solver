@@ -51,7 +51,7 @@ using namespace std;
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
-#define TRN 150//手数//MAX155
+#define TRN 60//手数//MAX155
 #define BEAM_WIDTH 2800000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
@@ -754,14 +754,14 @@ int main() {
 		int tesuu;
 		string ans="please wait...";
 		for(int shots=0;shots<10000;shots++){
-		if(tesuu_min==TRN){printf("path_length=INF\n");}
-		else{printf("path_length=%d\n",tesuu_min);}
-		printf("shots=%d/%d\n",shots+1,10000);
+		if(tesuu_min==TRN){printf("\npath_length=INF\n");}
+		else{printf("\npath_length=%d\n",tesuu_min);}
+		printf("\nshots=%d/%d\n\n",shots+1,10000);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,tesuu_min-1);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
 		t_sum += diff;
-		//printf("(x,y)=(%d,%d)", XX(tmp.moving[0]), YY(tmp.moving[0]));
+		printf("\nelapsed time=%fSec\n\n", diff);
 		tesuu=0;
 		if(tmp.score==tmp.maxcombo){
 		string route="";
