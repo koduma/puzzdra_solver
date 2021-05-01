@@ -11,7 +11,6 @@ printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
 これらが改善されればpull request受け付けます
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -61,13 +60,14 @@ using namespace std;
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
+typedef signed char sc;
 typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
 void init(F_T field[ROW][COL]); //初期配置生成関数
 void fall(int x,int h,F_T field[ROW][COL]); //ドロップの落下処理関数
 void set(F_T field[ROW][COL], int force); //空マスを埋める関数
 void show_field(F_T field[ROW][COL]); //盤面表示関数
-unsigned int rnd(int mini, int maxi); //整数乱数
+int rnd(int mini, int maxi); //整数乱数
 //上下左右に連結しているドロップを再帰的に探索していく関数
 int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F_T delflag[ROW][COL]);
 int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
@@ -75,15 +75,15 @@ int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ�
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
 
-int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash);//落とし減点評価関数
-int sum_e2(F_T field[ROW][COL], int* combo, ll* hash);//評価関数
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash);//落とし減点評価関数
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash);//評価関数
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
-int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash);//落とし減点評価関数
-int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash);//評価関数
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash);//落とし減点評価関数
+int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash);//評価関数
 ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
@@ -101,10 +101,10 @@ struct node {//どういう手かの構造体
 	T_T first_te;
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	int score;//評価値
-	int combo;//コンボ数
-	int nowC;//今どのx座標にいるか
-	int nowR;//今どのy座標にいるか
-	int prev;//1手前は上下左右のどっちを選んだか
+	sc combo;//コンボ数
+	sc nowC;//今どのx座標にいるか
+	sc nowR;//今どのy座標にいるか
+	sc prev;//1手前は上下左右のどっちを選んだか
 	int prev_score;//1手前の評価値
 	int improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
@@ -164,7 +164,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			F_T ff_field[ROW][COL];
 			memcpy(ff_field,f_field,sizeof(ff_field));
-			int cmb;
+			sc cmb;
 			ll ha;
 			cand.prev_score=sum_e2(ff_field,&cmb,&ha);
 			cand.improving=0;
@@ -232,7 +232,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						st = omp_get_wtime();
-						int cmb;
+						sc cmb;
 						ll ha;
 						cand.score = sum_e3(dropBB, &cmb,&ha);
 						cand.combo = cmb;
@@ -411,7 +411,7 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	}
 	return combo;
 }
-int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash) {
 	int ev = 0;
 	*combo = 0;
 	ll ha=0;
@@ -497,7 +497,7 @@ int evaluate2(F_T field[ROW][COL], int flag, int* combo, ll* hash) {
 	*hash=ha;
 	return ev;
 }
-int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash) {
 	int ev = 0;
 	*combo = 0;
 	ll ha=0;
@@ -612,10 +612,10 @@ int evaluate3(ll dropBB[DROP+1], int flag, int* combo, ll* hash) {
 	*hash=ha;
 	return ev;
 }
-int sum_e3(ll dropBB[DROP+1], int* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
+int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
 	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,hash);
 }
-int sum_e2(F_T field[ROW][COL], int* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash);
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
@@ -654,7 +654,7 @@ void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[
 ll around(ll bitboard){
 return bitboard | bitboard >> 1 | bitboard << 1 | bitboard >> 8 | bitboard << 8;
 }
-unsigned int rnd(int mini, int maxi) {
+int rnd(int mini, int maxi) {
 	static mt19937 mt((int)time(0));
 	uniform_int_distribution<int> dice(mini, maxi);
 	return dice(mt);
