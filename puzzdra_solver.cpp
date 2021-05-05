@@ -63,6 +63,7 @@ using namespace std;
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
+typedef unsigned char uc;
 typedef unsigned long long ll;
 enum { EVAL_NONE = 0, EVAL_FALL, EVAL_SET, EVAL_FS, EVAL_COMBO };
 void init(F_T field[ROW][COL]); //初期配置生成関数
@@ -93,7 +94,7 @@ struct node {//どういう手かの構造体
 	sc nowR;//今どのy座標にいるか
 	sc prev;//1手前は上下左右のどっちを選んだか
 	int prev_score;//1手前の評価値
-	int improving;//評価値改善回数
+	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
 	node() {//初期化
 		this->score = 0;
@@ -238,7 +239,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3), j));
+			vec.push_back(make_pair(fff[j].score+(BONUS*(int)fff[j].improving)+(fff[j].nowR*3), j));
 			ks2++;
 			}
 		}
