@@ -239,7 +239,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec.push_back(make_pair(fff[j].score+(BONUS*(int)fff[j].improving)+(fff[j].nowR*3), j));
+			vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3), j));
 			ks2++;
 			}
 		}
