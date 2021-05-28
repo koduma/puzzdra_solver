@@ -4,8 +4,8 @@
 
 ## Command 
 
-- g++ -O2 -std=c++11 -fopenmp puzzdra_solver.cpp -o puzzdra_solver  
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 puzzdra_solver_BBver.cpp -o puzzdra_solver_BBver
+- g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver.cpp
 
 # Benchmark
 
@@ -21,7 +21,7 @@
 
 | Version | CPU | Average Time | Average Combo |
 | --- | --- | --- | --- |
-| puzzdra_solver.cpp | Intel(R) Core(TM) i5-8250U | 0.2476s | 8.0051/8.0051 |
-| puzzdra_solver_BBver.cpp | Intel(R) Core(TM) i5-8250U| 0.1766s | 7.9997/7.9997 |
+| benchmark.cpp | Intel(R) Core(TM) i5-8250U | 0.2476s | 8.0051/8.0051 |
+| benchmark_BitBoard_ver.cpp | Intel(R) Core(TM) i5-8250U| 0.1766s | 7.9997/7.9997 |
 
 <img src="https://user-images.githubusercontent.com/47982907/101321654-0b96e900-38a9-11eb-9c70-a8d9fa3d491d.jpg" width="300px" height="500px">
