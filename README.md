@@ -2,10 +2,12 @@
 
 ## Compiler:MinGW-W64
 
-## Command 
+## Compile Command 
 
 - g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver.cpp
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver
+- g++ -O2 -std=c++11 -fopenmp Low-end_PC_solver.cpp -o Low-end_PC_solver  
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 High-end_PC_solver.cpp -o High-end_PC_solver
 
 # Benchmark
 
