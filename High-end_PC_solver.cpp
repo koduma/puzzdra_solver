@@ -137,7 +137,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 	}
 
 	cout<<"unordered_map_size="<<u_size<<endl;
-   printf("\n");
+	printf("\n");
 
 	int po=9+(8*(COL-1))+ROW-1;
 
