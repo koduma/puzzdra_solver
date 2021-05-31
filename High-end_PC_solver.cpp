@@ -52,7 +52,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 55//手数//MAX155
-#define BEAM_WIDTH 2800000//ビーム幅//MAX200000
+#define BEAM_WIDTH 10000000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
