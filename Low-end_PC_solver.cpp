@@ -728,6 +728,7 @@ int main() {
 	po-=8;
 	}
 
+
 	double avg = 0;//平均コンボ数
 	double start;
 	double t_sum = 0;
@@ -757,14 +758,13 @@ int main() {
 		int tesuu;
 		string ans="please wait...";
 		for(int shots=0;shots<10000;shots++){
-		if(tesuu_min==TRN){printf("\npath_length=INF\n");}
-		else{printf("\npath_length=%d\n",tesuu_min);}
+		printf("\n-----search_start-----\n");
 		printf("\nshots=%d/%d\n\n",shots+1,10000);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,tesuu_min-1);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
+		printf("\n-----search_end-----\n");
 		t_sum += diff;
-		printf("\nelapsed time=%fSec\n\n", diff);
 		tesuu=0;
 		if(tmp.score==tmp.maxcombo){
 		string route="";
@@ -788,7 +788,12 @@ int main() {
 		ans=url;
 		}
 		}//if(tmp
+		printf("\nResult=>{\n");
+		if(tesuu_min==TRN){printf("\npath_length=INF\n");}
+		else{printf("\npath_length=%d\n",tesuu_min);}
+		printf("\nDuration=%fSec\n\n", diff);
 		cout<<ans<<endl;
+		printf("\n}\n");
 		}//shots
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
