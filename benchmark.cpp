@@ -580,7 +580,7 @@ int main() {
 		printf("path_length=%d\n",path_length);
 		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
-		printf("elapsed time:%fSec\n", diff);
+		printf("Duration:%fSec\n", diff);
 		printf("------------\n");
 		avg += (double)combo;
 		oti_avg += (double)oti;
