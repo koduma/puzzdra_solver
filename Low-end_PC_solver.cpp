@@ -692,7 +692,10 @@ int main() {
 
 //layout=015315151020442313510540210411
 //TARGET:path_length=27
-
+	
+//layout=225530333313140355004550251403
+//TARGET:path_length=24
+	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
