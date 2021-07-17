@@ -78,8 +78,8 @@ int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ�
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1]); //スワイプ処理関数
 
-int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash);//落とし減点評価関数
-int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash);//評価関数
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
@@ -121,6 +121,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 
 	int stop = 0;//理論最大コンボ数
 
+	int p_maxcombo[DROP+1] = {0};
+
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -131,6 +133,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	}
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
+		p_maxcombo[i]=drop[i]/3;
 	}
 	MAXCOMBO += (double)stop;
 
@@ -152,7 +155,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			memcpy(ff_field,f_field,sizeof(ff_field));
 			sc cmb;
 			ll ha;
-			cand.prev_score=sum_e2(ff_field,&cmb,&ha);
+			cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 			cand.improving=0;
 			cand.hash=ha;
 			dque.push_back(cand);
@@ -200,7 +203,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						st = omp_get_wtime();
 						sc cmb;
 						ll ha;
-						cand.score = sum_e2(field, &cmb,&ha);
+						cand.score = sum_e2(field, &cmb,&ha,p_maxcombo);
 						cand.combo = cmb;
 						cand.hash=ha;
 						part1 += omp_get_wtime() - st;
@@ -378,11 +381,13 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	}
 	return combo;
 }
-int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash) {
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]) {
 	int ev = 0;
 	*combo = 0;
 	ll ha=0;
 	int oti = 0;
+	int d_maxcombo[DROP+1]={0};
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -434,6 +439,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash) {
 						cmb++;
 						if (c == 3) { cmb2 += 30; }
 						else { cmb2 += 20; }
+						d_maxcombo[(int)field[row][col]]++;
 					}
 					field[row][col]=0;
 					erase_x[col]=1;
@@ -441,7 +447,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash) {
 			}
 		}
 		for(int i=1;i<=DROP;i++){
-		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3){
+		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
 		cmb2-=right[i]-left[i];
 		}
 		}
@@ -464,8 +470,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash) {
 	*hash=ha;
 	return ev;
 }
-int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash) {//落とし有り、落ちコン無し評価関数
-	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash);
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
+	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
