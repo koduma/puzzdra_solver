@@ -438,8 +438,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
-				right[(int)num]=max(right[(int)num],col);
-				left[(int)num]=min(left[(int)num],col);
 				cnt_drop[(int)num]++;
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
@@ -478,6 +476,10 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					field[row][col]=0;
 					erase_x[col]=1;
 				}
+                                else{
+                                right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
+				left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+                                }
 			}
 		}
 		for(int i=1;i<=DROP;i++){
@@ -550,7 +552,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		if(c>=3){
 		cmb++;
 		if(c==3){cmb2+=30;}
-		else{cmb2+=20;}
+		else {cmb2+=20;}
 		d_maxcombo[i]++;
 		}
 		}
@@ -561,20 +563,22 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
 
-		if(dropBB[i]==0ll){continue;}
+		ll erased_dropBB=(dropBB[i])^(linked[i]);
 
-		int c=__builtin_popcountll(dropBB[i]);
+		if(erased_dropBB==0ll){continue;}
+
+		int c=__builtin_popcountll(erased_dropBB);
 
 		if(c<3){continue;}
 
-		long long tmp_drop=(long long)dropBB[i];
+		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
 		ll exist=(ll)t;
 		if(exist==0ll){continue;}
 		int h=( int ) ( ( exist * 0x03F566ED27179461ULL ) >> 58 );
 		int pos=table[h];
 		int LSB=(po-pos)/8;
-		int MSB=MSB64bit(dropBB[i]);
+		int MSB=MSB64bit(erased_dropBB);
 		if(MSB==0){continue;}
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
