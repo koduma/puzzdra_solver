@@ -404,8 +404,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
-				right[(int)num]=max(right[(int)num],col);
-				left[(int)num]=min(left[(int)num],col);
 				cnt_drop[(int)num]++;
 				if(row==0){
 				GetHeight[col]=(F_T)ROW;
@@ -444,6 +442,10 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					field[row][col]=0;
 					erase_x[col]=1;
 				}
+                                else{
+					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
+					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+                                }
 			}
 		}
 		for(int i=1;i<=DROP;i++){
