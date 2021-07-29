@@ -477,8 +477,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					erase_x[col]=1;
 				}
                                 else{
-                                right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
-				left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
+					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
                                 }
 			}
 		}
