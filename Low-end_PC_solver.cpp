@@ -263,7 +263,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		vector<pair<int, int> >vec;
+		vector<int>vec[3001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -274,17 +274,26 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				return bestAction;
 			}
-				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
-				fff[j].prev_score=fff[j].score;
-				vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving)+rnd(0,maxi)+(fff[j].nowR*3), j));
-				ks2++;
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			fff[j].prev_score=fff[j].score;
+			vec[fff[j].score+(BONUS*fff[j].improving)+rnd(0,maxi)+(fff[j].nowR*3)+100].push_back(j);
+			ks2++;
 			}
 		}
 		if(i==MAX_TRN-1){return bestAction;}
-		sort(vec.begin(), vec.end());
 		int push_node=0;
-		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
-			node temp = fff[vec[ks2-1-j].second];
+		int possible_score=3000;
+		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
+			node temp = fff[v];
+			swap(vec[possible_score][0], vec[possible_score].back());
+			vec[possible_score].pop_back();
+			//vec[possible_score].erase(vec[possible_score].begin());
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
@@ -780,9 +789,9 @@ int main() {
 		int tesuu_min=TRN;
 		int tesuu;
 		string ans="please wait...";
-		for(int shots=0;shots<10000;shots++){
+		for(int shots=0;shots<1000;shots++){
 		printf("\n-----search_start-----\n");
-		printf("\nshots=%d/%d\n\n",shots+1,10000);
+		printf("\nshots=%d/%d\n\n",shots+1,1000);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,tesuu_min-1);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
