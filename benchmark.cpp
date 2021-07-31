@@ -11,9 +11,6 @@ printf("TotalDuration:%fSec\n", t_sum);
 printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 
 これらが改善されればpull request受け付けます
-
-パズドラ検定クエスト対策君
-https://ideone.com/Sgjd02
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -228,7 +225,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		vector<pair<int, int> >vec;
+		vector<int>vec[3001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -242,14 +239,22 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec.push_back(make_pair(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3), j));
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100].push_back(j);
 			ks2++;
 			}
 		}
-		sort(vec.begin(), vec.end());
 		int push_node=0;
-		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
-			node temp = fff[vec[ks2-1-j].second];
+		int possible_score=3000;
+		for (int j = 0; push_node < BEAM_WIDTH; j++) {
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
+			node temp = fff[v];
+			swap(vec[possible_score][0], vec[possible_score].back());
+			vec[possible_score].pop_back();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
