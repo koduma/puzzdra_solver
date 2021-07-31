@@ -23,7 +23,7 @@
 
 | Version | CPU | Average Time | Average Combo |
 | --- | --- | --- | --- |
-| benchmark.cpp | Intel(R) Core(TM) i5-8250U | 0.2467s | 7.9972/7.9972 |
-| benchmark_BitBoard_ver.cpp | Intel(R) Core(TM) i5-8250U| 0.1793s | 7.9964/7.9964 |
+| benchmark.cpp | Intel(R) Core(TM) i5-8250U | 0.2245s | 8.0098/8.0098 |
+| benchmark_BitBoard_ver.cpp | Intel(R) Core(TM) i5-8250U| 0.1546s | 7.9934/7.9934 |
 
 <img src="https://user-images.githubusercontent.com/47982907/101321654-0b96e900-38a9-11eb-9c70-a8d9fa3d491d.jpg" width="300px" height="500px">
