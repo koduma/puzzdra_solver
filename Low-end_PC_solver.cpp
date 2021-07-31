@@ -200,7 +200,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 		for (int k = 0; k < ks; k++) {
 #ifdef _OPENMP
 			if (i == 0 && k == 0) {
-				printf("Threads[%d/%d]\n",
+				printf("Threads[%d/%d]\n\n",
 					omp_get_num_threads(),
 					omp_get_max_threads());
 			}
