@@ -52,12 +52,11 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 55//手数//MAX155
-#define BEAM_WIDTH 10000000//ビーム幅//MAX200000
+#define BEAM_WIDTH 28000000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define LAMBDA 50.0
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -272,7 +271,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		vector<pair<double, int> >vec;
+		vector<int>vec[3001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -283,20 +282,30 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN) {
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				return bestAction;
 			}
-				if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
-				fff[j].prev_score=fff[j].score;
-				int pos=(fff[j].nowR*COL)+fff[j].nowC;
-				double x_j=(double)(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3));
-				double y_j=LAMBDA/(double)(checkNodeList[pos][fff[j].hash]+1);
-				vec.push_back(make_pair(x_j+y_j, j));
-				ks2++;
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			fff[j].prev_score=fff[j].score;
+			int pos=(fff[j].nowR*COL)+fff[j].nowC;
+			int x_j=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100;
+			int LAMBDA[8]={50,25,12,6,3,2,1,0};
+			int v=checkNodeList[pos][fff[j].hash];
+			if(v>=8){v=7;}
+			vec[x_j+LAMBDA[v]].push_back(j);
+			ks2++;
 			}
 		}
 		if(i==MAX_TRN-1){return bestAction;}
-		sort(vec.begin(), vec.end());
 		int push_node=0;
-		for (int j = 0; push_node < BEAM_WIDTH && j < ks2; j++) {
-			node temp = fff[vec[ks2-1-j].second];
+		int possible_score=3000;
+		for (int j = 0; push_node < BEAM_WIDTH ; j++) {
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
+			node temp = fff[v];
+			swap(vec[possible_score][0], vec[possible_score].back());
+			vec[possible_score].pop_back();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
@@ -730,9 +739,6 @@ int main() {
 
 //layout=015315151020442313510540210411
 //TARGET:path_length=27
-	
-//layout=225530333313140355004550251403
-//TARGET:path_length=24
 
 	int i, j, k;
 	for(i=0;i<ROW;++i){
