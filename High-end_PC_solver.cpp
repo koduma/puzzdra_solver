@@ -804,9 +804,9 @@ int main() {
 		int tesuu_min=TRN;
 		int tesuu;
 		string ans="please wait...";
-		for(int shots=0;shots<10000;shots++){
+		for(int shots=0;shots<1000;shots++){
 		printf("\n-----search_start-----\n");
-		printf("\nshots=%d/%d\n\n",shots+1,10000);
+		printf("\nshots=%d/%d\n\n",shots+1,1000);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,tesuu_min-1);//ビームサーチしてtmpに最善手を保存
 		diff = omp_get_wtime() - start;
