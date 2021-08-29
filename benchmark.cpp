@@ -134,7 +134,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	}
 	MAXCOMBO += (double)stop;
 
-	deque<node>dque;
+	vector<node>dque;
 	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
@@ -225,7 +225,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		vector<int>vec[3001];
+		deque<int>vec[3001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -253,8 +253,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			int v=vec[possible_score][0];
 			node temp = fff[v];
-			swap(vec[possible_score][0], vec[possible_score].back());
-			vec[possible_score].pop_back();
+			//swap(vec[possible_score][0], vec[possible_score].back());
+			//vec[possible_score].pop_back();
+			vec[possible_score].pop_front();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
