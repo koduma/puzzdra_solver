@@ -735,9 +735,6 @@ return p;
 
 int main() {
 
-//layout=053241405407470557104053134522
-//TARGET:path_length=41
-
 //layout=015315151020442313510540210411
 //TARGET:path_length=27
 
