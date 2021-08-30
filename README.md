@@ -8,7 +8,7 @@
 - g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver
 - g++ -O2 -std=c++11 -fopenmp -mbmi2 OLD_Low-end_PC_solver.cpp -o OLD_Low-end_PC_solver -mcmodel=large
 - g++ -O2 -std=c++11 -fopenmp -mbmi2 OLD_High-end_PC_solver.cpp -o OLD_High-end_PC_solver -mcmodel=large
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 Latest_PC_solver.cpp -o Latest_PC_solver -mcmodel=large
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 New_PC_solver.cpp -o New_PC_solver -mcmodel=large
 
 
 # Benchmark
