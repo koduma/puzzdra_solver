@@ -49,7 +49,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 28000000//ビーム幅//MAX200000
+#define BEAM_WIDTH 2800000//ビーム幅//MAX200000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -820,17 +820,19 @@ int main() {
 		ans+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";
 		now_pos=((int)YY(tmp.first_te))*COL+(int)XX(tmp.first_te);
 		}
+		else{
 		int dir = (int)(7ll&(tmp.moving[0]));
 		if (dir==1) { ans+=to_string(3);swap(f_field[now_pos/COL][now_pos%COL],f_field[now_pos/COL][(now_pos%COL)-1]);now_pos--;prev_dir=dir-1;} //"LEFT"); }
 		if (dir==2) { ans+=to_string(6);swap(f_field[now_pos/COL][now_pos%COL],f_field[(now_pos/COL)-1][now_pos%COL]);now_pos-=COL;prev_dir=dir-1;} //"UP"); }
 		if (dir==3) { ans+=to_string(1);swap(f_field[now_pos/COL][now_pos%COL],f_field[(now_pos/COL)+1][now_pos%COL]);now_pos+=COL;prev_dir=dir-1;} //"DOWN"); }
 		if (dir==4) { ans+=to_string(4);swap(f_field[now_pos/COL][now_pos%COL],f_field[now_pos/COL][(now_pos%COL)+1]);now_pos++;prev_dir=dir-1;} //"RIGHT"); }
+		}
 		memcpy(field,f_field,sizeof(f_field));
 		int combo = sum_e(field);
 		string url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+ans+"&date="+date+"&ctwMode=false";
 		if(combo==tmp.maxcombo){
 		printf("\nResult=>{\n");
-		printf("\npath_length=%d\n\n",shots+1);
+		printf("\npath_length=%d\n\n",shots);
 		cout<<url<<endl;
 		printf("\n}\n");
 		break;
