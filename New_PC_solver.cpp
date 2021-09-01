@@ -836,10 +836,11 @@ int main() {
 		printf("\ncombo=%d/%d\n",combo,tmp.maxcombo);
 		printf("\npath_length=%d\n\n",shots);
 		cout<<url<<endl;
+		printf("\ncomplete\n");
 		printf("\n}\n");
 		break;
 		}//if(combo
-		else if(shots==TRN-1){
+		else{
 		int tesuu=0;
 		string route="";
 		route+=to_string(XX(tmp2.first_te))+to_string(YY(tmp2.first_te)+5)+",";
@@ -860,10 +861,8 @@ int main() {
 		printf("\ncombo=%d/%d\n",tmp2.score,tmp2.maxcombo);
 		printf("\npath_length=%d\n\n",tesuu);
 		cout<<url<<endl;
-		printf("\n}\n");
-		}
-		else{
 		printf("\nplease wait...\n");
+		printf("\n}\n");
 		}
 		}//shots
 	}//i
