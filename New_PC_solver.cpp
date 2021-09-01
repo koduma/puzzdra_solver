@@ -802,7 +802,7 @@ int main() {
 		}
 		printf("\n");
 		show_field(f_field);//盤面表示
-		Action tmp;
+		Action tmp,tmp2;
 		double diff;
 		string ans="";
 		int now_pos,prev_dir;
@@ -813,6 +813,7 @@ int main() {
 		printf("\nshots=%d/%d\n\n",shots+1,TRN);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,TRN,prev_dir,now_pos);//ビームサーチしてtmpに最善手を保存
+		if(shots==0){tmp2=tmp;}
 		diff = omp_get_wtime() - start;
 		printf("\n-----search_end-----\n");
 		t_sum += diff;
@@ -832,11 +833,35 @@ int main() {
 		string url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+ans+"&date="+date+"&ctwMode=false";
 		if(combo==tmp.maxcombo){
 		printf("\nResult=>{\n");
+		printf("\ncombo=%d/%d\n",combo,tmp.maxcombo);
 		printf("\npath_length=%d\n\n",shots);
 		cout<<url<<endl;
 		printf("\n}\n");
 		break;
 		}//if(combo
+		else if(shots==TRN-1){
+		int tesuu=0;
+		string route="";
+		route+=to_string(XX(tmp2.first_te))+to_string(YY(tmp2.first_te)+5)+",";
+		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
+			if (tmp2.moving[j] == 0ll) { break; }
+			for(k=0;k<21;k++){
+			int dir = (int)(7ll&(tmp2.moving[j]>>(3*k)));
+			if (dir==0){break;}
+			if (dir==1) { route+=to_string(3); } //"LEFT"); }
+			if (dir==2) { route+=to_string(6); } //"UP"); }
+			if (dir==3) { route+=to_string(1); } //"DOWN"); }
+			if (dir==4) { route+=to_string(4); } //"RIGHT"); }
+			tesuu++;
+			}
+		}
+		url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&date="+date+"&ctwMode=false";
+		printf("\nResult=>{\n");
+		printf("\ncombo=%d/%d\n",tmp2.score,tmp2.maxcombo);
+		printf("\npath_length=%d\n\n",tesuu);
+		cout<<url<<endl;
+		printf("\n}\n");
+		}
 		else{
 		printf("\nplease wait...\n");
 		}
