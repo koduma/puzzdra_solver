@@ -830,7 +830,9 @@ int main() {
 		}
 		memcpy(field,f_field,sizeof(f_field));
 		int combo = sum_e(field);
-		string url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+ans+"&date="+date+"&ctwMode=false";
+		string url="";
+		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+ans+"&ctwMode=false";}
+		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+ans+"&date="+date+"&ctwMode=false";}
 		if(combo==tmp.maxcombo){
 		printf("\nResult=>{\n");
 		printf("\ncombo=%d/%d\n",combo,tmp.maxcombo);
@@ -856,7 +858,8 @@ int main() {
 			tesuu++;
 			}
 		}
-		url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&date="+date+"&ctwMode=false";
+		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&ctwMode=false";}
+		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&date="+date+"&ctwMode=false";}	
 		printf("\nResult=>{\n");
 		printf("\ncombo=%d/%d\n",tmp2.score,tmp2.maxcombo);
 		printf("\npath_length=%d\n\n",tesuu);
