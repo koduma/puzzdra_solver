@@ -6,7 +6,7 @@
 
 - g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  
 - g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 New_PC_solver.cpp -o New_PC_solver -mcmodel=large
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 Excalibur.cpp -o Excalibur -mcmodel=large
 
 
 # Benchmark
