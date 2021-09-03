@@ -838,7 +838,7 @@ int main() {
 		printf("\ncombo=%d/%d\n",combo,tmp.maxcombo);
 		printf("\npath_length=%d\n\n",shots);
 		cout<<url<<endl;
-		printf("\ncomplete\n");
+		printf("\ncompleted\n");
 		printf("\n}\n");
 		break;
 		}//if(combo
