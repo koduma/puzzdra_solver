@@ -1,5 +1,8 @@
 /*
-linux導入手続き
+
+windows10,Linux ONLY
+
+Linux導入手続き
 
 //メモリ容量確認
 free -h
