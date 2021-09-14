@@ -1,13 +1,38 @@
 /*
-puzzdra_solver
+linux導入手続き
 
-パズドラのルート解析プログラムです
+//メモリ容量確認
+free -h
 
-コンパイラはMinGWを推奨します
+//g++インストール
 
-なるべく少ない時間でなるべく大きいコンボを出したいです
+sudo apt install g++
 
-pull request受け付けます
+//wgetインストール
+
+sudo apt-get update
+
+sudo apt-get install -y wget
+
+//ソースコードをダウンロード
+
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp
+
+//ビーム幅調整
+
+vi Excalibur.cpp
+
+//コンパイル
+
+g++ -O2 -std=c++11 -fopenmp -mbmi2 Excalibur.cpp -o Excalibur -mcmodel=large
+
+//run
+
+./Excalibur
+
+//input
+
+
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
