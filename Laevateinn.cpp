@@ -1,6 +1,8 @@
 /*
 
-linux導入手続き
+Linux ONLY
+
+Linux導入手続き
 
 //メモリ容量確認
 free -h
