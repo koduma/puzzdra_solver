@@ -153,7 +153,7 @@ struct Action {//最終的に探索された手
 	}
 };
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos); //ルート探索関数
-double part1 = 0, part2 = 0, part3 = 0, part4 = 0, MAXCOMBO = 0;
+double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos) {
 
 	int po=9+(8*(COL-1))+ROW-1;
@@ -248,7 +248,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
-#pragma omp parallel for private(st),reduction(+:part1,part4)
+#pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
 #ifdef _OPENMP
 			if (i == 0 && k == 0) {
@@ -286,19 +286,19 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
-						st = omp_get_wtime();
+						//st = omp_get_wtime();
 						sc cmb;
 						ll ha;
 						cand.score = sum_e3(dropBB, &cmb,&ha,p_maxcombo);
 						cand.combo = cmb;
 						cand.hash=ha;
-						part1 += omp_get_wtime() - st;
+						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
-						st = omp_get_wtime();
+						//st = omp_get_wtime();
 						//#pragma omp critical
 											//{ pque.push(cand); }
 						fff[(4 * k) + j] = cand;
-						part4 += omp_get_wtime() - st;
+						//part4 += omp_get_wtime() - st;
 					}
 					else {
 						cand.combo = -1;
@@ -312,7 +312,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		printf("depth=%d/%d\n",i+1,MAX_TRN);
-		part2 += omp_get_wtime() - start;
+		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
 		deque<int>vec[3001];
@@ -324,6 +324,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
@@ -332,7 +333,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			ks2++;
 			}
 		}
+		part2+=omp_get_wtime() - start;
 		if(i==MAX_TRN-1){return bestAction;}
+		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=3000;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
@@ -806,6 +809,10 @@ int main() {
 	po-=8;
 	}
 
+	string bestans="";
+	string str="";
+	string date="";
+
 
 	double avg = 0;//平均コンボ数
 	double start;
@@ -816,12 +823,10 @@ int main() {
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
-		string date="";
 		printf("date=");
 		cin>>date;
 		//init(f_field); set(f_field, 0);//初期盤面生成
 		printf("layout=");
-		string str="";
 		cin>>str;
 		for (j = 0; j < ROW; j++) {
 			for (k = 0; k < COL; k++) {
@@ -836,15 +841,28 @@ int main() {
 		int now_pos,prev_dir;
 		now_pos=0;
 		prev_dir=0;
+		int tesuu_min=TRN;
 		for(int shots=0;shots<TRN;shots++){
 		printf("\n-----search_start-----\n");
 		printf("\nshots=%d/%d\n\n",shots+1,TRN);
 		start = omp_get_wtime();
 		tmp = BEAM_SEARCH(f_field,shots,TRN,prev_dir,now_pos);//ビームサーチしてtmpに最善手を保存
-		if(shots==0){tmp2=tmp;}
 		diff = omp_get_wtime() - start;
 		printf("\n-----search_end-----\n");
 		t_sum += diff;
+		int path_length;
+		if(shots<=1){path_length=0;}
+		else{path_length=shots-1;}
+		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
+			if (tmp.moving[j] == 0ll) { break; }
+			for(k=0;k<21;k++){
+			int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
+			if (dir==0){break;}
+			path_length++;
+			}
+		}
+		if(tesuu_min>path_length){tesuu_min=path_length;}
+		tmp2=tmp;
 		if(shots==0){
 		ans+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";
 		now_pos=((int)YY(tmp.first_te))*COL+(int)XX(tmp.first_te);
@@ -871,9 +889,13 @@ int main() {
 		break;
 		}//if(combo
 		else{
-		int tesuu=0;
-		string route="";
-		route+=to_string(XX(tmp2.first_te))+to_string(YY(tmp2.first_te)+5)+",";
+		int tesuu;
+		if(shots<=1){tesuu=0;}
+		else{tesuu=shots-1;}
+		string route=ans;
+		if(shots>0){
+		route.pop_back();
+		}
 		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
 			if (tmp2.moving[j] == 0ll) { break; }
 			for(k=0;k<21;k++){
@@ -886,6 +908,7 @@ int main() {
 			tesuu++;
 			}
 		}
+		if(tesuu==tesuu_min){bestans=route;}
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+route+"&date="+date+"&ctwMode=false";}	
 		printf("\nResult=>{\n");
@@ -897,8 +920,14 @@ int main() {
 		}
 		}//shots
 	}//i
+	string url2="";
+	if(date=="null"){url2="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+bestans+"&ctwMode=false";}
+	else{url2="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+str+"&route="+bestans+"&date="+date+"&ctwMode=false";}
+	printf("\n");
+	cout<<url2<<endl;
+	printf("\n");
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3, part4);
+	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
 	cin>>i;
 	cin>>j;
 	cin>>k;
