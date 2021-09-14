@@ -1,13 +1,46 @@
 /*
-puzzdra_solver
 
-パズドラのルート解析プログラムです
+linux導入手続き
 
-コンパイラはMinGWを推奨します
+//メモリ容量確認
+free -h
 
-なるべく少ない時間でなるべく大きいコンボを出したいです
+//g++インストール
 
-pull request受け付けます
+sudo apt install g++
+
+//wgetインストール
+
+sudo apt-get update
+
+sudo apt-get install -y wget
+
+//Laevateinn.cppをダウンロード
+
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Laevateinn.cpp
+
+//hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
+
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp
+
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp
+
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp
+
+//ビーム幅調整
+
+vi Laevateinn.cpp
+
+//コンパイル
+
+g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
+
+//run
+
+./Laevateinn
+
+//input
+
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
