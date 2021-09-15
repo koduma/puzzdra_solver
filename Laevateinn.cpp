@@ -1,6 +1,6 @@
 /*
 
-Linux ONLY
+Windows10,Linux ONLY
 
 Linux導入手続き
 
@@ -35,7 +35,8 @@ vi Laevateinn.cpp
 
 //コンパイル
 
-g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
+Windows10:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
+Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
 
 //run
 
