@@ -1,6 +1,6 @@
 /*
 
-windows10,Linux ONLY
+Windows10,Linux ONLY
 
 Linux導入手続き
 
