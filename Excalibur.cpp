@@ -187,7 +187,7 @@ struct node2 {
 	}
 	}
 
-}ff[500];
+}ff[DIR*BEAM_WIDTH2];
 
 struct Action {//最終的に探索された手
 	T_T first_te;
