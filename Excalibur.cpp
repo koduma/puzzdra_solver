@@ -1,4 +1,5 @@
 /*
+
 Windows10,Linux ONLY
 
 Linux導入手続き
@@ -32,7 +33,6 @@ Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Excalibur.cpp loguru.cpp
 ./Excalibur
 
 //input
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -76,7 +76,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//ビーム幅//MAX200000
-#define BEAM_WIDTH2 1
+#define BEAM_WIDTH2 2
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -412,7 +412,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 /*
-
 	T_T first_te;
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	int score;//評価値
@@ -423,7 +422,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
-
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -434,13 +432,13 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	ll hash;
 	string true_path;
 	int true_path_length;
-
 */
+
+	printf("\n-----search_start_1/2-----\n");
 
 	vector<node2>dque;
 
-	int pa=TRN;
-	node2 pus;
+	deque<node2>pus[TRN+1];
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -458,12 +456,23 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	if(pa>cand.path_length){pa=cand.path_length;pus=cand;}
+	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	}
 	}
+	printf("\n-----search_start_2/2-----\n");
+	int cnt=0;
 
-	dque.push_back(pus);
+	for(int i=0;i<TRN;i++){
+	if((int)pus[i].size()==0){continue;}
+	node2 cand=pus[i][0];
+	pus[i].pop_front();
+	if(cnt<BEAM_WIDTH2){
+	dque.push_back(cand);
+	cnt++;
+	}
+	else{break;}
+	}
 
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -976,9 +985,6 @@ return p;
 }
 
 int main() {
-
-//layout=015315151020442313510540210411
-//TARGET:path_length=27
 	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
