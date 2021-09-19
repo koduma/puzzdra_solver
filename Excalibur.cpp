@@ -1,5 +1,4 @@
 /*
-
 Windows10,Linux ONLY
 
 Linux導入手続き
@@ -422,6 +421,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
+
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -465,6 +465,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for(int i=0;i<TRN;i++){
 	if((int)pus[i].size()==0){continue;}
+	while(1){
+	if((int)pus[i].size()==0){break;}
 	node2 cand=pus[i][0];
 	pus[i].pop_front();
 	if(cnt<BEAM_WIDTH2){
@@ -472,6 +474,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cnt++;
 	}
 	else{break;}
+	}
 	}
 
 	int stop=0;
