@@ -989,6 +989,9 @@ return p;
 
 int main() {
 	
+	//layout=242242100331023100110324132543
+	//TARGET:path_length=27
+	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
