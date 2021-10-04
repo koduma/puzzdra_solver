@@ -434,11 +434,17 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int true_path_length;
 */
 
+	double start = omp_get_wtime();
+
 	printf("\n-----search_start_1/2-----\n");
 
 	vector<node2>dque;
 
 	deque<node2>pus[TRN+1];
+
+	double avg=0;
+
+	double path_length_array[ROW][COL];
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -459,8 +465,25 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
+	avg+=(double)cand.path_length;
+	path_length_array[i][j]=(double)cand.path_length;
 	}
 	}
+	double delta_t = omp_get_wtime()-start;
+
+	double variance=0;
+
+	avg/=(double)(ROW*COL);
+
+	for (int i = 0; i < ROW; i++) {
+	for (int j = 0; j < COL; j++) {
+	variance+=(path_length_array[i][j]-avg)*(path_length_array[i][j]-avg);
+	}
+	}
+
+	if(variance<0.0001){printf("\ndifficulty=INF\n");}
+	else{printf("\ndifficulty=%f\n",delta_t*100.0/variance);}
+
 	printf("\n-----search_start_2/2-----\n");
 	int cnt=0;
 
