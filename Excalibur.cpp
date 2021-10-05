@@ -477,7 +477,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	variance+=(path_length_array[i][j]-avg)*(path_length_array[i][j]-avg)*(path_length_array[i][j]-avg)*(path_length_array[i][j]-avg);
+	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
 	}
 
