@@ -459,7 +459,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
-	if(i==0&&j==0){stop=tmp.score;}
+	if(i==0&&j==0){stop=0;}
+	stop=max(stop,tmp.score);
 	node2 cand;
 	F_T f_field[ROW][COL];
 	memcpy(cand.field,field,sizeof(f_field));
