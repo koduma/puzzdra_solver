@@ -198,13 +198,11 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos); //ルート探索関数
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos) {
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
 
 	int po=9+(8*(COL-1))+ROW-1;
-
-	int stop = 0;//理論最大コンボ数
 
 	int p_maxcombo[DROP+1] = {0};
 
@@ -217,7 +215,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		}
 	}
 	for (int i = 1; i <= DROP; i++) {
-		stop += drop[i] / 3;
 		p_maxcombo[i]=drop[i]/3;
 	}
 	MAXCOMBO += (double)stop;
@@ -434,6 +431,19 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int true_path_length;
 */
 
+	int stop=0;
+	int drop[DROP + 1] = { 0 };
+	for (int row = 0; row < ROW; row++) {
+		for (int col = 0; col < COL; col++) {
+			if (1 <= field[row][col] && field[row][col] <= DROP) {
+				drop[field[row][col]]++;
+			}
+		}
+	}
+	for (int i = 1; i <= DROP; i++) {
+		stop += drop[i] / 3;
+	}
+
 	double start = omp_get_wtime();
 
 	printf("\n-----search_start_1/2-----\n");
@@ -448,7 +458,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	Action tmp = BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j);
+	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
+	if(i==0&&j==0){stop=tmp.score;}
 	node2 cand;
 	F_T f_field[ROW][COL];
 	memcpy(cand.field,field,sizeof(f_field));
@@ -501,19 +512,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	}
 
-	int stop=0;
-	int drop[DROP + 1] = { 0 };
-	for (int row = 0; row < ROW; row++) {
-		for (int col = 0; col < COL; col++) {
-			if (1 <= field[row][col] && field[row][col] <= DROP) {
-				drop[field[row][col]]++;
-			}
-		}
-	}
-	for (int i = 1; i <= DROP; i++) {
-		stop += drop[i] / 3;
-	}
-
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
 	string bestAction;
@@ -543,7 +541,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	Action tmp = BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos);
+	Action tmp = BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
