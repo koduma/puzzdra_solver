@@ -351,12 +351,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[3001];
+		deque<int>vec[5001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo == stop) {
-				maxValue = stop;
+			if (fff[j].combo >= stop) {
+				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
@@ -365,7 +365,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
 			ks2++;
 			}
 		}
@@ -373,7 +373,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
-		int possible_score=3000;
+		int possible_score=5000;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
@@ -477,6 +477,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
+	cout<<"stop="<<stop<<"combo"<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
 	}
@@ -572,7 +573,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
-	if(combo==stop){return ff[j].true_path;}
+	if(combo>=stop){return ff[j].true_path;}
 	vec[ff[j].path_length].push_front(j);
 	}
 	}
@@ -793,6 +794,22 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
+
+		cmb2*=4;
+
+		for(int s=0;s<=COL-3;s++){
+		int same_num[DROP+1]={0};
+		for(int col=s;col<=s+2;col++){
+		for(int row=0;row<ROW;row++){
+		same_num[field[row][col]]++;
+		}
+		}
+		for(int i=1;i<=DROP;i++){
+		cmb2+=same_num[i];
+		}
+		}
+
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -922,6 +939,20 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		}
 		}
 
+		cmb2*=4;
+
+		for(int s=0;s<=COL-3;s++){
+		int same_num[DROP+1]={0};
+		ll bp=0ll;
+		for(int col=s;col<=s+2;col++){
+		bp+=file_bb[col];
+		}
+		for(int i=1;i<=DROP;i++){
+		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
+		cmb2+=same_num[i];
+		}
+		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1011,9 +1042,49 @@ return p;
 }
 
 int main() {
-	
-	//layout=242242100331023100110324132543
-	//TARGET:path_length=27
+
+
+	/*
+
+	testcase
+
+	layout=242242100331023100110324132543
+
+	:path_legnth=27,9combo
+
+	layout=201053210251533425501353123221
+
+	:path_length=26,9combo
+
+	layout=015315151020442313510540210411
+
+	:path_length=27,9combo
+
+	layout=432015152244350331552132312515
+
+	:path_legnth=31,9combo
+
+	layout=323243441332042002331313014300
+
+	:path_legnth=19,8combo
+
+	layout=225530333313140355004550251403
+
+	:path_legnth=24,9combo
+
+	layout=224234425402054400304510125043
+
+	:path_legnth=30,8combo
+
+	layout=053241405407470557104053134522
+
+	:path_legnth=41,10combo
+
+	layout=030303232323434343535353131313
+
+	:path_length=44,平積みonly,10combo
+
+	*/
 	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
