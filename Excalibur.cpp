@@ -477,7 +477,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
-	cout<<"stop="<<stop<<"combo"<<endl;
+	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
 	}
