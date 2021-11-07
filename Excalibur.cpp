@@ -805,10 +805,11 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		for(int i=1;i<=DROP;i++){
+		if(p_maxcombo[i]!=d_maxcombo[i]){
 		cmb2+=same_num[i];
 		}
 		}
-
+		}
 
 		*combo += cmb;
 		ev += cmb2;
@@ -948,8 +949,10 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		bp+=file_bb[col];
 		}
 		for(int i=1;i<=DROP;i++){
+		if(p_maxcombo[i]!=d_maxcombo[i]){
 		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
 		cmb2+=same_num[i];
+		}
 		}
 		}
 
@@ -1045,45 +1048,36 @@ int main() {
 
 
 	/*
-
+	
 	testcase
-
+	
 	layout=242242100331023100110324132543
-
 	:path_legnth=27,9combo
-
+	
 	layout=201053210251533425501353123221
-
 	:path_length=26,9combo
-
+	
 	layout=015315151020442313510540210411
-
 	:path_length=27,9combo
-
+	
 	layout=432015152244350331552132312515
-
 	:path_legnth=31,9combo
-
+	
 	layout=323243441332042002331313014300
-
 	:path_legnth=19,8combo
-
+	
 	layout=225530333313140355004550251403
-
 	:path_legnth=24,9combo
-
+	
 	layout=224234425402054400304510125043
-
 	:path_legnth=30,8combo
-
+	
 	layout=053241405407470557104053134522
-
 	:path_legnth=41,10combo
-
+	
 	layout=030303232323434343535353131313
-
 	:path_length=44,平積みonly,10combo
-
+	
 	*/
 	
 	int i, j, k;
