@@ -1,6 +1,6 @@
 /*
 
-Windows10,Linux ONLY
+Windows10,Windows11,Linux ONLY
 
 Linux導入手続き
 
@@ -35,7 +35,7 @@ vi Laevateinn.cpp
 
 //コンパイル
 
-Windows10:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Laevateinn.cpp loguru.cpp -o Laevateinn -mcmodel=large
 
 //run
@@ -779,9 +779,6 @@ return p;
 }
 
 int main() {
-	
-	//layout=242242100331023100110324132543
-	//TARGET:path_length=27
 	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
