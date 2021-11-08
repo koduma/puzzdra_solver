@@ -1,5 +1,5 @@
 /*
-Windows10,Linux ONLY
+Windows10,Windows11,Linux ONLY
 
 Linux導入手続き
 
@@ -25,7 +25,7 @@ wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_sol
 vi Excalibur.cpp
 
 //コンパイル
-Windows10:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
 
 //run
