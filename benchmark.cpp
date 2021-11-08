@@ -4,6 +4,7 @@ puzzdra_solver
 パズドラのルート解析プログラムです
 
 コンパイラはMinGWを推奨します
+
 なるべく少ない時間でなるべく大きいコンボを出したいです
 
 printf("TotalDuration:%fSec\n", t_sum);
@@ -52,7 +53,7 @@ using namespace std;
 #define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
-#define PROBLEM 1000//問題数
+#define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -224,12 +225,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[5001];
+		deque<int>vec[3001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo>=stop) {
-				maxValue = fff[j].combo;
+			if (fff[j].combo==stop) {
+				maxValue = stop;
 				bestAction.score = maxValue;
 				bestAction.first_te=fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
@@ -238,12 +239,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_back(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100].push_back(j);
 			ks2++;
 			}
 		}
 		int push_node=0;
-		int possible_score=5000;
+		int possible_score=3000;
 		for (int j = 0; push_node < BEAM_WIDTH; j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
@@ -458,23 +459,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-
-		cmb2*=4;
-
-		for(int s=0;s<=COL-3;s++){
-		int same_num[DROP+1]={0};
-		for(int col=s;col<=s+2;col++){
-		for(int row=0;row<ROW;row++){
-		same_num[field[row][col]]++;
-		}
-		}
-		for(int i=1;i<=DROP;i++){
-		if(p_maxcombo[i]!=d_maxcombo[i]){
-		cmb2+=same_num[i];
-		}
-		}
-		}
-
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
