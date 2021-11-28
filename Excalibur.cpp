@@ -7,7 +7,7 @@ Linux導入手続き
 free -h
 
 //g++インストール
-sudo apt install g++
+sudo apt install -y g++
 
 //wgetインストール
 sudo apt-get update
