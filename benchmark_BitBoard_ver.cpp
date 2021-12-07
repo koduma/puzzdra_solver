@@ -15,6 +15,7 @@ printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
+#pragma GCC target ("sse4.2")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
