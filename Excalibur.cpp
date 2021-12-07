@@ -36,6 +36,7 @@ Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread -ldl Excalibur.cpp loguru.cpp
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
+#pragma GCC target ("sse4.2")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
