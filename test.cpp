@@ -46,10 +46,10 @@ using namespace std;
 #define DIR 4//方向
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
-#define DROP 6//ドロップの種類//MAX9
+#define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 10000//ビーム幅//MAX200000
+#define BEAM_WIDTH 2800000//ビーム幅//MAX200000
 #define PROBLEM 10000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -259,12 +259,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 		part2 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[3001];
+		deque<int>vec[5001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo == stop) {
-				maxValue = stop;
+			if (fff[j].combo >= stop) {
+				maxValue = fff[j].combo;;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
@@ -272,12 +272,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100].push_back(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_back(j);
 			ks2++;
 			}
 		}
 		int push_node=0;
-		int possible_score=3000;
+		int possible_score=5000;
 		for (int j = 0; push_node < BEAM_WIDTH; j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
@@ -492,6 +492,22 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
+		
+		cmb2*=4;
+
+		for(int s=0;s<=COL-3;s++){
+		int same_num[DROP+1]={0};
+		for(int col=s;col<=s+2;col++){
+		for(int row=0;row<ROW;row++){
+		same_num[field[row][col]]++;
+		}
+		}
+		for(int i=1;i<=DROP;i++){
+		if(p_maxcombo[i]!=d_maxcombo[i]){
+		cmb2+=same_num[i];
+		}
+		}
+		}
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -618,6 +634,22 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
+		}
+		}
+		
+		cmb2*=4;
+
+		for(int s=0;s<=COL-3;s++){
+		int same_num[DROP+1]={0};
+		ll bp=0ll;
+		for(int col=s;col<=s+2;col++){
+		bp+=file_bb[col];
+		}
+		for(int i=1;i<=DROP;i++){
+		if(p_maxcombo[i]!=d_maxcombo[i]){
+		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
+		cmb2+=same_num[i];
+		}
 		}
 		}
 
@@ -757,8 +789,7 @@ int main() {
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
-		init(f_field); set(f_field, 0);//初期盤面生成
-		/*
+		//init(f_field); set(f_field, 0);//初期盤面生成
 		string str="";
 		cin>>str;
 		for (j = 0; j < ROW; j++) {
@@ -766,7 +797,6 @@ int main() {
 				f_field[j][k] = (str[k+(COL*j)] - '0')+1;
 			}
 		}
-		*/
 		show_field(f_field);//盤面表示
 		start = omp_get_wtime();
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
