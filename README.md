@@ -1,4 +1,4 @@
-[![ubuntu-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/ubuntu-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/ubuntu-latest.yml)
+[![windows-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml)
 
 # Puzzle & Dragons Solver
 
