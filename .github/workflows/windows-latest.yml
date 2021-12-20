@@ -20,5 +20,5 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         install: make mingw-w64-x86_64-toolchain
-    - name: dir
-      run:  dir /s/b/a-d
+    - name: compile
+      run:  g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
