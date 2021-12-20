@@ -21,4 +21,4 @@ jobs:
       with:
         install: make mingw-w64-x86_64-toolchain
     - name: dir
-      run:  dir
+      run:  dir /s/b/a-d
