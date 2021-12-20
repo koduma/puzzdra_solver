@@ -19,9 +19,9 @@ jobs:
         platform: x64
     - name: download
       run: |
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp %CD%\Excalibur.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp %CD%\hash_map.hpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp %CD%\loguru.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp %CD%\loguru.hpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp C:Excalibur.cpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp C:hash_map.hpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp C:loguru.cpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp C:loguru.hpp
     - name: make
       run: g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
