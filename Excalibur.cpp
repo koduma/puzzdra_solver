@@ -17,9 +17,9 @@ sudo apt-get install -y wget
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
 vi Excalibur.cpp
