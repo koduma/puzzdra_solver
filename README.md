@@ -17,7 +17,7 @@
 
 - Board = 5x6
 - Drop = 6 (fire, water, wood, light, dark, heal)
-- Direction = 4 (up,down,right,left)
+- Direction = 4 (up,down,left,right)
 - Problem = 10000
 - Beam_width = 10000
 - Max_turn = Trn = 150
