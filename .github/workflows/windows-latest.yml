@@ -20,13 +20,5 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         install: make mingw-w64-x86_64-toolchain
-    - name: download
-      run: |
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp C:\Excalibur.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp C:\hash_map.hpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp C:\loguru.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp C:\loguru.hpp
-    - name: cd
-      run: cd C:\
-    - name: make
-      run: g++ -O2 -std=c++11 -fopenmp -mbmi2 Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -lpthread 
+    - name: tree
+      run:  tree C:/f 
