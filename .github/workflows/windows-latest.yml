@@ -26,4 +26,4 @@ jobs:
     - name: cd
       run: cd C:\
     - name: make
-      run: g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
+      run: g++ -O2 -std=c++11 -fopenmp -mbmi2 Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -lpthread 
