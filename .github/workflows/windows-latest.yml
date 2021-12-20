@@ -10,20 +10,23 @@ jobs:
   build:
 
     runs-on: windows-latest
+    
+    defaults:
+      run:
+        shell: msys2 {0}
 
     steps:
     - uses: actions/checkout@v2
-    - name: set up MinGW
-      uses: egor-tensin/setup-mingw@v2
+    - uses: msys2/setup-msys2@v2
       with:
-        platform: x64
+        install: make mingw-w64-x86_64-toolchain
     - name: download
       run: |
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp C:\koduma\Excalibur.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp C:\koduma\hash_map.hpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp C:\koduma\loguru.cpp
-          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp C:\koduma\loguru.hpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp C:\Excalibur.cpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/hash_map.hpp C:\hash_map.hpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.cpp C:\loguru.cpp
+          bitsadmin /transfer download https://raw.githubusercontent.com/koduma/puzzdra_solver/master/folder/loguru.hpp C:\loguru.hpp
     - name: cd
-      run: cd C:\koduma
+      run: cd C:\
     - name: make
       run: g++ -O2 -std=c++11 -fopenmp -mbmi2 Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -lpthread 
