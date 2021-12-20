@@ -1,3 +1,5 @@
+[![C/C++ CI](https://github.com/koduma/puzzdra_solver/actions/workflows/ubuntu-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/ubuntu-latest.yml)
+
 # Puzzle & Dragons Solver
 
 ## Compiler:MinGW-W64
