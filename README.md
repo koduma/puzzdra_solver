@@ -3,7 +3,7 @@
 
 # Puzzle & Dragons Solver
 
-## Compiler:MinGW-W64
+## Compiler:MinGW-w64
 
 ## Compile Command 
 
