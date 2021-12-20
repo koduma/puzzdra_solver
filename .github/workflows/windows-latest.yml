@@ -20,5 +20,5 @@ jobs:
     - uses: msys2/setup-msys2@v2
       with:
         install: make mingw-w64-x86_64-toolchain
-    - name: tree
-      run:  tree C:/f 
+    - name: dir
+      run:  dir /w
