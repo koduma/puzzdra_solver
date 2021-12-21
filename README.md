@@ -4,7 +4,7 @@
 
 # Puzzle & Dragons Solver
 
-## Compiler:MinGW-w64
+## Compiler:g++
 
 ## Compile Command 
 
