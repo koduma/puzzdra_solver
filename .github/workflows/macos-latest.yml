@@ -16,7 +16,10 @@ jobs:
         
     steps:
     - uses: actions/checkout@v2
-    - name: g++
-      run: g++
+    - name: install g++
+      run: |
+          brew install gcc
+          sudo ln -sf $(ls -d /usr/local/bin/* | grep "/g++-" | sort -r | head -n1) /usr/local/bin/g++
+          g++ --version
     - name: compile
       run: g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
