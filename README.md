@@ -6,11 +6,16 @@
 
 ## Compiler:g++
 
-## Compile Command 
+## Compile Command
 
 - g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  
 - g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver
-
+- Linux->
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
+- Windows->
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
+- MacOS->
+- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl
 
 # Benchmark
 
