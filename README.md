@@ -8,14 +8,13 @@
 
 ## Compile Command
 
-- g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver
-- Linux->
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
-- Windows->
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
-- MacOS->
-- g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl
+| OS | Version | Compile Command |
+| --- | --- | --- |
+|  Any | benchmark.cpp | g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  |
+|  Any | benchmark_BitBoard_ver.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver |
+|  Linux | Excalibur.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl  |
+|  Windows | Excalibur.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large  |
+|  MacOS | Excalibur.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl  |
 
 # Benchmark
 
