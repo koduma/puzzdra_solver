@@ -2,6 +2,8 @@
 [![windows-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml)
 [![macos-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml)
 
+# Contact https://twitter.com/tekitouk
+
 # Puzzle & Dragons Solver
 
 ## Compiler:g++
