@@ -1,0 +1,22 @@
+name: macos-latest
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:  
+    runs-on: macos-latest
+    
+    defaults:
+      run:
+        shell: bash
+        
+    steps:
+    - uses: actions/checkout@v2
+    - name: g++
+      run: g++
+    - name: compile
+      run: g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
