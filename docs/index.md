@@ -1,4 +1,4 @@
-## Welcome to GitHub Pages
+## パズドラルート解析サイトへようこそ！
 
 You can use the [editor on GitHub](https://github.com/koduma/puzzdra_solver/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
