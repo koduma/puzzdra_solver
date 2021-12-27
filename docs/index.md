@@ -1,37 +1,21 @@
-## パズドラのルート解析プロジェクト
+## パズドラ定石メーカーのルート解析プロジェクト
 
-You can use the [editor on GitHub](https://github.com/koduma/puzzdra_solver/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
+パズドラ定石メーカーのルート解析プログラムをGitHubに公開しています
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### オンラインで試す！
 
-### Markdown
+step1:
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+[オンラインルート解析プログラム](https://wandbox.org/permlink/hUO0FRO4pG3nhRtD)
 
-```markdown
-Syntax highlighted code block
+にアクセスする
 
-# Header 1
-## Header 2
-### Header 3
+step2:
 
-- Bulleted
-- List
+Stdinにlayoutの数字(例：201053210251533425501353123221)を入力して、Run(or Ctrl+Enter)を押す
 
-1. Numbered
-2. List
+step3:
 
-**Bold** and _Italic_ and `Code` text
+Run(or Ctrl+Enter)の下の黒い画面に、パズドラ定石メーカーのURLが表示されるのでそこへアクセスをする
 
-[Link](url) and ![Image](src)
-```
-
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/koduma/puzzdra_solver/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+# するとルート解析結果が表示されます！
