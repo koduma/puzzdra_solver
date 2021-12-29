@@ -4,6 +4,8 @@
 
 ### オンラインで試す！
 
+<form action="https://wandbox.org/permlink/hUO0FRO4pG3nhRtD" method="get" target="_blank"><button type="submit">オンラインルート解析プログラム</button></form>
+
 #### Step1:アクセスする
 
 [オンラインルート解析プログラム](https://wandbox.org/permlink/hUO0FRO4pG3nhRtD)
