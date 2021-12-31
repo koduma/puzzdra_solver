@@ -1,23 +1,59 @@
-## パズドラ定石メーカーのルート解析プロジェクト
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>パズドラ定石メーカーのルート計算サイト</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script type="text/javascript">
+$('form').submit(function(){
 
-パズドラ定石メーカーのルート解析プログラムを[GitHub](https://github.com/koduma/puzzdra_solver)に公開しています
+    const myObj = {code: '#include <iostream>\nint main() { int x = 0; std::cout << \"hoge\" << std::endl; }',options:'warning,gnu++1y',
+                   compiler:'gcc-head',compiler-option-raw:'-Dx=hogefuga\n-O3'};
 
-### オンラインで試す！
+    $.ajax({
+        type: 'POST',
+        url: 'https://wandbox.org/api/compile.json',
+        dataType: 'json',
+        data: JSON.stringify(myObj),
+        contentType : 'application/json',
+        success: function(data) {
+        successmessage = 'Data was succesfully captured';
+        $("label#successmessage").text(successmessage);
+        },
+        error: function (data) {
+        successmessage = 'Error';
+        $("label#successmessage").text(successmessage);
+        },
+    });
+});
+</script>
 
-#### Step1:アクセスする
+</head>
+<body>
 
-[オンラインルート解析プログラム](https://wandbox.org/permlink/hUO0FRO4pG3nhRtD)
+<p>パズドラ定石メーカーのルート計算サイトです。kkk</p>
 
-にアクセスする
+<form>
+<label>layout=<input type="text" id="layout"></label>
+<button value="submit" type="submit">計算</button>
+</form>
+  
+<p id="msg"></p>
+  
+<a href="#" onclick="redirect();">計算結果</a>
 
-#### Step2:Stdinへ入力
+<script>
+  
+function redirect(){
+    location.href = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
+}
 
-Stdinにlayoutの数字(例：201053210251533425501353123221)を入力する
+let layout = document.getElementById('layout');
+layout.value = '';
+let msg = document.getElementById('msg');
+let checkButton = document.getElementById('checkButton');
+checkButton.addEventListener('click', buttonClick);
+</script>
 
-#### Step3:Run(or Ctrl+Enter) を押す
-
-#### Step4:アクセスする
-
-Run(or Ctrl+Enter)の下の黒い画面にパズドラ定石メーカーのURLが表示されるので、そこへアクセスをする
-
-# するとルート解析結果が表示されます！
+</body>
+</html>
