@@ -7,12 +7,11 @@
 </head>
 <body>
 
-<p>パズドラ定石メーカーのルート計算サイトです。eee</p>
+<p>パズドラ定石メーカーのルート計算サイトです。fff</p>
 
 <form>
 <label>layout=<input type="text" id="layout"></label>
-<input type="button" value="入力完了" id="checkButton">
-<button value="submit" type="submit">計算</button>
+<button value="submit" type="submit" id="checkButton">計算</button>
 </form>
   
 <p id="msg"></p>
@@ -23,6 +22,7 @@
   
 function buttonClick(){
   msg.innerText = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
+  return false;
 }
 function redirect(){
     location.href = msg.innerText;
