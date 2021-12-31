@@ -19,7 +19,7 @@
     title="パズドラ定石メーカー"
     width="500"
     height="500"
-    src="https://www.openstreetmap.org/export/embed.html?bbox=-1.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik">
+    src="https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik">
 </iframe>
   
 </p>
@@ -27,7 +27,7 @@
 <script> 
   
 function buttonClick(){
-  document.getElementById('jyoseki').contentWindow.location.replace('http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout='+layout.value+'&route=null&ctwMode=false');
+  document.getElementById('jyoseki')[0].contentWindow.location.replace('http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout='+layout.value+'&route=null&ctwMode=false');
 }
 
 let layout = document.getElementById('layout');
