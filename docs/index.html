@@ -7,12 +7,12 @@
 </head>
 <body>
 
-<p>パズドラ定石メーカーのルート計算サイトです。bbb</p>
+<p>パズドラ定石メーカーのルート計算サイトです。ccc</p>
 
-<p>
+<form>
 <label>layout=<input type="text" id="layout"></label>
-<input type="submit" value="solve" id="checkButton">
-</p>
+<button value="solve" type="submit" id="checkButton">solve</button>
+</form>
 
 <a href="#" onclick="redirect();">計算結果</a>
   
@@ -30,7 +30,6 @@ function redirect(){
 let layout = document.getElementById('layout');
 layout.value = '';
 let msg = document.getElementById('msg');
-
 let checkButton = document.getElementById('checkButton');
 checkButton.addEventListener('click', buttonClick);
 </script>
