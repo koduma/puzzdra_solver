@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <title>パズドラ定石メーカーのルート計算サイト</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>  
 </head>
 <body>
 
-<p>パズドラ定石メーカーのルート計算サイトです。</p>
+<p>パズドラ定石メーカーのルート計算サイトです。aaa</p>
 
 <p>
 <label>layout=<input type="text" id="layout"></label>
 <input type="button" value="solve" id="checkButton">
 </p>
 
-<a href="#" onclick="redirect();" target="_blank" rel="noopener noreferrer">計算結果</a>
+<a href="#" onclick="redirect();">計算結果</a>
   
 <p id="msg"></p>
 
@@ -23,7 +24,7 @@ function buttonClick(){
   msg.innerText = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
 }
 function redirect(){
-    location.href = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
+    location.href = msg.innerText;
 }
 
 let layout = document.getElementById('layout');
