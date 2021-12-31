@@ -13,14 +13,16 @@
 <input type="button" value="calc" id="checkButton">
 </p>
   
+<p>
+  
 <iframe id="jyoseki"
     title="パズドラ定石メーカー"
     width="500"
     height="500"
     src="https://www.openstreetmap.org/export/embed.html?bbox=-0.004017949104309083%2C51.47612752641776%2C0.00030577182769775396%2C51.478569861898606&layer=mapnik">
 </iframe>
-
-<p id="msg"></p>
+  
+</p>
 
 <script> 
   
@@ -30,7 +32,6 @@ function buttonClick(){
 
 let layout = document.getElementById('layout');
 layout.value = '';
-let msg = document.getElementById('msg');
 
 let checkButton = document.getElementById('checkButton');
 checkButton.addEventListener('click', buttonClick);
