@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サンプル</title>
+</head>
+<body>
+
+<p>サンプルページです。</p>
+
+<p>
+<label>名前：<input type="text" id="nameText"></label>
+<input type="button" value="Check" id="checkButton">
+</p>
+
+<p id="msg"></p>
+
+<script>
+function butotnClick(){
+  msg.innerText = 'お名前は' + nameText.value + 'さんですね';
+}
+
+let nameText = document.getElementById('nameText');
+nameText.value = '名前';
+let msg = document.getElementById('msg');
+
+let checkButton = document.getElementById('checkButton');
+checkButton.addEventListener('click', butotnClick);
+</script>
+
+</body>
+</html>
