@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<p>パズドラ定石メーカーのルート計算サイトです。hhh</p>
+<p>パズドラ定石メーカーのルート計算サイトです。iii</p>
 
 <form>
 <label>layout=<input type="text" id="layout"></label>
@@ -34,6 +34,9 @@ $('form').submit(function(){
         success: function(data) {
             alert(data);
         }
+        error: function (request, status, error) {
+        alert(request.responseText);
+    }
     });
 });
 function redirect(){
