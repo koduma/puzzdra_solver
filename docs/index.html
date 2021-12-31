@@ -12,6 +12,8 @@
 <label>layout=<input type="text" id="layout"></label>
 <input type="button" value="solve" id="checkButton">
 </p>
+
+<a href="#" onclick="redirect();">計算結果</a>
   
 <p id="msg"></p>
 
@@ -19,6 +21,9 @@
   
 function buttonClick(){
   msg.innerText = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
+}
+function redirect(){
+    location.href = 'http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout=' + layout.value + '&route=null&ctwMode=false';
 }
 
 let layout = document.getElementById('layout');
