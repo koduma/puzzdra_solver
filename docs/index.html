@@ -2,30 +2,38 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>サンプル</title>
+<title>パズドラ定石メーカーのルート計算サイト</title>
 </head>
 <body>
 
-<p>サンプルページです。</p>
+<p>パズドラ定石メーカーのルート計算サイトです。</p>
 
 <p>
-<label>名前：<input type="text" id="nameText"></label>
-<input type="button" value="Check" id="checkButton">
+<label>layout=<input type="text" id="layout"></label>
+<input type="button" value="calc" id="checkButton">
 </p>
 
 <p id="msg"></p>
+  
+<iframe id="jyoseki"
+    title="パズドラ定石メーカー"
+    width="500"
+    height="500"
+    src="http://serizawa.web5.jp/puzzdra_theory_maker/">
+</iframe>
 
-<script>
-function butotnClick(){
-  msg.innerText = 'お名前は' + nameText.value + 'さんですね';
+<script> 
+  
+function buttonClick(){
+  document.getElementById('jyoseki').contentWindow.location.replace('http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout='+layout.value+'&route=null&ctwMode=false');
 }
 
-let nameText = document.getElementById('nameText');
-nameText.value = '名前';
+let layout = document.getElementById('layout');
+layout.value = '';
 let msg = document.getElementById('msg');
 
 let checkButton = document.getElementById('checkButton');
-checkButton.addEventListener('click', butotnClick);
+checkButton.addEventListener('click', buttonClick);
 </script>
 
 </body>
