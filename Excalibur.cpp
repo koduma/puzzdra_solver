@@ -33,6 +33,7 @@ MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o E
 ./Excalibur
 
 //input
+
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -107,8 +108,8 @@ ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
-int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
+int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
 ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
@@ -313,6 +314,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
 						F_T tmp=field[cand.nowR][cand.nowC];
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
 						int pre_drop=(int)tmp;
 						int pre_pos=po-((8*cand.nowC)+cand.nowR);
 						int next_drop=(int)field[ny][nx];
@@ -326,10 +329,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						ll ha;
-						cand.score = sum_e3(dropBB, &cmb,&ha,p_maxcombo);
+						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.combo = cmb;
-						cand.hash=ha;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						//st = omp_get_wtime();
@@ -420,7 +421,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
-	
+
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -743,7 +744,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
-		}	
+		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
@@ -769,7 +770,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
-		
+
 		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
@@ -832,10 +833,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	*hash=ha;
 	return ev;
 }
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]) {
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	int ev = 0;
 	*combo = 0;
-	ll ha=0;
 	int oti = 0;
 	ll occBB=0;
 
@@ -910,36 +910,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		cmb2-=LSB-MSB;
 		}
 
-		if(oti==0){
-		for(int i=1;i<=DROP;i++){
-
-		long long tmp_drop=(long long)dropBB[i];
-
-		int prev_x;
-		int prev_y;
-
-		for(int j=0;;j++){
-		long long t=tmp_drop&(-tmp_drop);
-		ll exist=(ll)t;
-		if(exist==0ll){break;}
-		int h=( int ) ( ( exist * 0x03F566ED27179461ULL ) >> 58 );
-		int pos=table[h];
-		int pos_x=(po-pos)/8;
-		int pos_y=(po-pos)%8;
-		ha ^= zoblish_field[pos_y][pos_x][i];
-		prev_x=pos_x;
-		prev_y=pos_y;
-		tmp_drop=tmp_drop & ~(1ll<<(pos));
-		}//j
-		dropBB[i]^=linked[i];
-		occBB^=linked[i];
-		}//i
-		}//if
-		else{
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
-		}
 		}
 
 		cmb2*=4;
@@ -972,11 +945,10 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
-	*hash=ha;
 	return ev;
 }
-int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
-	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
+int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
+	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,p_maxcombo);
 }
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
@@ -1050,38 +1022,38 @@ int main() {
 
 
 	/*
-	
+
 	testcase
-	
+
 	layout=242242100331023100110324132543
 	:path_legnth=27,9combo
-	
+
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
-	
+
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
-	
+
 	layout=432015152244350331552132312515
 	:path_legnth=31,9combo
-	
+
 	layout=323243441332042002331313014300
 	:path_legnth=19,8combo
-	
+
 	layout=225530333313140355004550251403
 	:path_legnth=24,9combo
-	
+
 	layout=224234425402054400304510125043
 	:path_legnth=30,8combo
-	
+
 	layout=053241405407470557104053134522
 	:path_legnth=41,10combo
-	
+
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
-	
+
 	*/
-	
+
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
