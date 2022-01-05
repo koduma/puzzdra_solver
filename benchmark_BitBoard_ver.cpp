@@ -3,7 +3,7 @@ puzzdra_solver
 
 パズドラのルート解析プログラムです
 
-コンパイラはMinGWを推奨します
+コンパイラはg++を推奨します
 
 なるべく少ない時間でなるべく大きいコンボを出したいです
 
@@ -84,8 +84,8 @@ ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
-int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
+int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
 ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
@@ -225,6 +225,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
 						F_T tmp=field[cand.nowR][cand.nowC];
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
 						int pre_drop=(int)tmp;
 						int pre_pos=po-((8*cand.nowC)+cand.nowR);
 						int next_drop=(int)field[ny][nx];
@@ -238,10 +240,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						st = omp_get_wtime();
 						sc cmb;
-						ll ha;
-						cand.score = sum_e3(dropBB, &cmb,&ha,p_maxcombo);
+						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.combo = cmb;
-						cand.hash=ha;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						st = omp_get_wtime();
@@ -444,7 +444,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
-		}	
+		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
@@ -470,7 +470,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
-		
+
 		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
@@ -516,10 +516,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	*hash=ha;
 	return ev;
 }
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]) {
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	int ev = 0;
 	*combo = 0;
-	ll ha=0;
 	int oti = 0;
 	ll occBB=0;
 
@@ -594,36 +593,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		cmb2-=LSB-MSB;
 		}
 
-		if(oti==0){
-		for(int i=1;i<=DROP;i++){
-
-		long long tmp_drop=(long long)dropBB[i];
-
-		int prev_x;
-		int prev_y;
-
-		for(int j=0;;j++){
-		long long t=tmp_drop&(-tmp_drop);
-		ll exist=(ll)t;
-		if(exist==0ll){break;}
-		int h=( int ) ( ( exist * 0x03F566ED27179461ULL ) >> 58 );
-		int pos=table[h];
-		int pos_x=(po-pos)/8;
-		int pos_y=(po-pos)%8;
-		ha ^= zoblish_field[pos_y][pos_x][i];
-		prev_x=pos_x;
-		prev_y=pos_y;
-		tmp_drop=tmp_drop & ~(1ll<<(pos));
-		}//j
-		dropBB[i]^=linked[i];
-		occBB^=linked[i];
-		}//i
-		}//if
-		else{
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
-		}
 		}
 
 		*combo += cmb;
@@ -640,11 +612,10 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, ll* hash,int p_maxcombo[DR
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
-	*hash=ha;
 	return ev;
 }
-int sum_e3(ll dropBB[DROP+1], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
-	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
+int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
+	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,p_maxcombo);
 }
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
@@ -777,7 +748,7 @@ int main() {
 		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
 		double diff = omp_get_wtime() - start;
 		t_sum += diff;
-		string layout="";		
+		string layout="";
 		for(int v=0;v<ROW;v++){
 		for(int u=0;u<COL;u++){
 		layout+=to_string(f_field[v][u]-1);
@@ -785,7 +756,7 @@ int main() {
 		}
 		string route="";
 		int path_length=0;
-		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";		
+		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";
 		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
 			if (tmp.moving[j] == 0ll) { break; }
 			for(k=0;k<21;k++){
