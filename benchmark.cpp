@@ -81,7 +81,6 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
-ll calc_hash(ll hash,sc y,sc x,F_T d,sc ny,sc nx,F_T nd);
 int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]);
 int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]);
 
@@ -192,20 +191,22 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
 					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
+						int ny=cand.nowR + dy[j];
+						int nx=cand.nowC + dx[j];
 						F_T field[ROW][COL];//盤面
 						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						F_T tmp=field[cand.nowR][cand.nowC];
-						ll ha=calc_hash(cand.hash,cand.nowR,cand.nowC,tmp,cand.nowR+dy[j],cand.nowC+dx[j],field[cand.nowR+dy[j]][cand.nowC+dx[j]]);
-						field[cand.nowR][cand.nowC]=field[cand.nowR+dy[j]][cand.nowC+dx[j]];
-						field[cand.nowR+dy[j]][cand.nowC+dx[j]]=tmp;
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
+						field[cand.nowR][cand.nowC]=field[ny][nx];
+						field[ny][nx]=tmp;
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						st = omp_get_wtime();
 						sc cmb;
-						cand.score = sum_e3(field, &cmb,p_maxcombo);
+						cand.score = evaluate3(field, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.combo = cmb;
-						cand.hash=ha;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						st = omp_get_wtime();
@@ -297,11 +298,6 @@ void fall(int x,int h,F_T field[ROW][COL]) {
 				tgt--;
 			}
 		}
-}
-ll calc_hash(ll hash,sc y,sc x,F_T d,sc ny,sc nx,F_T nd){
-  hash^=zoblish_field[y][x][d]^zoblish_field[ny][nx][nd];
-  hash^=zoblish_field[y][x][nd]^zoblish_field[ny][nx][d];
-  return hash;
 }
 void init(F_T field[ROW][COL]) { set(field, !0); }
 void set(F_T field[ROW][COL], int force) {
