@@ -3,7 +3,7 @@ puzzdra_solver
 
 パズドラのルート解析プログラムです
 
-コンパイラはMinGWを推奨します
+コンパイラはg++を推奨します
 
 なるべく少ない時間でなるべく大きいコンボを出したいです
 
@@ -81,6 +81,9 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
+ll calc_hash(ll hash,sc y,sc x,F_T d,sc ny,sc nx,F_T nd);
+int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]);
+int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]);
 
 struct node {//どういう手かの構造体
 	T_T first_te;
@@ -164,7 +167,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 	int maxValue = 0;//最高スコア
 
 	bestAction.maxcombo = stop;
-	
+
 	unordered_map<ll, bool> checkNodeList[ROW*COL];
 
 	//2手目以降をビームサーチで探索
@@ -181,7 +184,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 #endif
 			node temp = dque[k];//que.front(); que.pop();
-			F_T temp_field[ROW][COL]; 
+			F_T temp_field[ROW][COL];
 			memcpy(temp_field, f_field, sizeof(temp_field));
 			operation(temp_field, temp.first_te,temp.movei);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
@@ -192,6 +195,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						F_T field[ROW][COL];//盤面
 						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						F_T tmp=field[cand.nowR][cand.nowC];
+						ll ha=calc_hash(cand.hash,cand.nowR,cand.nowC,tmp,cand.nowR+dy[j],cand.nowC+dx[j],field[cand.nowR+dy[j]][cand.nowC+dx[j]]);
 						field[cand.nowR][cand.nowC]=field[cand.nowR+dy[j]][cand.nowC+dx[j]];
 						field[cand.nowR+dy[j]][cand.nowC+dx[j]]=tmp;
 						cand.nowC += dx[j];
@@ -199,8 +203,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						st = omp_get_wtime();
 						sc cmb;
-						ll ha;
-						cand.score = sum_e2(field, &cmb,&ha,p_maxcombo);
+						cand.score = sum_e3(field, &cmb,p_maxcombo);
 						cand.combo = cmb;
 						cand.hash=ha;
 						part1 += omp_get_wtime() - st;
@@ -294,6 +297,11 @@ void fall(int x,int h,F_T field[ROW][COL]) {
 				tgt--;
 			}
 		}
+}
+ll calc_hash(ll hash,sc y,sc x,F_T d,sc ny,sc nx,F_T nd){
+  hash^=zoblish_field[y][x][d]^zoblish_field[ny][nx][nd];
+  hash^=zoblish_field[y][x][nd]^zoblish_field[ny][nx][d];
+  return hash;
 }
 void init(F_T field[ROW][COL]) { set(field, !0); }
 void set(F_T field[ROW][COL], int force) {
@@ -406,7 +414,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
-		}	
+		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				F_T num = field[row][col];
@@ -432,7 +440,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
-		
+
 		F_T erase_x[COL]={0};
 
 		for (int row = 0; row < ROW; row++) {
@@ -478,6 +486,95 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	*hash=ha;
 	return ev;
 }
+int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) {
+	int ev = 0;
+	*combo = 0;
+	int oti = 0;
+	int d_maxcombo[DROP+1]={0};
+
+	while (1) {
+		int cmb = 0;
+		int cmb2 = 0;
+		F_T chkflag[ROW][COL]={0};
+		F_T delflag[ROW][COL]={0};
+		F_T GetHeight[COL];
+		int cnt_drop[DROP+1]={0};
+		int right[DROP+1];
+		int left[DROP+1];
+		for(int i=0;i<=DROP;i++){
+		right[i]=-1;
+		left[i]=COL;
+		}
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COL; col++) {
+				F_T num = field[row][col];
+				cnt_drop[(int)num]++;
+				if(row==0){
+				GetHeight[col]=(F_T)ROW;
+				}
+				if(num>0 && GetHeight[col]==(F_T)ROW){
+				GetHeight[col]=(F_T)row;
+				}
+				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row][col+1]=1;
+					delflag[row][col+2]=1;
+				}
+				if (row <= ROW - 3 && num == field[row + 1][col] && num == field[row + 2][col] && num > 0) {
+					delflag[row][col]=1;
+					delflag[row+1][col]=1;
+					delflag[row+2][col]=1;
+				}
+			}
+		}
+
+		F_T erase_x[COL]={0};
+
+		for (int row = 0; row < ROW; row++) {
+			for (int col = 0; col < COL; col++) {
+				if (delflag[row][col]>0) {
+					int c = chain(row, col, field[row][col], field, chkflag, delflag);
+					if (c >= 3) {
+						cmb++;
+						if (c == 3) { cmb2 += 30; }
+						else { cmb2 += 20; }
+						d_maxcombo[(int)field[row][col]]++;
+					}
+					field[row][col]=0;
+					erase_x[col]=1;
+				}
+                                else{
+					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
+					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+                                }
+			}
+		}
+		for(int i=1;i<=DROP;i++){
+		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
+		cmb2-=right[i]-left[i];
+		}
+		}
+		*combo += cmb;
+		ev += cmb2;
+		//コンボが発生しなかったら終了
+		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
+		oti++;
+		if (flag & EVAL_FALL){//落下処理発生
+		for(int x=0;x<COL;x++){
+		if(erase_x[x]==1){
+		fall(x,GetHeight[x],field);
+		}
+		}
+		}
+		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
+
+	}
+	ev += oti;
+	return ev;
+}
+int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
+	return evaluate3(field, EVAL_FALL | EVAL_COMBO, combo,p_maxcombo);
+}
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
 	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
 }
@@ -521,7 +618,7 @@ ll xor128() {//xorshift整数乱数
 int main() {
 
 	int i, j, k;
-	
+
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
 	for(k=0;k<=DROP;k++){
@@ -529,7 +626,7 @@ int main() {
 	}
 	}
 	}
-	
+
 	int mistake=0;
 
 	double avg = 0;//平均コンボ数
@@ -542,7 +639,7 @@ int main() {
 		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		init(f_field); set(f_field, 0);//初期盤面生成
-		/*		
+		/*
 		string str="";
 		cin>>str;
 		for (j = 0; j < ROW; j++) {
@@ -557,7 +654,7 @@ int main() {
 		double diff = omp_get_wtime() - start;
 		t_sum += diff;
 		string layout="";
-		
+
 		for(int v=0;v<ROW;v++){
 		for(int u=0;u<COL;u++){
 		layout+=to_string(f_field[v][u]-1);
@@ -566,7 +663,7 @@ int main() {
 		string route="";
 		//printf("(x,y)=(%d,%d)", XX(tmp.first_te), YY(tmp.first_te));
 		int path_length=0;
-		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";		
+		route+=to_string(XX(tmp.first_te))+to_string(YY(tmp.first_te)+5)+",";
 		for (j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
 			if (tmp.moving[j] == 0ll) { break; }
 			for(k=0;k<21;k++){
