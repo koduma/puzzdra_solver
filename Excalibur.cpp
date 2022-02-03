@@ -1149,8 +1149,8 @@ int main() {
 		}
 		}
 		}
-		for (int i = 1; i <= DROP; i++) {
-		maxcombo += drop[i] / 3;
+		for (int loop = 1; loop <= DROP; loop++) {
+		maxcombo += drop[loop] / 3;
 		}
 		int combo=sum_e(f_field);
 		printf("\nResult=>{\n");
