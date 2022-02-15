@@ -1026,7 +1026,7 @@ int main() {
 	testcase
 
 	layout=242242100331023100110324132543
-	:path_legnth=27,9combo
+	:path_length=27,9combo
 
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
@@ -1035,19 +1035,19 @@ int main() {
 	:path_length=27,9combo
 
 	layout=432015152244350331552132312515
-	:path_legnth=31,9combo
+	:path_length=31,9combo
 
 	layout=323243441332042002331313014300
-	:path_legnth=19,8combo
+	:path_length=19,8combo
 
 	layout=225530333313140355004550251403
-	:path_legnth=24,9combo
+	:path_length=24,9combo
 
 	layout=224234425402054400304510125043
-	:path_legnth=30,8combo
+	:path_length=30,8combo
 
 	layout=053241405407470557104053134522
-	:path_legnth=41,10combo
+	:path_length=41,10combo
 
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
