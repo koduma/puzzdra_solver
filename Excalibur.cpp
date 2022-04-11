@@ -1025,6 +1025,12 @@ int main() {
 	/*
 
 	testcase
+	
+	layout=367254402726710107527213362754
+	:path_length=57,10combo
+	
+	layout=047631151072370164261053045210
+	:path_length=50,10combo
 
 	layout=242242100331023100110324132543
 	:path_length=27,9combo
