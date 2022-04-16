@@ -329,7 +329,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						cand.score = evaluate2(field, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						ll ha;
+						cand.score = evaluate2(field, EVAL_FALL | EVAL_COMBO, &cmb,&ha,p_maxcombo);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
