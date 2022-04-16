@@ -329,7 +329,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						cand.score = evaluate2(field, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -726,10 +726,9 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	}
 	return combo;
 }
-int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]) {
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	int ev = 0;
 	*combo = 0;
-	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
 
@@ -742,9 +741,13 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
+		int up[DROP+1];
+		int down[DROP+1];
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
+		up[i]=ROW;
+		down[i]=-1;
 		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -755,9 +758,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 				if(num>0 && GetHeight[col]==(F_T)ROW){
 				GetHeight[col]=(F_T)row;
-				}
-				if(oti==0){
-					ha ^= zoblish_field[row][col][(int)num];
 				}
 				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
 					delflag[row][col]=1;
@@ -790,23 +790,22 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
 					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+					up[(int)field[row][col]]=min(up[(int)field[row][col]],row);
+					down[(int)field[row][col]]=max(down[(int)field[row][col]],row);
                                 }
 			}
 		}
 		for(int i=1;i<=DROP;i++){
 		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
-		cmb2-=right[i]-left[i];
+		cmb2-=right[i]-left[i]+down[i]-up[i];
 		}
 		}
 
-		//cmb2*=4
-		
-		if(COL>=2){
-		
-		if(COL%2==0){
-		for(int s=0;s<=(COL/2);s+=(COL/2)){
+		cmb2*=4;
+
+		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
-		for(int col=s;col<s+(COL/2);col++){
+		for(int col=s;col<=s+2;col++){
 		for(int row=0;row<ROW;row++){
 		same_num[field[row][col]]++;
 		}
@@ -814,23 +813,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for(int i=1;i<=DROP;i++){
 		if(p_maxcombo[i]!=d_maxcombo[i]){
 		cmb2+=same_num[i];
-		}
-		}
-		}			
-		}
-		else{
-		for(int s=0;s<=(COL/2);s+=(COL/2)){
-		int same_num[DROP+1]={0};
-		for(int col=s;col<=s+(COL/2);col++){
-		for(int row=0;row<ROW;row++){
-		same_num[field[row][col]]++;
-		}
-		}
-		for(int i=1;i<=DROP;i++){
-		if(p_maxcombo[i]!=d_maxcombo[i]){
-		cmb2+=same_num[i];
-		}
-		}
 		}
 		}
 		}
@@ -851,7 +833,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 
 	}
 	ev += oti;
-	*hash=ha;
 	return ev;
 }
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
@@ -936,16 +917,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB^=linked[i];
 		}
 
-		//cmb2*=4;
-		
-		if(COL>=2){
-		
-		if(COL%2==0){
+		cmb2*=4;
 
-		for(int s=0;s<=(COL/2);s+=(COL/2)){
+		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
-		for(int col=s;col<s+(COL/2);col++){
+		for(int col=s;col<=s+2;col++){
 		bp+=file_bb[col];
 		}
 		for(int i=1;i<=DROP;i++){
@@ -954,25 +931,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		cmb2+=same_num[i];
 		}
 		}
-		}
-			
-		}
-		else{
-		
-		for(int s=0;s<=(COL/2);s+=(COL/2)){
-		int same_num[DROP+1]={0};
-		ll bp=0ll;
-		for(int col=s;col<=s+(COL/2);col++){
-		bp+=file_bb[col];
-		}
-		for(int i=1;i<=DROP;i++){
-		if(p_maxcombo[i]!=d_maxcombo[i]){
-		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
-		cmb2+=same_num[i];
-		}
-		}
-		}		
-		}			
 		}
 
 		*combo += cmb;
