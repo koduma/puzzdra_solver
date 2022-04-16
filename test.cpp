@@ -726,9 +726,10 @@ int evaluate(F_T field[ROW][COL], int flag) {
 	}
 	return combo;
 }
-int evaluate2(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) {
+int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]) {
 	int ev = 0;
 	*combo = 0;
+	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
 
@@ -758,6 +759,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 				}
 				if(num>0 && GetHeight[col]==(F_T)ROW){
 				GetHeight[col]=(F_T)row;
+				}
+				if(oti==0){
+					ha ^= zoblish_field[row][col][(int)num];
 				}
 				if (col <= COL - 3 && num == field[row][col + 1] && num == field[row][col + 2] && num > 0) {
 					delflag[row][col]=1;
@@ -833,6 +837,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 
 	}
 	ev += oti;
+	*hash=ha;
 	return ev;
 }
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
