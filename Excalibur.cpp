@@ -1027,7 +1027,7 @@ int main() {
 	testcase
 	
 	layout=367254402726710107527213362754
-	:path_length=5,10combo
+	:path_length=52,10combo
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
