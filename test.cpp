@@ -77,8 +77,8 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 2800000//ビーム幅//MAX200000
-#define BEAM_WIDTH2 3
+#define BEAM_WIDTH 2800000//MAX2800000
+#define BEAM_WIDTH2 30//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -329,8 +329,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						ll ha;
-						cand.score = evaluate2(field, EVAL_FALL | EVAL_COMBO, &cmb,&ha,p_maxcombo);
+						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -462,6 +461,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+	int ppp=(i*COL)+j+1;
+	if(ppp!=24){continue;}
 	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
@@ -743,13 +744,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
-		int up[DROP+1];
-		int down[DROP+1];
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
-		up[i]=ROW;
-		down[i]=-1;
 		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -795,14 +792,12 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
 					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
-					up[(int)field[row][col]]=min(up[(int)field[row][col]],row);
-					down[(int)field[row][col]]=max(down[(int)field[row][col]],row);
                                 }
 			}
 		}
 		for(int i=1;i<=DROP;i++){
 		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
-		cmb2-=right[i]-left[i]+down[i]-up[i];
+		cmb2-=right[i]-left[i];
 		}
 		}
 
@@ -1034,7 +1029,7 @@ int main() {
 	testcase
 	
 	layout=367254402726710107527213362754
-	:path_length=57,10combo
+	:path_length=52,10combo
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
