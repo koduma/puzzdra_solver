@@ -78,7 +78,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 30//MAX30
+#define BEAM_WIDTH2 300//MAX300
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -106,6 +106,7 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
+int read_file_mode=0;
 
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
@@ -201,6 +202,7 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
+
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -410,30 +412,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
-/*
-	T_T first_te;
-	ll movei[(TRN/21)+1];//スワイプ移動座標
-	int score;//評価値
-	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
-	sc prev;//1手前は上下左右のどっちを選んだか
-	int prev_score;//1手前の評価値
-	uc improving;//評価値改善回数
-	ll hash;//盤面のハッシュ値
-
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	string path;
-	int path_length;
-	int pos;
-	sc prev;
-	ll hash;
-	string true_path;
-	int true_path_length;
-*/
-
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
@@ -458,6 +436,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	double avg=0;
 
 	double path_length_array[ROW][COL];
+
+	if(read_file_mode==0){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -488,6 +468,87 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	path_length_array[i][j]=(double)cand.path_length;
 	}
 	}
+
+	}
+	else{
+
+	int kosu=0;
+	string line;
+	string t_path[BEAM_WIDTH2];
+	ifstream myfile ("input.txt");
+
+	while(getline(myfile,line)){
+
+	t_path[kosu]=line;
+	kosu++;
+
+	}
+	myfile.close();
+
+	for(int i=0;i<kosu;i++){
+
+	node2 nnn;
+
+	F_T f_field[ROW][COL];
+	memcpy(f_field,field,sizeof(f_field));
+
+	int tgt=0;
+	string top="";
+	while(1){
+
+	if(t_path[i][tgt]==','){tgt++;break;}
+	top+=t_path[i][tgt];
+	tgt++;
+
+	}
+	int pos;
+	sc pre_v;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+
+	nnn.first_te=(T_T)YX(pos/COL,pos%COL);
+
+	for(int j=0;j<=TRN/21;j++){
+	nnn.movei[j]=0ll;
+	}
+	int basyo=0;
+
+	for(int j=tgt;j<(int)t_path[i].size();j++){
+	if(t_path[i][j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
+	if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
+	if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
+	if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
+	basyo++;
+	}
+	nnn.prev=pre_v;
+	nnn.pos=pos;
+	memcpy(nnn.field,f_field,sizeof(f_field));
+	nnn.calc_path();
+	nnn.calc_hash();
+	nnn.true_path=t_path[i];
+	nnn.true_path_length=nnn.path_length;
+	pus[nnn.path_length].push_front(nnn);
+	if(i==0){
+	printf("path_length=%d\n",nnn.path_length);
+	}
+	}
+
+/*
+
+	F_T field[ROW][COL];//ok
+	T_T first_te;//ok
+	ll movei[(TRN/21)+1];//ok
+	string path;//ok
+	int path_length;//ok
+	int pos;//ok
+	sc prev;//ok
+	ll hash;//ok
+	string true_path;//ok
+	int true_path_length;//ok
+*/
+
+	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
@@ -496,7 +557,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
+	//variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
 	}
 
@@ -529,9 +590,18 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
+	
+	ofstream file("input.txt");
+
+	for (int k = 0; k < ks; k++) {
+	string mystring=dque[k].true_path+'\n';
+	file << mystring;
+	}
+	file.close();
 	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
+	
 	for (int j = 0; j < DIR; j++) {
 	node2 cand = temp;
 	int x=cand.pos%COL;
@@ -1110,6 +1180,12 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
+		string suru;
+		printf("readfile?(y/n)=");
+		cin>>suru;
+		if(suru=="y"){
+		read_file_mode=1;
+		}
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
