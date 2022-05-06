@@ -13,8 +13,8 @@ sudo apt install -y g++
 sudo apt-get update
 sudo apt-get install -y wget
 
-//Excalibur.cppをダウンロード
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp
+//Ridill.cppをダウンロード
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Ridill.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
@@ -22,15 +22,15 @@ wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_sol
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
-vi Excalibur.cpp
+vi Ridill.cpp
 
 //コンパイル
-Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
-Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
-MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl
+Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large -ldl
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large
+MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -ldl
 
 //run
-./Excalibur
+./Ridill
 
 //input
 
