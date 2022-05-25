@@ -200,6 +200,7 @@ struct Action {//最終的に探索された手
 	T_T first_te;
 	double score;//コンボ数
 	int maxcombo;//理論コンボ数
+	int combo;
 	ll moving[(TRN/21)+1];//スワイプ移動座標
 	Action() {//初期化
 		this->score = 0;
@@ -369,6 +370,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				maxValue = fff[j].combo;
 				bestAction.score = fff[j].score;
 				bestAction.first_te = fff[j].first_te;
+				bestAction.combo = fff[j].combo;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				part2+=omp_get_wtime() - start;
 				return bestAction;
@@ -395,6 +397,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				maxValue = temp.combo;
 				bestAction.score = temp.score;
 				bestAction.first_te = temp.first_te;
+				bestAction.combo = temp.combo;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 			}
 			if (i < MAX_TRN - 1) {
@@ -426,7 +429,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
-		p_maxcombo[i] = drop[i] / 3
+		p_maxcombo[i] = drop[i] / 3;
 	}
 
 	double start = omp_get_wtime();
@@ -449,7 +452,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	//if(ppp!=7){continue;}
 	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
-	stop=max(stop,tmp.score);
+	stop=max(stop,tmp.combo);
 	node2 cand;
 	F_T f_field[ROW][COL];
 	memcpy(cand.field,field,sizeof(f_field));
