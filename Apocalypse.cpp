@@ -190,7 +190,7 @@ struct node2 {
 	}
 	}
 	}
-	bool operator < (const node& n)const {//スコアが高い方が優先される
+	bool operator < (const node2& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
 
