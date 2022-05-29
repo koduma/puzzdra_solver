@@ -1,27 +1,37 @@
 /*
 Windows10,Windows11,Linux,MacOS
+
 Linux導入手続き
+
 //メモリ容量確認
 free -h
+
 //g++インストール
 sudo apt install -y g++
+
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
+
 //test.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/test.cpp
+
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
+
 //ビーム幅調整
 vi test.cpp
+
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test.cpp loguru.cpp -o test -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test.cpp loguru.cpp -o test -mcmodel=large
 MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test.cpp loguru.cpp -o test -ldl
+
 //run
 ./test
+
 //input
 */
 #pragma warning(disable:4710)
@@ -353,16 +363,20 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		//deque<int>vec[5001];
 		priority_queue<pair<double,int> >pque;
 		int ks2 = 0;
+		bool ret=false;
+		double ret_score=-DBL_MAX;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo >= stop) {
+			if (fff[j].combo >= stop&&ret_score<fff[j].score) {
 				maxValue = fff[j].combo;
 				bestAction.score = fff[j].score;
 				bestAction.first_te = fff[j].first_te;
 				bestAction.combo = fff[j].combo;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				part2+=omp_get_wtime() - start;
-				return bestAction;
+				ret_score=fff[j].score;
+				ret=true;
+				//part2+=omp_get_wtime() - start;
+				//return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -372,7 +386,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(i==MAX_TRN-1){return bestAction;}
+		if(i==MAX_TRN-1||ret){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
