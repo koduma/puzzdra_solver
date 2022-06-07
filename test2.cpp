@@ -117,6 +117,7 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 int near_field(F_T target[ROW][COL],F_T field[ROW][COL]);
+int evaluate4(F_T field[ROW][COL],F_T target[ROW][COL], sc* combo, int p_maxcombo[DROP+1]);
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
