@@ -1189,7 +1189,7 @@ int main() {
 		node3 ppp=pque3.top();pque3.pop();
 		memcpy(oti_field,f_field,sizeof(f_field));
 		Action tmp = BEAM_SEARCH2(oti_field,ppp.field);
-		memcpy(field, oti_field, sizeof(oti_field));
+		memcpy(field, ppp.field, sizeof(field));
 		printf("combo=%d/%d\n",sum_e(field),tmp.maxcombo);
 		}
 	}//i
