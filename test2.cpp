@@ -268,7 +268,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						field[cand.nowR][cand.nowC]=field[ny][nx];
 						field[ny][nx]=tmp;
-            memcpy(cand.field,field,sizeof(field));
+						memcpy(cand.field,field,sizeof(field));
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
@@ -308,11 +308,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-        node3 ppp;
-        F_T ppp_field[ROW][COL];
-        memcpy(ppp.field,fff[j].field,sizeof(ppp_field));
-        ppp.score=-near_field(ppp.field,f_field);
-        pque3.push(ppp);
+				node3 ppp;
+				F_T ppp_field[ROW][COL];
+				memcpy(ppp.field,fff[j].field,sizeof(ppp_field));
+				ppp.score=-near_field(ppp.field,f_field);
+				pque3.push(ppp);
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -341,14 +341,14 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 			}
-      if(i<TRN-1){
+			if(i<TRN-1){
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
 				push_node++;
 				}
-      }
+			}
 		}
 		part3 += omp_get_wtime() - start;
 	}
@@ -452,7 +452,7 @@ Action BEAM_SEARCH2(F_T f_field[ROW][COL],F_T target[ROW][COL]) {
 						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						field[cand.nowR][cand.nowC]=field[ny][nx];
 						field[ny][nx]=tmp;
-            memcpy(cand.field,field,sizeof(field));
+						memcpy(cand.field,field,sizeof(field));
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
@@ -492,8 +492,8 @@ Action BEAM_SEARCH2(F_T f_field[ROW][COL],F_T target[ROW][COL]) {
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-        part2+=omp_get_wtime() - start;
-        printf("depth=%d\n",i+1);
+				part2+=omp_get_wtime() - start;
+				printf("depth=%d\n",i+1);
 				return bestAction;
 			}
 			vec[fff[j].score+(fff[j].nowR*3)+2000].push_front(j);
@@ -543,24 +543,24 @@ int near_field(F_T target[ROW][COL],F_T field[ROW][COL]){
 	for(int i=0;i<ROW;i++){//7
 	for(int j=0;j<COL;j++){//6
 	int md=100;
-  int pos_y=0;
-  int pos_x=0;
+	int pos_y=0;
+	int pos_x=0;
 	for(int k=0;k<ROW;k++){//5
 	for(int m=0;m<COL;m++){//4
 	if(couple[k][m]==0){//3
 	if(target[i][j]==field[k][m]){//2
-  int d=max(i-k,k-i)+max(j-m,m-j);
-  if(md>d){//1
-  md=d;
-  pos_y=k;
-  pos_x=m;
-  }//1
-  }//2
+	int d=max(i-k,k-i)+max(j-m,m-j);
+	if(md>d){//1
+	md=d;
+	pos_y=k;
+	pos_x=m;
+	}//1
+	}//2
 	}//3
 	}//4
 	}//5
-  ret+=md;
-  couple[pos_y][pos_x]=1;
+	ret+=md;
+	couple[pos_y][pos_x]=1;
 	}//6
 	}//7
   
@@ -906,8 +906,8 @@ int evaluate4(F_T field[ROW][COL],F_T target[ROW][COL], sc* combo, int p_maxcomb
 	*combo = 0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
-  F_T t_field[ROW][COL];
-  memcpy(t_field,field,sizeof(t_field));
+	F_T t_field[ROW][COL];
+	memcpy(t_field,field,sizeof(t_field));
 
 	while (1) {
 		int cmb = 0;
@@ -1179,21 +1179,19 @@ int main() {
 		show_field(f_field);//盤面表示
 		printf("\n");
 		double start = omp_get_wtime();
-    
-    memcpy(oti_field,f_field,sizeof(f_field));
-    BEAM_SEARCH(oti_field);
-    
-    for(int uuu=0;uuu<1000;uuu++){
-    
-    if(pque3.empty()){break;}
-    
-    node3 ppp=pque3.top();pque3.pop();
-    memcpy(oti_field,f_field,sizeof(f_field));
+		
+		memcpy(oti_field,f_field,sizeof(f_field));
+		BEAM_SEARCH(oti_field);
+		for(int uuu=0;uuu<1000;uuu++){
+			
+		if(pque3.empty()){break;}
+		
+		node3 ppp=pque3.top();pque3.pop();
+		memcpy(oti_field,f_field,sizeof(f_field));
 		Action tmp = BEAM_SEARCH2(oti_field,ppp.field);
-    memcpy(field, oti_field, sizeof(oti_field));
-		operation(field, tmp.first_te,tmp.moving);
-    printf("combo=%d/%d\n",sum_e(field),tmp.maxcombo);
-    }
+		memcpy(field, oti_field, sizeof(oti_field));
+		printf("combo=%d/%d\n",sum_e(field),tmp.maxcombo);
+		}
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
