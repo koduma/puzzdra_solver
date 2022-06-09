@@ -377,7 +377,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int tugi_siz=0;
 		for(int j=0;j<NODE_SIZE;j++){
 		if(vec.empty()){break;}
-		tugi[tugi_siz]=vec.top();vec.pop();
+		tugi[tugi_siz]=vec.top().second;vec.pop();
 		tugi_siz++;
 		}
 		part2+=omp_get_wtime() - start;
