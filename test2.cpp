@@ -4,27 +4,34 @@ Windows10,Windows11,Linux,MacOS
 Linux導入手続き
 
 //メモリ容量確認
+
 free -h
 
 //g++インストール
+
 sudo apt install -y g++
 
 //wgetインストール
+
 sudo apt-get update
 sudo apt-get install -y wget
 
 //test2.cppをダウンロード
+
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/test2.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
+
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
+
 vi test2.cpp
 
 //コンパイル
+
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large
 MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -ldl
@@ -78,7 +85,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 300//MAX300
+#define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -117,8 +124,6 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-int tugi[NODE_SIZE];
-
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -144,7 +149,7 @@ struct node {//どういう手かの構造体
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
-}fff[NODE_SIZE],ggg[NODE_SIZE];
+}fff[NODE_SIZE];
 
 struct node2 {
 
@@ -205,9 +210,8 @@ struct Action {//最終的に探索された手
 };
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-int omae;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
-	omae=0;
+
 	int po=9+(8*(COL-1))+ROW-1;
 
 	int p_maxcombo[DROP+1] = {0};
@@ -225,8 +229,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	MAXCOMBO += (double)stop;
 
+	vector<node>dque;
 	double start, st;
 	//1手目を全通り探索する
+	dque.clear();
 
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
@@ -246,8 +252,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 			cand.improving=0;
 			cand.hash=ha;
-			ggg[omae]=cand;
-			omae++;
+			dque.push_back(cand);
 		}
 	}// L, U,D,R //
 	}
@@ -272,8 +277,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
-	ggg[omae]=ca;
-	omae++;
+	dque.push_back(ca);
 	}
 
 	int dx[DIR] = { -1, 0,0,1 },
@@ -295,11 +299,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
-		int ks = omae;
+		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
-			node temp = ggg[k];//que.front(); que.pop();
+			node temp = dque[k];//que.front(); que.pop();
 			F_T temp_field[ROW][COL];
 			ll temp_dropBB[DROP+1]={0};
 			memcpy(temp_field, f_field, sizeof(temp_field));
@@ -356,7 +360,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
-		priority_queue<pair<int,int> >vec;
+		dque.clear();
+		deque<int>vec[5001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -370,26 +375,41 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec.push(make_pair(fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500,j));
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
 			ks2++;
 			}
 		}
-		int tugi_siz=0;
-		for(int j=0;j<BEAM_WIDTH;j++){
-		if(vec.empty()){break;}
-		tugi[tugi_siz]=vec.top().second;vec.pop();
-		tugi_siz++;
-		}
 		part2+=omp_get_wtime() - start;
+		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
-#pragma omp parallel for
-		for (int j = 0; j < tugi_siz ;j++) {
-			node temp = fff[tugi[j]];
+		int push_node=0;
+		int possible_score=5000;
+		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
+			node temp = fff[v];
+			//swap(vec[possible_score][0], vec[possible_score].back());
+			//vec[possible_score].pop_back();
+			vec[possible_score].pop_front();
+			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
+				maxValue = temp.combo;
+				bestAction.score = maxValue;
+				bestAction.first_te = temp.first_te;
+				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
+			}
 			if (i < MAX_TRN - 1) {
-				ggg[j]=temp;
+			int pos=(temp.nowR*COL)+temp.nowC;
+			if(!checkNodeList[pos][temp.hash]){
+				checkNodeList[pos][temp.hash]=true;
+				dque.push_back(temp);
+				push_node++;
+				}
 			}
 		}
-		omae=tugi_siz;
 		part3 += omp_get_wtime() - start;
 	}
 	return bestAction;
@@ -771,6 +791,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 						else { cmb2 += 20; }
 						d_maxcombo[(int)field[row][col]]++;
 					}
+					else if(c==2){
+						cmb2+=5;//koko
+					}
 					field[row][col]=0;
 					erase_x[col]=1;
 				}
@@ -868,6 +891,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(c==3){cmb2+=30;}
 		else {cmb2+=20;}
 		d_maxcombo[i]++;
+		}
+		else if(c==2){
+		cmb2+=5;//koko
 		}
 		}
 		}
