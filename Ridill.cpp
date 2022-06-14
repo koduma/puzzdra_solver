@@ -78,7 +78,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 300//MAX300
+#define BEAM_WIDTH2 1000//MAX1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -442,7 +442,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	int ppp=(i*COL)+j+1;
-	if(ppp!=24){continue;}
+	//if(ppp!=24){continue;}
 	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
@@ -471,6 +471,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	}
 	else{
+		
+	Action tmpp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	
+	stop=tmpp.score;
 
 	int kosu=0;
 	string line;
