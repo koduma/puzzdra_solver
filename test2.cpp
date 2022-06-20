@@ -85,7 +85,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 3//MAX30
+#define BEAM_WIDTH2 30//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -123,6 +123,8 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
+
+int pad=3;
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -365,9 +367,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			if (fff[j].combo >= stop) {
+			if (fff[j].combo >= stop - pad) {
 				maxValue = fff[j].combo;
-				bestAction.score = maxValue;
+				bestAction.score = stop;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				part2+=omp_get_wtime() - start;
@@ -791,9 +793,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 						else { cmb2 += 20; }
 						d_maxcombo[(int)field[row][col]]++;
 					}
-					else if(c==2){
-						cmb2+=5;//koko
-					}
 					field[row][col]=0;
 					erase_x[col]=1;
 				}
@@ -891,9 +890,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(c==3){cmb2+=30;}
 		else {cmb2+=20;}
 		d_maxcombo[i]++;
-		}
-		else if(c==2){
-		cmb2+=5;//koko
 		}
 		}
 		}
@@ -1189,3 +1185,4 @@ int main() {
 	cin>>k;
 	return 0;
 }
+
