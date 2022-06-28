@@ -519,9 +519,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for(int j=tgt;j<(int)t_path[i].size();j++){
 	if(t_path[i][j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
-	if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
-	if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
-	if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
+	else if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
+	else if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else{continue;}
 	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
 	basyo++;
 	}
