@@ -482,6 +482,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	}
 	else{
+	
+	Action tmpp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	
+	stop=tmpp.score;
 
 	int kosu=0;
 	string line;
@@ -497,8 +501,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	myfile.close();
 
 	for(int i=0;i<kosu;i++){
-
+	
 	node2 nnn;
+	
+	nnn.true_path.clear();
 
 	F_T f_field[ROW][COL];
 	memcpy(f_field,field,sizeof(f_field));
@@ -506,7 +512,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int tgt=0;
 	string top="";
 	while(1){
-
+	nnn.true_path.push_back(t_path[i][tgt]);
 	if(t_path[i][tgt]==','){tgt++;break;}
 	top+=t_path[i][tgt];
 	tgt++;
@@ -526,9 +532,11 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for(int j=tgt;j<(int)t_path[i].size();j++){
 	if(t_path[i][j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
-	if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
-	if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
-	if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
+	else if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
+	else if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else{continue;}
+	nnn.true_path.push_back(t_path[i][j]);
 	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
 	basyo++;
 	}
@@ -537,7 +545,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(nnn.field,f_field,sizeof(f_field));
 	nnn.calc_path();
 	nnn.calc_hash();
-	nnn.true_path=t_path[i];
+	//nnn.true_path=t_path[i];
 	nnn.true_path_length=nnn.path_length;
 	sc cm;
 	ll hha;
