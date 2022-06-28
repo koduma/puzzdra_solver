@@ -490,8 +490,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	myfile.close();
 
 	for(int i=0;i<kosu;i++){
-
+	
 	node2 nnn;
+	
+	nnn.true_path.clear();
 
 	F_T f_field[ROW][COL];
 	memcpy(f_field,field,sizeof(f_field));
