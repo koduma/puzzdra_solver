@@ -1113,7 +1113,7 @@ int main() {
 	:path_length=50,10combo
 
 	layout=242242100331023100110324132543
-	:path_length=27,9combo
+	:path_length=26,9combo
 
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
