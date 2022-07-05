@@ -404,8 +404,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
-			if(visited[pos][temp.hash]==0||visited[pos][temp.hash]>i+1){
-				visited[pos][temp.hash]=i+1;
+			if(visited[pos][temp.hash]==0||visited[pos][temp.hash]>i+maxi){
+				visited[pos][temp.hash]=i+maxi;
 				dque.push_back(temp);
 				push_node++;
 				}
