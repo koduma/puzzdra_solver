@@ -413,34 +413,9 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 	}
 	return maxValue;
 }
-int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
-int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
+int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node2 n2,int stop); //ルート探索関数
+int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node n2,int stop) {
 
-/*
-	T_T first_te;
-	ll movei[(TRN/21)+1];//スワイプ移動座標
-	int score;//評価値
-	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
-	sc prev;//1手前は上下左右のどっちを選んだか
-	int prev_score;//1手前の評価値
-	uc improving;//評価値改善回数
-	ll hash;//盤面のハッシュ値
-
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	string path;
-	int path_length;
-	int pos;
-	sc prev;
-	ll hash;
-	string true_path;
-	int true_path_length;
-*/
-
-	int stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -449,52 +424,10 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 			}
 		}
 	}
-	for (int i = 1; i <= DROP; i++) {
-		stop += drop[i] / 3;
-	}
 
 	vector<node2>dque;
-
-	deque<node2>pus[TRN+1];
-
-	for (int i = 0; i < ROW; i++) {
-	for (int j = 0; j < COL; j++) {
-	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
-	if(i==0&&j==0){stop=0;}
-	stop=max(stop,tmp.score);
-	node2 cand;
-	F_T f_field[ROW][COL];
-	memcpy(cand.field,field,sizeof(f_field));
-	cand.first_te = tmp.first_te;
-	for (int trn = 0; trn <= TRN/21; trn++) {
-	cand.movei[trn] = tmp.moving[trn];
-	}
-	cand.calc_path();
-	cand.pos = (i*COL)+j;
-	cand.prev = -1;
-	cand.calc_hash();
-	cand.true_path=to_string(j)+to_string(i+5)+",";
-	cand.true_path_length=0;
-	if(stop!=tmp.score){cand.path_length=TRN;}
-	pus[cand.path_length].push_front(cand);
-	}
-	}
 	
-	int cnt=0;
-
-	for(int i=0;i<TRN;i++){
-	if((int)pus[i].size()==0){continue;}
-	while(1){
-	if((int)pus[i].size()==0){break;}
-	node2 cand=pus[i][0];
-	pus[i].pop_front();
-	if(cnt<BEAM_WIDTH2){
-	dque.push_back(cand);
-	cnt++;
-	}
-	else{break;}
-	}
-	}
+	dque.push_back(n2);
 
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
