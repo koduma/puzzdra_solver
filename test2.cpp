@@ -413,8 +413,8 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 	}
 	return maxValue;
 }
-int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node2 n2,int stop); //ルート探索関数
-int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node2 n2,int stop) {
+int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop); //ルート探索関数
+int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
@@ -458,7 +458,7 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node2 n2,int stop) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	cand.score = BEAM_SEARCH(f_field,i+1,TRN,cand.prev,cand.pos,stop);
+	cand.score = BEAM_SEARCH(f_field,i+maxi,TRN,cand.prev,cand.pos,stop);//maxi_min=2
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_hash();
 	cand.path_length = 0;
