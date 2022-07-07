@@ -126,14 +126,15 @@ ll fallBB(ll p,ll rest,ll mask);
 void calc_p_length(F_T field[ROW][COL],T_T first_te,ll movei[(TRN/21)+1],int path_length);
 
 ll keisan_hash(F_T field[ROW][COL]){
-  ll hash=0ll;
-
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = field[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
-	}
-	}
+	
+ll hash=0ll;
+	
+for (int row = 0; row < ROW; row++) {
+for (int col = 0; col < COL; col++) {
+F_T num = field[row][col];
+hash ^= zoblish_field[row][col][(int)num];
+}
+}
   return hash;
 }
 
@@ -384,7 +385,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-        calc_p_length(f_field,fff[j].first_te,fff[j].movei,i+maxi);
+				calc_p_length(f_field,fff[j].first_te,fff[j].movei,i+maxi);
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -483,7 +484,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-  Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
+	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	node2 cand;
@@ -506,8 +507,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;  
-  }
-  }
+	}
+	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
@@ -569,15 +570,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-  ll haha=keisan_hash(f_field);  
-  if(visited[cand.pos][haha]>0){
-  memcpy(cand.field,f_field,sizeof(f_field));
-  cand.hash=haha;
-  cand.path_length=visited[cand.pos][haha];
-  ff[(4 * k) + j] = cand;
-  continue;
-  }
-  Action tmp=BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
+	ll haha=keisan_hash(f_field);
+	if(visited[cand.pos][haha]>0){
+	memcpy(cand.field,f_field,sizeof(f_field));
+	cand.hash=haha;
+	cand.path_length=visited[cand.pos][haha];
+	ff[(4 * k) + j] = cand;
+	continue;
+	}
+	Action tmp=BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -1069,21 +1070,20 @@ void calc_p_length(F_T field[ROW][COL],T_T first_te,ll movei[(TRN/21)+1],int pat
         if (dir==4) { route+=to_string(4); } //"RIGHT"); }
       }
     }
-
-		int tgt=0;
-		string top="";
-		while(1){
-
-		if(route[tgt]==','){tgt++;break;}
-		top+=route[tgt];
-		tgt++;
-
-		}
-		int pos;
-		if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
-		else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-    
-		for(int j=tgt;j<(int)route.size();j++){
+	
+    int tgt=0;
+    string top="";
+    while(1){
+    if(route[tgt]==','){tgt++;break;}
+    top+=route[tgt];
+    tgt++;
+    }
+	
+    int pos;
+    if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+    else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+	
+    for(int j=tgt;j<(int)route.size();j++){
       ll ha=0ll;
       for(int row=0;row<ROW;row++){
             for(int col=0;col<COL;col++){
@@ -1101,7 +1101,7 @@ void calc_p_length(F_T field[ROW][COL],T_T first_te,ll movei[(TRN/21)+1],int pat
       if(route[j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;}
       if(route[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
       path_length--;
-		}
+    }
 }
 
 int main() {
