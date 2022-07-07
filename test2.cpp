@@ -458,7 +458,7 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,node n2,int stop) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	cand.score = BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
+	cand.score = BEAM_SEARCH(f_field,i+1,TRN,cand.prev,cand.pos,stop);
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_hash();
 	cand.path_length = 0;
