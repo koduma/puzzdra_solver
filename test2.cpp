@@ -123,7 +123,7 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-void calc_p_length(F_T field[ROW][COL],T_T first_te,ll movei[TRN/21],int path_length);
+void calc_p_length(F_T field[ROW][COL],T_T first_te,ll movei[(TRN/21)+1],int path_length);
 
 ll keisan_hash(F_T field[ROW][COL]){
   ll hash=0ll;
