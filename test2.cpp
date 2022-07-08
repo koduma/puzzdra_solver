@@ -517,8 +517,8 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	return maxValue;
 
 }
-Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
-Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
+string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
+string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
