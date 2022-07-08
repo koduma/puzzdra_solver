@@ -498,6 +498,7 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	}
 	int push_node=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
+	if(vec.empty()){break;}
 	int v=vec.top().second;vec.pop();
 	node2 temp = gg[v];
 	F_T f_field[ROW][COL];
@@ -637,6 +638,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	int push_node=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
+	if(vec.empty()){break;}
 	int v=vec.top().second;vec.pop();
 	node2 temp = ff[v];
 	F_T f_field[ROW][COL];
