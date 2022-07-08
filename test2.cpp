@@ -541,7 +541,7 @@ Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	
 	Action asd=BEAM_SEARCH(field,1,TRN,-1,0,stop,1);
 	
-	stop = asd.ev;
+	stop = asd.score;
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
