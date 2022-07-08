@@ -578,7 +578,7 @@ Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
-	string bestAction;
+	string bestAction="";
 	int maxValue = 0;
 
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
@@ -625,35 +625,26 @@ Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
-	deque<int>vec[1001];
+	priority_queue<pair<int,int> >vec;
 	for(int j=0;j<4*ks;j++){
 	if(ff[j].path_length!=-1){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
 	if(combo>=stop){return ff[j].true_path;}
-	vec[ff[j].path_length].push_front(j);
+	vec.push(make_pair(ff[j].score,j));
 	}
 	}
 	int push_node=0;
-	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
-	if(possible_score>1000){break;}
-	if((int)vec[possible_score].size()==0){
-	possible_score++;
-	continue;
-	}
-	int v=vec[possible_score][0];
+	int v=vec.top().second;vec.pop();
 	node2 temp = ff[v];
-	//swap(vec[possible_score][0], vec[possible_score].back());
-	//vec[possible_score].pop_back();
-	vec[possible_score].pop_front();
 	F_T f_field[ROW][COL];
 	memcpy(f_field,temp.field,sizeof(f_field));
-	int combo = sum_e(f_field);
+	int combo = sum_e(f_field);	
 	if (maxValue < combo) {//コンボ数が増えたらその手を記憶する
 	maxValue = combo;
-	bestAction=temp.true_path;
+	bestAction = temp.true_path;
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
