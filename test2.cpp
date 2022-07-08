@@ -161,7 +161,7 @@ struct node2 {
 	ll hash;
 	string true_path;
 	int true_path_length;
-	int score;
+	int score;//evaluate
 
 	void calc_path(){
 
@@ -194,22 +194,26 @@ struct node2 {
 	}
 	}
 	}
+	bool operator < (const node2& n)const {//スコアが高い方が優先される
+		return score < n.score;
+	}
 
-}ff[DIR*BEAM_WIDTH2];
+}ff[DIR*BEAM_WIDTH2],gg[DIR*BEAM_WIDTH2];
 
 struct Action {//最終的に探索された手
 	T_T first_te;
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
+	int ev;
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,int type); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,int type) {
 
 	int po=9+(8*(COL-1))+ROW-1;
 
@@ -369,8 +373,9 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				bestAction.ev = 10000*(TRN-i-maxi);
 				part2+=omp_get_wtime() - start;
-				return 10000*(TRN-i);
+				return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -383,7 +388,10 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
-		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
+		int max_pn;
+		if(type==0){max_pn=BEAM_WIDTH;}
+		else{max_pn=2800000;}
+		for (int j = 0; push_node < max_pn ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
 			possible_score--;
@@ -396,9 +404,10 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 			vec[possible_score].pop_front();
 			if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.score;
-				bestAction.score = maxValue;
+				bestAction.score = temp.combo;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
+				bestAction.ev = maxValue;
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
@@ -411,7 +420,7 @@ int BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_
 		}
 		part3 += omp_get_wtime() - start;
 	}
-	return maxValue;
+	return bestAction;
 }
 int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop); //ルート探索関数
 int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
@@ -458,40 +467,39 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	cand.score = BEAM_SEARCH(f_field,i+maxi,TRN,cand.prev,cand.pos,stop);//maxi_min=2
+	Action tmp = BEAM_SEARCH(f_field,i+maxi,TRN,cand.prev,cand.pos,stop,0);
+	cand.score = tmp.ev;
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_hash();
 	cand.path_length = 0;
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}
 	}//if(0<=x+dx[j]
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-
-	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
 	priority_queue<pair<int,int> >vec;
 	for(int j=0;j<4*ks;j++){
-	if(ff[j].path_length!=-1){
+	if(gg[j].path_length!=-1){
 	F_T f_field[ROW][COL];
-	memcpy(f_field,ff[j].field,sizeof(f_field));
+	memcpy(f_field,gg[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
-	if(combo>=stop){return 10000*(TRN-i);}
-	vec.push(make_pair(ff[j].score,j));
+	if(combo>=stop){return 10000*(TRN-i-maxi);}
+	vec.push(make_pair(gg[j].score,j));
 	}
 	}
 	int push_node=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
 	int v=vec.top().second;vec.pop();
-	node2 temp = ff[v];
+	node2 temp = gg[v];
 	F_T f_field[ROW][COL];
 	if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
 	maxValue = temp.score;
@@ -512,6 +520,152 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 Action BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	
+	int stop=0;
+	int drop[DROP + 1] = { 0 };
+	for (int row = 0; row < ROW; row++) {
+		for (int col = 0; col < COL; col++) {
+			if (1 <= field[row][col] && field[row][col] <= DROP) {
+				drop[field[row][col]]++;
+			}
+		}
+	}
+	for (int i = 1; i <= DROP; i++) {
+		stop += drop[i] / 3;
+	}
+
+	printf("\n-----search_start_1/2-----\n");
+
+	vector<node2>dque;
+
+	priority_queue<node2>pus;
+	
+	Action asd=BEAM_SEARCH(field,1,TRN,-1,0,stop,1);
+	
+	stop = asd.ev;
+
+	for (int i = 0; i < ROW; i++) {
+	for (int j = 0; j < COL; j++) {
+	node2 cand;
+	F_T f_field[ROW][COL];
+	memcpy(cand.field,field,sizeof(f_field));
+	cand.first_te = (T_T)YX(i, j);;
+	for (int trn = 0; trn <= TRN/21; trn++) {
+	cand.movei[trn] = 0ll;
+	}
+	cand.calc_path();
+	cand.pos = (i*COL)+j;
+	cand.prev = -1;
+	cand.calc_hash();
+	cand.true_path=to_string(j)+to_string(i+5)+",";
+	cand.true_path_length=0;
+	cand.score = BEAM_SEARCH2(field,2,TRN,cand,stop);
+	pus.push(cand);
+	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
+	cout<<"evaluate="<<cand.score<<endl;
+	cout<<"combo="<<stop<<endl;
+	}
+	}
+
+	printf("\n-----search_start_2/2-----\n");
+	int cnt=0;
+	
+	while(1){
+	if(cnt>=BEAM_WIDTH2){break;}
+	node2 n22=pus.top();pus.pop();
+	dque.push_back(n22);
+	cnt++;
+	}
+
+	int dx[DIR] = { -1, 0,0,1 };
+	int dy[DIR] = { 0,-1,1,0 };
+	string bestAction;
+	int maxValue = 0;
+
+	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
+
+	for (int i = 0; i < MAX_TRN; i++) {
+	int ks = (int)dque.size();
+	for (int k = 0; k < ks; k++) {
+
+	node2 temp = dque[k];
+	for (int j = 0; j < DIR; j++) {
+	node2 cand = temp;
+	int x=cand.pos%COL;
+	int y=cand.pos/COL;
+	if (0 <= x + dx[j] && x + dx[j] < COL &&0 <= y + dy[j] && y + dy[j] < ROW) {
+	if (cand.prev + j != 3) {
+	F_T f_field[ROW][COL];
+	memcpy(f_field,cand.field,sizeof(f_field));
+	int nx=x + dx[j];
+	int ny=y + dy[j];
+	swap(f_field[y][x],f_field[ny][nx]);
+	memcpy(cand.field,f_field,sizeof(f_field));
+	cand.pos = (ny*COL)+nx;
+	if(j==0){cand.true_path+=to_string(3);}
+	else if(j==1){cand.true_path+=to_string(6);}
+	else if(j==2){cand.true_path+=to_string(1);}
+	else{cand.true_path+=to_string(4);}
+	cand.prev = j;
+	cand.score = BEAM_SEARCH2(f_field,i+3,TRN,cand,stop);
+	cand.calc_hash();
+	cand.path_length = 0;
+	ff[(4 * k) + j] = cand;
+	}//if(cand.prev
+	else {
+	cand.path_length = -1;
+	ff[(4 * k) + j] = cand;
+	}
+	}//if(0<=x+dx[j]
+	else {
+	cand.path_length = -1;
+	ff[(4 * k) + j] = cand;
+	}
+	}//for(int j=0;
+	}//for(int k=0;
+
+	printf("depth=%d/%d\n",i+1,MAX_TRN);
+	dque.clear();
+	deque<int>vec[1001];
+	for(int j=0;j<4*ks;j++){
+	if(ff[j].path_length!=-1){
+	F_T f_field[ROW][COL];
+	memcpy(f_field,ff[j].field,sizeof(f_field));
+	int combo = sum_e(f_field);
+	if(combo>=stop){return ff[j].true_path;}
+	vec[ff[j].path_length].push_front(j);
+	}
+	}
+	int push_node=0;
+	int possible_score=0;
+	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
+	if(possible_score>1000){break;}
+	if((int)vec[possible_score].size()==0){
+	possible_score++;
+	continue;
+	}
+	int v=vec[possible_score][0];
+	node2 temp = ff[v];
+	//swap(vec[possible_score][0], vec[possible_score].back());
+	//vec[possible_score].pop_back();
+	vec[possible_score].pop_front();
+	F_T f_field[ROW][COL];
+	memcpy(f_field,temp.field,sizeof(f_field));
+	int combo = sum_e(f_field);
+	if (maxValue < combo) {//コンボ数が増えたらその手を記憶する
+	maxValue = combo;
+	bestAction=temp.true_path;
+	}
+	if (i < MAX_TRN - 1) {
+	if(!checkNodeList[temp.pos][temp.hash]){
+	checkNodeList[temp.pos][temp.hash]=true;
+	dque.push_back(temp);
+	push_node++;
+	}
+	}
+	}
+	}//for(int i=0;
+
+	return bestAction;
 }
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
