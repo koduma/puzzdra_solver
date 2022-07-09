@@ -406,8 +406,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				visited[pos][temp.hash]++;
-				if(mv<visited[pos][hash]){
-				mv=visited[pos][hash];
+				if(mv<visited[pos][temp.hash]){
+				mv=visited[pos][temp.hash];
 				}
 				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
