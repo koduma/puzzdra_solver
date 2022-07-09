@@ -642,7 +642,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	cand.path_length=calc_path_length(tmp);
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
-	//cout<<"path_length="<<cand.path_length<<endl;
+	cout<<"path_length="<<cand.path_length<<endl;
 	}
 	}
 	printf("\n-----search_start_2/2-----\n");
