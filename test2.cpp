@@ -425,15 +425,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop); //ルート探索関数
 int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 
-	int drop[DROP + 1] = { 0 };
-	for (int row = 0; row < ROW; row++) {
-		for (int col = 0; col < COL; col++) {
-			if (1 <= field[row][col] && field[row][col] <= DROP) {
-				drop[field[row][col]]++;
-			}
-		}
-	}
-
 	vector<node2>dque;
 	
 	dque.push_back(n2);
@@ -468,7 +459,7 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	Action tmp = BEAM_SEARCH(f_field,i+maxi,TRN,cand.prev,cand.pos,stop,0);
+	Action tmp = BEAM_SEARCH(f_field,i+1+maxi,TRN,cand.prev,cand.pos,stop,0);
 	cand.score = tmp.ev;
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_hash();
@@ -525,15 +516,6 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 int BEAM_SEARCH3(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop); //ルート探索関数
 int BEAM_SEARCH3(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 
-	int drop[DROP + 1] = { 0 };
-	for (int row = 0; row < ROW; row++) {
-		for (int col = 0; col < COL; col++) {
-			if (1 <= field[row][col] && field[row][col] <= DROP) {
-				drop[field[row][col]]++;
-			}
-		}
-	}
-
 	vector<node2>dque;
 	
 	dque.push_back(n2);
@@ -568,7 +550,7 @@ int BEAM_SEARCH3(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	cand.score = BEAM_SEARCH2(f_field,i+maxi,TRN,cand,stop);
+	cand.score = BEAM_SEARCH2(f_field,i+1+maxi,TRN,cand,stop);
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_hash();
 	cand.path_length = 0;
@@ -662,7 +644,7 @@ string BEAM_SEARCH4(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	cand.score = BEAM_SEARCH3(field,3,TRN,cand,stop);
+	cand.score = BEAM_SEARCH3(field,1,TRN,cand,stop);
 	pus.push(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<(TRN-(cand.score/10000))<<endl;
@@ -710,7 +692,7 @@ string BEAM_SEARCH4(F_T field[ROW][COL],int MAX_TRN) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	cand.score = BEAM_SEARCH3(f_field,i+4,TRN,cand,stop);
+	cand.score = BEAM_SEARCH3(f_field,i+2,TRN,cand,stop);
 	cand.calc_hash();
 	cand.path_length = 0;
 	ff[(4 * k) + j] = cand;
