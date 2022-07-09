@@ -566,6 +566,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	int cnt=0;
 	
 	while(1){
+	if(pus.empty()){break;}
 	if(cnt>=BEAM_WIDTH2){break;}
 	node2 n22=pus.top();pus.pop();
 	dque.push_back(n22);
