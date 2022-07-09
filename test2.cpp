@@ -407,7 +407,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = temp.combo;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				bestAction.ev = temp.combo*(TRN-i-maxi);
+				bestAction.ev = maxValue*(TRN-i-maxi);
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
