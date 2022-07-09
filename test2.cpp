@@ -286,7 +286,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
-	int maxValue = -99999;//最高スコア
+	int maxValue = 0;//最高スコア
 
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
@@ -402,12 +402,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			//swap(vec[possible_score][0], vec[possible_score].back());
 			//vec[possible_score].pop_back();
 			vec[possible_score].pop_front();
-			if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
-				maxValue = temp.score;
+			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
+				maxValue = temp.combo;
 				bestAction.score = temp.combo;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				bestAction.ev = maxValue;
+				bestAction.ev = temp.combo*(TRN-i-maxi);
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
@@ -441,7 +441,8 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
 	string bestAction;
-	int maxValue = -99999;
+	int maxValue = 0;
+	int m_combo = 0;
 
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
 
@@ -502,8 +503,11 @@ int BEAM_SEARCH2(F_T field[ROW][COL],int maxi,int MAX_TRN,node2 n2,int stop) {
 	int v=vec.top().second;vec.pop();
 	node2 temp = gg[v];
 	F_T f_field[ROW][COL];
-	if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
-	maxValue = temp.score;
+	memcpy(f_field,temp.field,sizeof(f_field));
+	int combo = sum_e(f_field);
+	if (m_combo < combo) {//コンボ数が増えたらその手を記憶する
+	m_combo = combo;
+	maxValue = combo*(TRN-i-maxi);
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
