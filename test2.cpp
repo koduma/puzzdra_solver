@@ -123,7 +123,6 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
 emilib::HashMap<ll, int> visited[ROW*COL];
-int mv=0;
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -371,6 +370,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				for(int u=0;u<ROW*COL;u++){
+				for (auto itr = checkNodeList[u].begin(); itr != checkNodeList[u].end(); ++itr)
+				{
+				visited[u][itr->first]=i+maxi;
+				}
+				}
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -405,9 +410,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
-				visited[pos][temp.hash]++;
-				if(mv<visited[pos][temp.hash]){
-				mv=visited[pos][temp.hash];
+				if(visited[pos][temp.hash]>0){
+				continue;
 				}
 				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
@@ -581,7 +585,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}//for(int j=0;
 	}//for(int k=0;
 
-	printf("depth=%d/%d,most_visited=%d\n",i+1,MAX_TRN,mv);
+	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
 	deque<int>vec[1001];
 	for(int j=0;j<4*ks;j++){
