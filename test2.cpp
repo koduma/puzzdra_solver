@@ -286,7 +286,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	int maxValue = 0;//最高スコア
 
 	bestAction.maxcombo = stop;
-	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
+	emilib::HashMap<ll, int> checkNodeList[ROW*COL];
 
 	ll rootBB[DROP+1]={0};
 
@@ -373,7 +373,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				for(int u=0;u<ROW*COL;u++){
 				for (auto itr = checkNodeList[u].begin(); itr != checkNodeList[u].end(); ++itr)
 				{
-				visited[u][itr->first]=i+maxi;
+				if(visited[u][itr->first]==0){
+				visited[u][itr->first]=itr->second;
+				}
+				else{
+				visited[u][itr->first]=min(visited[u][itr->first],itr->second);
+				}
 				}
 				}
 				part2+=omp_get_wtime() - start;
@@ -409,11 +414,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
-			if(!checkNodeList[pos][temp.hash]){
-				if(visited[pos][temp.hash]>0){
+			if(checkNodeList[pos][temp.hash]==0){
+				if(visited[pos][temp.hash]<i+maxi&&visted[pos][temp.hash]>0){
 				continue;
 				}
-				checkNodeList[pos][temp.hash]=true;
+				checkNodeList[pos][temp.hash]=i+maxi;
 				dque.push_back(temp);
 				push_node++;
 				}
