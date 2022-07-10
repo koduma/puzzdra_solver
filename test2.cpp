@@ -415,7 +415,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(checkNodeList[pos][temp.hash]==0){
-				if(visited[pos][temp.hash]<i+maxi&&visted[pos][temp.hash]>0){
+				if(visited[pos][temp.hash]<i+maxi&&visited[pos][temp.hash]>0){
 				continue;
 				}
 				checkNodeList[pos][temp.hash]=i+maxi;
