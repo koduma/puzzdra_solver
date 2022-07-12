@@ -565,7 +565,11 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
   
   
     if(depth==0){
-    n.score = -evaluate2(field,EVAL_FALL | EVAL_COMBO,&n.combo,&n.hash,p_maxcombo);
+    sc comboo;
+    ll ha;
+    n.score = -evaluate2(field,EVAL_FALL | EVAL_COMBO,&comboo,&ha,p_maxcombo);
+    n.combo = comboo;
+    n.hash = ha;
     n_states.emplace_back(n);
     return;
     }
