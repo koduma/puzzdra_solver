@@ -298,29 +298,29 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	int pos=po-((8*col)+row);
 	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
-  }
+	}
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
 		start = omp_get_wtime();
-    vector<node>n_states;
-    node n=dque[0];
-    dfs(f_field,n,i+1,&checkNodeList,n_states,p_maxcombo,0);
+		vector<node>n_states;
+		node n=dque[0];
+		dfs(f_field,n,i+1,&checkNodeList,n_states,p_maxcombo,0);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
-    sort(n_states.begin(),n_states.end());
+		sort(n_states.begin(),n_states.end());
 		part2+=omp_get_wtime() - start;
 		start = omp_get_wtime();
 		int push_node=0;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {//3
-      if(j>=(int)n_states.size()){break;}
+			if(j>=(int)n_states.size()){break;}
 			node temp = n_states[j];
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-        if(maxValue>=stop){return bestAction;}
+				if(maxValue>=stop){return bestAction;}
 			}
 			if (i < MAX_TRN - 1) {//2
 			int pos=(temp.nowR*COL)+temp.nowC;
@@ -584,8 +584,8 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
     n2.nowR=ny;
     n2.nowC=nx;
     F_T tmp=field[y][x];
-		n2.hash^=(zoblish_field[y][x][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
-		n2.hash^=(zoblish_field[y][x][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
+    n2.hash^=(zoblish_field[y][x][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+    n2.hash^=(zoblish_field[y][x][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
     swap(field[y][x],field[ny][nx]);
     n2.movei[dpath/21] |= (((ll)(dir+1))<<((3*dpath)%63));
     if(depth==1 || ((*c)[(ny*COL)+nx][n2.hash])){
