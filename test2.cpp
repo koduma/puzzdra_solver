@@ -209,7 +209,7 @@ struct Action {//最終的に探索された手
 	}
 };
 
-void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath);
+void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],emilib::HashMap<ll, bool> (*v)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath);
 
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
@@ -305,7 +305,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 		vector<node>n_states;
 		node n=dque[0];
-		dfs(f_field,n,i+1,&checkNodeList,n_states,p_maxcombo,0);
+		emilib::HashMap<ll, bool> visited[ROW*COL];
+		dfs(f_field,n,i+1,&checkNodeList,&visited,n_states,p_maxcombo,0);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		sort(n_states.begin(),n_states.end());
@@ -561,7 +562,7 @@ void fall(int x,int h,F_T field[ROW][COL]) {
 			}
 		}
 }
-void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath){
+void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],emilib::HashMap<ll, bool> (*v)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath){
   
   
     if(depth==0){
@@ -594,14 +595,16 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
     n2.hash^=(zoblish_field[y][x][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
     swap(field[y][x],field[ny][nx]);
     n2.movei[dpath/21] |= (((ll)(dir+1))<<((3*dpath)%63));
-    if(depth==1 || ((*c)[(ny*COL)+nx][n2.hash])){
-    if(((*c)[(ny*COL)+nx][n2.hash])==false){
-    (*c)[(ny*COL)+nx].erase(n2.hash);
-    }
-    dfs(field,n2,depth-1,c,n_states,p_maxcombo,dpath+1);
-    }
-    else if(((*c)[(ny*COL)+nx][n2.hash])==false){
-    (*c)[(ny*COL)+nx].erase(n2.hash);
+	    
+    bool letsgo=false;
+
+    if(((*c)[(ny*COL)+nx][n2.hash])&&((*v)[(ny*COL)+nx][n2.hash])==false){letsgo=true;}	    
+    if(depth==1){letsgo=true;}
+	    
+    (*v)[(ny*COL)+nx][n2.hash]=true;
+	    
+    if(letsgo){	    
+    dfs(field,n2,depth-1,c,v,n_states,p_maxcombo,dpath+1);
     }
     swap(field[y][x],field[ny][nx]);
     }
