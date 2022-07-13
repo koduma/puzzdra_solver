@@ -595,6 +595,9 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
     swap(field[y][x],field[ny][nx]);
     n2.movei[dpath/21] |= (((ll)(dir+1))<<((3*dpath)%63));
     if(depth==1 || ((*c)[(ny*COL)+nx][n2.hash])){
+    if(((*c)[(ny*COL)+nx][n2.hash])==false){
+    (*c)[(ny*COL)+nx].erase(n2.hash);
+    }
     dfs(field,n2,depth-1,c,n_states,p_maxcombo,dpath+1);
     }
     else if(((*c)[(ny*COL)+nx][n2.hash])==false){
