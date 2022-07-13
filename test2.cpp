@@ -323,7 +323,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				if(maxValue>=stop){return bestAction;}
+				if(maxValue>=5){return bestAction;}
 			}
 			if (i < MAX_TRN - 1) {//2
 			int pos=(temp.nowR*COL)+temp.nowC;
