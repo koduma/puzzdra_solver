@@ -305,7 +305,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 		vector<node>n_states;
 		node n=dque[0];
+		F_T ff_field[ROW][COL];
+		memcpy(ff_field,f_field,sizeof(ff_field));
 		dfs(f_field,n,i+1,&checkNodeList,n_states,p_maxcombo,0);
+		for(int mm=0;mm<ROW*COL;mm++){if(ff_field[mm/COL][mm%COL]!=f_field[mm/COL][mm%COL]){cout<<"akan"<<endl;}}
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		sort(n_states.begin(),n_states.end());
