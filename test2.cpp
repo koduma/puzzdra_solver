@@ -579,6 +579,8 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
   
     int dx[DIR] = { -1, 0,0,1 };
     int dy[DIR] = { 0,-1,1,0 };
+	
+    (*v)[(n.nowR*COL)+n.nowC][n.hash]=true;	
  
     for(int dir=0;dir<DIR;dir++){
     int pos=(n.nowR*COL)+n.nowC;
@@ -600,8 +602,6 @@ void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW
 
     if(((*c)[(ny*COL)+nx][n2.hash])&&((*v)[(ny*COL)+nx][n2.hash])==false){letsgo=true;}	    
     if(depth==1){letsgo=true;}
-	    
-    (*v)[(ny*COL)+nx][n2.hash]=true;
 	    
     if(letsgo){	    
     dfs(field,n2,depth-1,c,v,n_states,p_maxcombo,dpath+1);
