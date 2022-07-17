@@ -828,7 +828,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		y_bonus[field[row][col]]++;
 		}
 		for(int i=1;i<=DROP;i++){
-		if(y_bonus[i]>=3){cmb2+=10;}
+		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
 
@@ -953,7 +953,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
 		int yb=__builtin_popcountll(bp&dropBB[i]);
-		if(yb>=3){cmb2+=10;}
+		if(yb>=3){cmb2+=20;}
 		}
 		}
 
