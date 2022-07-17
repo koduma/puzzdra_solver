@@ -84,7 +84,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 10000//MAX2800000
+#define BEAM_WIDTH 2800000//MAX2800000
 #define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
@@ -149,7 +149,7 @@ struct node {//どういう手かの構造体
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
-};
+}fff[NODE_SIZE];
 
 struct node2 {
 
@@ -208,9 +208,6 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-
-void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],emilib::HashMap<ll, bool> (*v)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath);
-
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -302,35 +299,117 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
+		int ks = (int)dque.size();
 		start = omp_get_wtime();
-		vector<node>n_states;
-		node n=dque[0];
-		emilib::HashMap<ll, bool> visited[ROW*COL];
-		dfs(f_field,n,i+1,&checkNodeList,&visited,n_states,p_maxcombo,0);
+#pragma omp parallel for
+		for (int k = 0; k < ks; k++) {
+			node temp = dque[k];//que.front(); que.pop();
+			F_T temp_field[ROW][COL];
+			ll temp_dropBB[DROP+1]={0};
+			memcpy(temp_field, f_field, sizeof(temp_field));
+			memcpy(temp_dropBB,rootBB,sizeof(rootBB));
+			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
+			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
+				node cand = temp;
+				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
+					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
+					if (cand.prev + j != 3) {
+						int ny=cand.nowR + dy[j];
+						int nx=cand.nowC + dx[j];
+						F_T field[ROW][COL];//盤面
+						ll dropBB[DROP+1]={0};
+						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
+						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
+						F_T tmp=field[cand.nowR][cand.nowC];
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
+						int pre_drop=(int)tmp;
+						int pre_pos=po-((8*cand.nowC)+cand.nowR);
+						int next_drop=(int)field[ny][nx];
+						int next_pos=po-((8*nx)+ny);
+						dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
+						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
+						field[cand.nowR][cand.nowC]=field[ny][nx];
+						field[ny][nx]=tmp;
+						cand.nowC += dx[j];
+						cand.nowR += dy[j];
+						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
+						//st = omp_get_wtime();
+						sc cmb;
+						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						cand.combo = cmb;
+						//part1 += omp_get_wtime() - st;
+						cand.prev = j;
+						//st = omp_get_wtime();
+						//#pragma omp critical
+											//{ pque.push(cand); }
+						fff[(4 * k) + j] = cand;
+						//part4 += omp_get_wtime() - st;
+					}
+					else {
+						cand.combo = -1;
+						fff[(4 * k) + j] = cand;
+					}
+				}
+				else {
+					cand.combo = -1;
+					fff[(4 * k) + j] = cand;
+				}
+			}
+		}
+		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
-		sort(n_states.begin(),n_states.end());
+		dque.clear();
+		deque<int>vec[5001];
+		int ks2 = 0;
+		for (int j = 0; j < 4 * ks; j++) {
+			if (fff[j].combo != -1) {
+			if (fff[j].combo >= stop) {
+				maxValue = fff[j].combo;
+				bestAction.score = maxValue;
+				bestAction.first_te = fff[j].first_te;
+				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				part2+=omp_get_wtime() - start;
+				return bestAction;
+			}
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			fff[j].prev_score=fff[j].score;
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
+			ks2++;
+			}
+		}
 		part2+=omp_get_wtime() - start;
+		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
-		for (int j = 0; push_node < BEAM_WIDTH ;j++) {//3
-			if(j>=(int)n_states.size()){break;}
-			node temp = n_states[j];
+		int possible_score=5000;
+		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
+			node temp = fff[v];
+			//swap(vec[possible_score][0], vec[possible_score].back());
+			//vec[possible_score].pop_back();
+			vec[possible_score].pop_front();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				if(maxValue>=stop){return bestAction;}
 			}
-			if (i < MAX_TRN - 1) {//2
+			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
-			if(!checkNodeList[pos][temp.hash]){//1
+			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
+				dque.push_back(temp);
 				push_node++;
-				}//1
-			}//2
-		}//3
+				}
+			}
+		}
 		part3 += omp_get_wtime() - start;
 	}
 	return bestAction;
@@ -562,55 +641,6 @@ void fall(int x,int h,F_T field[ROW][COL]) {
 			}
 		}
 }
-void dfs(F_T field[ROW][COL],node n,int depth,emilib::HashMap<ll, bool> (*c)[ROW*COL],emilib::HashMap<ll, bool> (*v)[ROW*COL],vector<node>& n_states,int p_maxcombo[DROP+1],int dpath){
-  
-  
-    if(depth==0){
-    sc comboo;
-    ll ha;
-    F_T f_field[ROW][COL];
-    memcpy(f_field,field,sizeof(f_field));
-    n.score = -evaluate2(f_field,EVAL_FALL | EVAL_COMBO,&comboo,&ha,p_maxcombo);
-    n.combo = comboo;
-    n.hash = ha;
-    n_states.emplace_back(n);
-    return;
-    }
-  
-    int dx[DIR] = { -1, 0,0,1 };
-    int dy[DIR] = { 0,-1,1,0 };
-	
-    (*v)[(n.nowR*COL)+n.nowC][n.hash]=true;	
- 
-    for(int dir=0;dir<DIR;dir++){
-    int pos=(n.nowR*COL)+n.nowC;
-    int x=pos%COL;
-    int y=pos/COL;
-    int nx=x+dx[dir];
-    int ny=y+dy[dir];
-    node n2=n;
-    if(0<=nx&&nx<COL&&0<=ny&&ny<ROW){
-    n2.nowR=ny;
-    n2.nowC=nx;
-    F_T tmp=field[y][x];
-    n2.hash^=(zoblish_field[y][x][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
-    n2.hash^=(zoblish_field[y][x][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
-    swap(field[y][x],field[ny][nx]);
-    n2.movei[dpath/21] |= (((ll)(dir+1))<<((3*dpath)%63));
-	    
-    bool letsgo=false;
-
-    if(((*c)[(ny*COL)+nx][n2.hash])&&((*v)[(ny*COL)+nx][n2.hash])==false){letsgo=true;}	    
-    if(depth==1){letsgo=true;}
-	    
-    if(letsgo){	    
-    dfs(field,n2,depth-1,c,v,n_states,p_maxcombo,dpath+1);
-    }
-    swap(field[y][x],field[ny][nx]);
-    }
-    }
-
-}
 void init(F_T field[ROW][COL]) { set(field, !0); }
 void set(F_T field[ROW][COL], int force) {
 	for (int i = 0; i < ROW; i++) {
@@ -791,6 +821,16 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
+		
+		for(int col=0;col<COL;col++){
+		int y_bonus[DROP+1]={0};
+		for(int row=0;row<ROW;row++){
+		y_bonus[field[row][col]]++;
+		}
+		for(int i=1;i<=DROP;i++){
+		if(y_bonus[i]>=3){cmb2+=10;}
+		}
+		}
 
 		*combo += cmb;
 		ev += cmb2;
@@ -906,6 +946,14 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
 		cmb2+=same_num[i];
 		}
+		}
+		}
+		
+		for(int col=0;col<COL;col++){
+		ll bp=file_bb[col];
+		for(int i=1;i<=DROP;i++){
+		int yb=__builtin_popcountll(bp&dropBB[i]);
+		if(yb>=3){cmb2+=10;}
 		}
 		}
 
