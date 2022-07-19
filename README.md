@@ -2,7 +2,32 @@
 [![windows-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml)
 [![macos-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml)
 
-# Contact https://twitter.com/tekitouk
+# コンタクト https://twitter.com/tekitouk
+
+# 懸賞問題
+
+  手数を小さく出来た方には、1個につきitunesカードもしくはgoogle playカード1万円分差し上げます。
+
+	layout=367254402726710107527213362754
+	:手数=52,10combo
+	layout=047631151072370164261053045210
+	:手数=50,10combo
+	layout=242242100331023100110324132543
+	:手数=26,9combo
+	layout=201053210251533425501353123221
+	:手数=26,9combo
+	layout=015315151020442313510540210411
+	:手数=27,9combo
+	layout=432015152244350331552132312515
+	:手数=31,9combo
+	layout=323243441332042002331313014300
+	:手数=19,8combo
+	layout=225530333313140355004550251403
+	:手数=24,9combo
+	layout=224234425402054400304510125043
+	:手数=30,8combo
+	layout=053241405407470557104053134522
+	:手数=41,10combo
 
 # Puzzle & Dragons Solver
 
