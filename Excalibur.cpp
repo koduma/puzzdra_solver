@@ -124,16 +124,16 @@ int MSB64bit(ll v) {
 }
 
 struct node {//どういう手かの構造体
-	T_T first_te;
 	ll movei[(TRN/21)+1];//スワイプ移動座標
+	ll hash;//盤面のハッシュ値
 	int score;//評価値
+	int prev_score;//1手前の評価値
+	T_T first_te;
+	uc improving;//評価値改善回数
 	sc combo;//コンボ数
 	sc nowC;//今どのx座標にいるか
 	sc nowR;//今どのy座標にいるか
 	sc prev;//1手前は上下左右のどっちを選んだか
-	int prev_score;//1手前の評価値
-	uc improving;//評価値改善回数
-	ll hash;//盤面のハッシュ値
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
@@ -815,6 +815,16 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 
+		for(int col=0;col<COL;col++){
+		int y_bonus[DROP+1]={0};
+		for(int row=0;row<ROW;row++){
+		y_bonus[field[row][col]]++;
+		}
+		for(int i=1;i<=DROP;i++){
+		if(y_bonus[i]>=3){cmb2+=20;}
+		}
+		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -929,6 +939,14 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
 		cmb2+=same_num[i];
 		}
+		}
+		}
+
+		for(int col=0;col<COL;col++){
+		ll bp=file_bb[col];
+		for(int i=1;i<=DROP;i++){
+		int yb=__builtin_popcountll(bp&dropBB[i]);
+		if(yb>=3){cmb2+=20;}
 		}
 		}
 
