@@ -320,7 +320,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						memcpy(g_board,temp_board,sizeof(temp_board));//盤面をもどす
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
 						F_T tmp=g_board[(cand.nowR*COL)+cand.nowC];
-            cand.hash^=(zoblish_field[(int)cand.nowR][(int)cand.nowC][(int)tmp])^(zoblish_field[ny][nx][(int)g_board[(ny*COL)+nx]]);
+						cand.hash^=(zoblish_field[(int)cand.nowR][(int)cand.nowC][(int)tmp])^(zoblish_field[ny][nx][(int)g_board[(ny*COL)+nx]]);
 						cand.hash^=(zoblish_field[(int)cand.nowR][(int)cand.nowC][(int)g_board[(ny*COL)+nx]])^(zoblish_field[ny][nx][(int)tmp]);
 						int pre_drop=(int)tmp;
 						int pre_pos=po-((8*cand.nowC)+cand.nowR);
