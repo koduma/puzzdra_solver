@@ -289,12 +289,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	rootBB[(int)f_field[row][col]]|=(1ll << (pos));
 	}
 	}
-    
-    F_T board[ROW*COL];
-  
-    for(int i=0;i<ROW*COL;i++){
-    board[i]=f_field[i/COL][i%COL];
-    }
+	
+	F_T board[ROW*COL];
+	
+	for(int i=0;i<ROW*COL;i++){
+	board[i]=f_field[i/COL][i%COL];
+	}
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
