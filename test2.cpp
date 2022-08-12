@@ -333,12 +333,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						for(int j0=0;j0<=3;j0++){
-						for(int j1=j0+1;j1<=4;j1++){
-						for(int j2=j1+1;j2<=5;j2++){
+						for(int jx=0;jx<=3;jx++){
+						for(int jy=jx+1;jy<=4;jy++){
+						for(int jz=jy+1;jz<=5;jz++){
 						for(int ii=0;ii<10;ii++){
-						if(field[pattern[ii][j0]/COL][pattern[ii][j0]%COL]==field[pattern[ii][j1]/COL][pattern[ii][j1]%COL]&&
-						field[pattern[ii][j1]/COL][pattern[ii][j1]%COL]==field[pattern[ii][j2]/COL][pattern[ii][j2]%COL])
+						if(field[pattern[ii][jx]/COL][pattern[ii][jx]%COL]==field[pattern[ii][jy]/COL][pattern[ii][jy]%COL]&&
+						field[pattern[ii][jy]/COL][pattern[ii][jy]%COL]==field[pattern[ii][jz]/COL][pattern[ii][jz]%COL])
 						{cand.score+=ADDING;}
 						}
 						}
