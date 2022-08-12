@@ -332,6 +332,15 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						if(field[0][0]==field[2][2]&&field[0][0]==field[4][4]){cand.score+=ADDING;}
+						if(field[19/COL][19%COL]==field[28/COL][28%COL]&&field[19/COL][19%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
+						if(field[9/COL][9%COL]==field[25/COL][25%COL]&&field[9/COL][9%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
+						if(field[9/COL][9%COL]==field[19/COL][19%COL]&&field[9/COL][9%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
+						if(field[12/COL][12%COL]==field[18/COL][18%COL]&&field[12/COL][12%COL]==field[20/COL][20%COL]){cand.score+=ADDING;}
+						if(field[8/COL][8%COL]==field[17/COL][17%COL]&&field[8/COL][8%COL]==field[20/COL][20%COL]){cand.score+=ADDING;}
+						if(field[2/COL][2%COL]==field[5/COL][5%COL]&&field[2/COL][2%COL]==field[23/COL][23%COL]){cand.score+=ADDING;}
+						if(field[8/COL][8%COL]==field[9/COL][9%COL]&&field[8/COL][8%COL]==field[25/COL][25%COL]){cand.score+=ADDING;}
+						if(field[11/COL][11%COL]==field[13/COL][13%COL]&&field[11/COL][11%COL]==field[26/COL][26%COL]){cand.score+=ADDING;}
+						if(field[7/COL][7%COL]==field[12/COL][12%COL]&&field[7/COL][7%COL]==field[16/COL][16%COL]){cand.score+=ADDING;}
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
