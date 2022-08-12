@@ -333,7 +333,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						int ok=0;
 						for(int j1=0;j1<=3;j1++){
 						for(int j2=j1+1;j2<=4;j2++){
 						for(int j3=j2+1;j3<=5;j3++){
