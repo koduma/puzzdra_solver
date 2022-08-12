@@ -83,7 +83,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define ADDING 2
+#define ADDING 20
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -333,23 +333,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						for(int ii=0;ii<465;ii++){
-						if(field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][1]/COL][pattern[ii][1]%COL]&&
-						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]&&
-						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
-						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
-						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
-						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]&&
-						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
-						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
-						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
-						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
-						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
-						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
-						field[pattern[ii][3]/COL][pattern[ii][3]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
-						field[pattern[ii][3]/COL][pattern[ii][3]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
-						field[pattern[ii][4]/COL][pattern[ii][4]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL])
+						int ok=0;
+						for(int j1=0;j1<=3;j1++){
+						for(int j2=j1+1;j2<=4;j2++){
+						for(int j3=j2+1;j3<=5;j3++){
+						for(int ii=0;ii<10;ii++){
+						if(field[pattern[ii][j1]/COL][pattern[ii][j1]%COL]==field[pattern[ii][j2]/COL][pattern[ii][j2]%COL]&&
+						field[pattern[ii][j2]/COL][pattern[ii][j2]%COL]==field[pattern[ii][j3]/COL][pattern[ii][j3]%COL])
 						{cand.score+=ADDING;}
+						}
+						}
+						}
 						}
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
