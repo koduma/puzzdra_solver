@@ -1136,9 +1136,10 @@ int main() {
 	int a,b,c;
 	int size=0;
 	while(fscanf(fp, "%d %d %d", &a, &b, &c) != EOF) {
-	pattern[i][0]=a;
-	pattern[i][1]=b;
-	pattern[i][2]=c;
+	pattern[size][0]=a;
+	pattern[size][1]=b;
+	pattern[size][2]=c;
+	size++;
 	}
 	fclose(fp);
 	
