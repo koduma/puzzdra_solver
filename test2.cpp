@@ -118,7 +118,7 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-int pattern[447][3];
+int pattern[465][6];
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -333,9 +333,23 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						for(int ii=0;ii<447;ii++){
+						for(int ii=0;ii<465;ii++){
 						if(field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][1]/COL][pattern[ii][1]%COL]&&
-						   field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]){cand.score+=ADDING;}
+						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]&&
+						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
+						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
+						field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
+						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]&&
+						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
+						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
+						field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
+						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][3]/COL][pattern[ii][3]%COL]&&
+						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
+						field[pattern[ii][2]/COL][pattern[ii][2]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
+						field[pattern[ii][3]/COL][pattern[ii][3]%COL]==field[pattern[ii][4]/COL][pattern[ii][4]%COL]&&
+						field[pattern[ii][3]/COL][pattern[ii][3]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL]&&
+						field[pattern[ii][4]/COL][pattern[ii][4]%COL]==field[pattern[ii][5]/COL][pattern[ii][5]%COL])
+						{cand.score+=ADDING;}
 						}
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
@@ -1133,12 +1147,15 @@ int main() {
 	
 	FILE *fp;
 	fp = fopen("pattern.txt","r");
-	int a,b,c;
+	int a[6];
 	int size=0;
-	while(fscanf(fp, "%d %d %d", &a, &b, &c) != EOF) {
-	pattern[size][0]=a;
-	pattern[size][1]=b;
-	pattern[size][2]=c;
+	while(fscanf(fp, "%d %d %d %d %d %d", &a[0], &a[1], &a[2],&a[3],&a[4],&a[5]) != EOF) {
+	pattern[size][0]=a[0];
+	pattern[size][1]=a[1];
+	pattern[size][2]=a[2];
+	pattern[size][3]=a[3];
+	pattern[size][4]=a[4];
+	pattern[size][5]=a[5];	
 	size++;
 	}
 	fclose(fp);
