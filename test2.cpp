@@ -83,6 +83,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
+#define ADDING 10
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -99,7 +100,7 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL], F_T chkflag[ROW][COL], F
 int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
-void operation(F_T board[ROW*COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
+void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
 
 int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
@@ -213,7 +214,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
 			if (1 <= f_field[row][col] && f_field[row][col] <= DROP) {
-				drop[(int)f_field[row][col]]++;
+				drop[f_field[row][col]]++;
 			}
 		}
 	}
@@ -223,7 +224,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	MAXCOMBO += (double)stop;
 
 	vector<node>dque;
-	double start;
+	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
 
@@ -286,14 +287,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	for(int row=0;row<ROW;row++){
 	for(int col=0;col<COL;col++){
 	int pos=po-((8*col)+row);
-	rootBB[(int)f_field[row][col]]|=(1ll << (pos));
+	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
-	}
-	
-	F_T board[ROW*COL];
-	
-	for(int i=0;i<ROW*COL;i++){
-	board[i]=f_field[i/COL][i%COL];
 	}
 
 	//2手目以降をビームサーチで探索
@@ -303,11 +298,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 #pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
 			node temp = dque[k];//que.front(); que.pop();
-			F_T temp_board[ROW*COL];
+			F_T temp_field[ROW][COL];
 			ll temp_dropBB[DROP+1]={0};
-			memcpy(temp_board, board, sizeof(temp_board));
+			memcpy(temp_field, f_field, sizeof(temp_field));
 			memcpy(temp_dropBB,rootBB,sizeof(rootBB));
-			operation(temp_board, temp.first_te,temp.movei,temp_dropBB);
+			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
 				node cand = temp;
 				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
@@ -315,27 +310,28 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 					if (cand.prev + j != 3) {
 						int ny=cand.nowR + dy[j];
 						int nx=cand.nowC + dx[j];
-						F_T g_board[ROW*COL];//盤面
+						F_T field[ROW][COL];//盤面
 						ll dropBB[DROP+1]={0};
-						memcpy(g_board,temp_board,sizeof(temp_board));//盤面をもどす
+						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
-						F_T tmp=g_board[(cand.nowR*COL)+cand.nowC];
-						cand.hash^=(zoblish_field[(int)cand.nowR][(int)cand.nowC][(int)tmp])^(zoblish_field[ny][nx][(int)g_board[(ny*COL)+nx]]);
-						cand.hash^=(zoblish_field[(int)cand.nowR][(int)cand.nowC][(int)g_board[(ny*COL)+nx]])^(zoblish_field[ny][nx][(int)tmp]);
+						F_T tmp=field[cand.nowR][cand.nowC];
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
 						int pre_drop=(int)tmp;
 						int pre_pos=po-((8*cand.nowC)+cand.nowR);
-						int next_drop=(int)g_board[(ny*COL)+nx];
+						int next_drop=(int)field[ny][nx];
 						int next_pos=po-((8*nx)+ny);
 						dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
-						g_board[(cand.nowR*COL)+cand.nowC]=g_board[(ny*COL)+nx];
-						g_board[(ny*COL)+nx]=tmp;
+						field[cand.nowR][cand.nowC]=field[ny][nx];
+						field[ny][nx]=tmp;
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						if(field[0][0]==field[2][2]&&field[0][0]==field[4][4]){cand.score+=ADDING;}
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -445,7 +441,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
 			if (1 <= field[row][col] && field[row][col] <= DROP) {
-				drop[(int)field[row][col]]++;
+				drop[field[row][col]]++;
 			}
 		}
 	}
@@ -777,6 +773,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
+		
 
 		F_T erase_x[COL]={0};
 
@@ -811,7 +808,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
 		for(int row=0;row<ROW;row++){
-		same_num[(int)field[row][col]]++;
+		same_num[field[row][col]]++;
 		}
 		}
 		for(int i=1;i<=DROP;i++){
@@ -824,7 +821,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
 		for(int row=0;row<ROW;row++){
-		y_bonus[(int)field[row][col]]++;
+		y_bonus[field[row][col]]++;
 		}
 		for(int i=1;i<=DROP;i++){
 		if(y_bonus[i]>=3){cmb2+=20;}
@@ -985,7 +982,7 @@ int sum_evaluate(F_T field[ROW][COL]) {//落としも落ちコンも有りコン
 	return evaluate(field, EVAL_FS | EVAL_COMBO);
 }
 //移動した後の盤面を生成する関数
-void operation(F_T board[ROW*COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]) {
+void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]) {
 	int prw = (int)YY(first_te), pcl = (int)XX(first_te), i,j;
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
@@ -998,15 +995,15 @@ void operation(F_T board[ROW*COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[D
 		if(dir==0){break;}
 		int row=prw+dy[dir-1];
 		int col=pcl+dx[dir-1];
-		int pre_drop=(int)board[(prw*COL)+pcl];
+		int pre_drop=(int)field[prw][pcl];
 		int pre_pos=po-((8*pcl)+prw);
-		int next_drop=(int)board[(row*COL)+col];
+		int next_drop=(int)field[row][col];
 		int next_pos=po-((8*col)+row);
 		dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 		dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
-		F_T c = board[(prw*COL)+pcl];
-		board[(prw*COL)+pcl] = board[(row*COL)+col];
-		board[(row*COL)+col] = c;
+		F_T c = field[prw][pcl];
+		field[prw][pcl] = field[row][col];
+		field[row][col] = c;
 		prw = row, pcl = col;
 		}//j
 	}//i
@@ -1125,13 +1122,13 @@ int main() {
 	string date="";
 	string url="";
 
-	//double avg = 0;//平均コンボ数
+	double avg = 0;//平均コンボ数
 	double t_sum = 0;
-	//double oti_avg = 0;//平均落ちコンボ数
+	double oti_avg = 0;//平均落ちコンボ数
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
-		//F_T field[ROW][COL]; //盤面
-		//F_T oti_field[ROW][COL];//落ちコン用盤面
+		F_T field[ROW][COL]; //盤面
+		F_T oti_field[ROW][COL];//落ちコン用盤面
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
@@ -1176,7 +1173,7 @@ int main() {
 		for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
 		if (1 <= f_field[row][col] && f_field[row][col] <= DROP) {
-		drop[(int)f_field[row][col]]++;
+		drop[f_field[row][col]]++;
 		}
 		}
 		}
