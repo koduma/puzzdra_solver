@@ -83,7 +83,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define ADDING 10
+#define ADDING 2
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -117,6 +117,8 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
+
+int pattern[447][3];
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -331,16 +333,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						if(field[0][0]==field[2][2]&&field[0][0]==field[4][4]){cand.score+=ADDING;}
-						if(field[19/COL][19%COL]==field[28/COL][28%COL]&&field[19/COL][19%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
-						if(field[9/COL][9%COL]==field[25/COL][25%COL]&&field[9/COL][9%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
-						if(field[9/COL][9%COL]==field[19/COL][19%COL]&&field[9/COL][9%COL]==field[29/COL][29%COL]){cand.score+=ADDING;}
-						if(field[12/COL][12%COL]==field[18/COL][18%COL]&&field[12/COL][12%COL]==field[20/COL][20%COL]){cand.score+=ADDING;}
-						if(field[8/COL][8%COL]==field[17/COL][17%COL]&&field[8/COL][8%COL]==field[20/COL][20%COL]){cand.score+=ADDING;}
-						if(field[2/COL][2%COL]==field[5/COL][5%COL]&&field[2/COL][2%COL]==field[23/COL][23%COL]){cand.score+=ADDING;}
-						if(field[8/COL][8%COL]==field[9/COL][9%COL]&&field[8/COL][8%COL]==field[25/COL][25%COL]){cand.score+=ADDING;}
-						if(field[11/COL][11%COL]==field[13/COL][13%COL]&&field[11/COL][11%COL]==field[26/COL][26%COL]){cand.score+=ADDING;}
-						if(field[7/COL][7%COL]==field[12/COL][12%COL]&&field[7/COL][7%COL]==field[16/COL][16%COL]){cand.score+=ADDING;}
+						for(int ii=0;ii<447;ii++){
+						if(field[pattern[ii][0]/COL][pattern[ii][0]%COL]==field[pattern[ii][1]/COL][pattern[ii][1]%COL]&&
+						   field[pattern[ii][1]/COL][pattern[ii][1]%COL]==field[pattern[ii][2]/COL][pattern[ii][2]%COL]){cand.score+=ADDING;}
+						}
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -1134,6 +1130,19 @@ int main() {
 	double avg = 0;//平均コンボ数
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
+	
+	FILE *fp;
+	fp = fopen("pattern.txt","r");
+	int a,b,c;
+	int size=0;
+	while(fscanf(fp, "%d %d %d", &a, &b, &c) != EOF) {
+	pattern[i][0]=a;
+	pattern[i][1]=b;
+	pattern[i][2]=c;
+	}
+	fclose(fp);
+	
+	
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
