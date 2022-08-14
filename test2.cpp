@@ -852,8 +852,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 
 	for(int i=1;i<=DROP;i++){
 	occBB|=dropBB[i];
-  if(dropBB[i]==131072ll){ev+=6;}
-  if(dropBB[i]==33554432ll){ev+=11;}  
+	if(dropBB[i]==131072ll){ev+=6;}
+	if(dropBB[i]==33554432ll){ev+=11;}  
 	}
 
 	int po=9+(8*(COL-1))+ROW-1;
