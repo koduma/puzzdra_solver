@@ -106,7 +106,7 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
-int read_file_mode=0;
+int read_file_mode;
 
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
@@ -1210,6 +1210,7 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
+		read_file_mode=0;
 		string suru;
 		printf("readfile?(y/n)=");
 		cin>>suru;
