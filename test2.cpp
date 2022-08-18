@@ -493,7 +493,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int cnt=0;
 
 	while(1){
-	if((int)pus.size()==0){break;}
+	if(pus.empty()){break;}
 	node2 cand=pus.top();
 	pus.pop();
 	if(cnt<BEAM_WIDTH2){
