@@ -77,8 +77,8 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 3//MAX30
+#define BEAM_WIDTH 10//MAX2800000
+#define BEAM_WIDTH2 100//MAX1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -156,6 +156,7 @@ struct node2 {
 	ll hash;
 	string true_path;
 	int true_path_length;
+	int score;
 
 	void calc_path(){
 
@@ -188,12 +189,17 @@ struct node2 {
 	}
 	}
 	}
+	
+	bool operator < (const node2& n)const {//スコアが高い方が優先される
+		return score < n.score;
+	}
 
 }ff[DIR*BEAM_WIDTH2];
 
 struct Action {//最終的に探索された手
 	T_T first_te;
-	int score;//コンボ数
+	sc combo;
+	int score;
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
 	Action() {//初期化
@@ -276,7 +282,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
-	int maxValue = 0;//最高スコア
+	int maxValue = -99999;//最高スコア
 
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
@@ -359,8 +365,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
-				maxValue = fff[j].combo;
-				bestAction.score = maxValue;
+				bestAction.combo = fff[j].combo;
+				bestAction.score = fff[j].score;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				part2+=omp_get_wtime() - start;
@@ -388,10 +394,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			//swap(vec[possible_score][0], vec[possible_score].back());
 			//vec[possible_score].pop_back();
 			vec[possible_score].pop_front();
-			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
-				maxValue = temp.combo;
+			if (maxValue < temp.score) {//コンボ数が増えたらその手を記憶する
+				maxValue = temp.score;
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
+				bestAction.combo = temp.combo;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 			}
 			if (i < MAX_TRN - 1) {
@@ -453,7 +460,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	vector<node2>dque;
 
-	deque<node2>pus[TRN+1];
+	priority_queue<node2>pus;
 
 	double avg=0;
 
@@ -462,8 +469,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
-	if(i==0&&j==0){stop=0;}
-	stop=max(stop,tmp.score);
 	node2 cand;
 	F_T f_field[ROW][COL];
 	memcpy(cand.field,field,sizeof(f_field));
@@ -477,45 +482,25 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	if(stop!=tmp.score){cand.path_length=TRN;}
-	pus[cand.path_length].push_front(cand);
+	cand.score=tmp.score;
+	pus.push(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
-	cout<<"path_length="<<cand.path_length<<endl;
-	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
-	avg+=(double)cand.path_length;
-	path_length_array[i][j]=(double)cand.path_length;
+	cout<<"score="<<cand.score<<endl;
 	}
 	}
-	double delta_t = omp_get_wtime()-start;
-
-	double variance=0;
-
-	avg/=(double)(ROW*COL);
-
-	for (int i = 0; i < ROW; i++) {
-	for (int j = 0; j < COL; j++) {
-	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
-	}
-	}
-
-	if(variance<0.0001){printf("\ndifficulty=INF\n");}
-	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
 
 	printf("\n-----search_start_2/2-----\n");
 	int cnt=0;
 
-	for(int i=0;i<TRN;i++){
-	if((int)pus[i].size()==0){continue;}
 	while(1){
-	if((int)pus[i].size()==0){break;}
-	node2 cand=pus[i][0];
-	pus[i].pop_front();
+	if((int)pus.size()==0){break;}
+	node2 cand=pus.top();
+	pus.pop();
 	if(cnt<BEAM_WIDTH2){
 	dque.push_back(cand);
 	cnt++;
 	}
 	else{break;}
-	}
 	}
 
 	int dx[DIR] = { -1, 0,0,1 };
@@ -552,6 +537,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
 	}
+	cand.score = tmp.score;
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
@@ -571,29 +557,22 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
-	deque<int>vec[1001];
+	priority_queue<pair<int,int> >vec;
 	for(int j=0;j<4*ks;j++){
 	if(ff[j].path_length!=-1){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
 	if(combo>=stop){return ff[j].true_path;}
-	vec[ff[j].path_length].push_front(j);
+	vec.push(make_pair(ff[j].score,j));
 	}
 	}
 	int push_node=0;
-	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
-	if(possible_score>1000){break;}
-	if((int)vec[possible_score].size()==0){
-	possible_score++;
-	continue;
-	}
-	int v=vec[possible_score][0];
+	if(vec.empty()){break;}
+	int v=vec.top().second;
+	vec.pop();
 	node2 temp = ff[v];
-	//swap(vec[possible_score][0], vec[possible_score].back());
-	//vec[possible_score].pop_back();
-	vec[possible_score].pop_front();
 	F_T f_field[ROW][COL];
 	memcpy(f_field,temp.field,sizeof(f_field));
 	int combo = sum_e(f_field);
@@ -851,9 +830,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	ll occBB=0;
 
 	for(int i=1;i<=DROP;i++){
-	occBB|=dropBB[i];
-	if(dropBB[i]==131072ll){ev+=6;}
-	if(dropBB[i]==33554432ll){ev+=11;}  
+	occBB|=dropBB[i]; 
 	}
 
 	int po=9+(8*(COL-1))+ROW-1;
