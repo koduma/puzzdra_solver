@@ -562,11 +562,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	double variance=0;
 
 	avg/=(double)(ROW*COL);
+	
+	if(read_file_mode==0){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	//variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
+	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
+	}
+	
 	}
 
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
