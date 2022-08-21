@@ -860,14 +860,14 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	int po=9+(8*(COL-1))+ROW-1;
 
 	int d_maxcombo[DROP+1]={0};
-  
-  for(int i=0;i<702;i++){
-  for(int d=1;d<=DROP;d++){
-  if(__builtin_popcountll(pattern[i]&dropBB[d])>=3){
-  ev+=ADD[i];
-  }
-  }
-  }
+	
+	for(int i=0;i<702;i++){
+		for(int d=1;d<=DROP;d++){
+			if(__builtin_popcountll(pattern[i]&dropBB[d])>=3){
+				ev+=ADD[i];
+			}
+		}
+	}
 
 	while (1) {
 		int cmb = 0;
@@ -975,6 +975,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
+	
+	if(ev>=4000){ev=4000;}
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
