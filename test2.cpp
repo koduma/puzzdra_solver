@@ -439,14 +439,29 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(depth==DEPTH){
 		
 	printf("\n-----search_start_1/2-----\n");
+		
+	Action tmp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
+	
+	stop=tmp.score;
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	Action tmp=BEAM_SEARCH(0,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
+	F_T g_field[ROW][COL];
+	memcpy(customer.field,f_field,sizeof(g_field));
+	customer.first_te=(T_T)YX(i,j);
+	for (int trn = 0; trn <= TRN/21; trn++) {
+	customer.movei[trn] = 0ll;
+	}
+	customer.calc_path();
+	customer.pos = (i*COL)+j;
+	customer.prev = -1;
+	customer.calc_hash();
+	customer.true_path=to_string(j)+to_string(i+5)+",";
+	customer.true_path_length=0;
+	tmp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	node2 cand;
-	F_T g_field[ROW][COL];
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -554,8 +569,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-
+	if(depth==DEPTH){
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
+	}
 	dque.clear();
 	deque<int>vec[1001];
 	for(int j=0;j<4*ks;j++){
