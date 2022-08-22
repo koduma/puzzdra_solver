@@ -440,9 +440,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	printf("\n-----search_start_1/2-----\n");
 		
-	Action tmp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
 	
-	stop=tmp.score;
+	stop=tmpp.score;
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -458,12 +458,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.calc_hash();
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
-	tmp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
-	cand.first_te = tmp.first_te;
+	cand.first_te = tmpp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
-	cand.movei[trn] = tmp.moving[trn];
+	cand.movei[trn] = tmpp.moving[trn];
 	}
 	cand.calc_path();
 	cand.pos = (i*COL)+j;
@@ -471,11 +471,11 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	if(stop!=tmp.score){cand.path_length=TRN;}
+	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
-	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
+	cout<<"combo="<<tmpp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
 	}
