@@ -459,8 +459,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
 	tmp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
-	if(i==0&&j==0){stop=0;}
-	stop=max(stop,tmp.score);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmp.first_te;
