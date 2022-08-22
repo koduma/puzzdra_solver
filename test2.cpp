@@ -1131,11 +1131,11 @@ int main() {
 		printf("\n");
 		show_field(f_field);//盤面表示
 		printf("\n");
-    //Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop);
+		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
-    node2 cutomer;
-		Action act=BEAM_SEARCH(1,f_field,0,TRN,-1,-1,0,customer);
-    bestans=act.path;
+		node2 cutomer;
+		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer);
+		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
 		double diff = omp_get_wtime() - start;
