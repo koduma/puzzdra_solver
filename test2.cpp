@@ -428,8 +428,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 
 	double start = omp_get_wtime();
 
-	printf("\n-----search_start_1/2-----\n");
-
 	vector<node2>dque;
 
 	deque<node2>pus[TRN+1];
@@ -439,6 +437,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	double path_length_array[ROW][COL];
 	  
 	if(depth==DEPTH){
+		
+	printf("\n-----search_start_1/2-----\n");
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
