@@ -578,6 +578,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if(combo>=stop){
+		bestAction.score = combo;
+		bestAction.first_te = ff[depth-1][j].first_te;
+		ll movei[(TRN/21)+1];
+		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 		bestAction.path=ff[depth-1][j].true_path;
 		return bestAction;
 	}
@@ -602,6 +606,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int combo = sum_e(g_field);
 	if (maxValue < combo) {//コンボ数が増えたらその手を記憶する
 	maxValue = combo;
+	bestAction.score = combo;
+	bestAction.first_te = temp.first_te;
+	ll movei[(TRN/21)+1];
+	memcpy(bestAction.moving, temp.movei, sizeof(movei));
 	bestAction.path=temp.true_path;
 	}
 	if (i < MAX_TRN - 1) {
