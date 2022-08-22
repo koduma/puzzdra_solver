@@ -197,7 +197,7 @@ struct Action {//最終的に探索された手
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
-  string path;
+	string path;
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
