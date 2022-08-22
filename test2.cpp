@@ -413,7 +413,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
     
   }
   else{
-  stop=0;
+	stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -437,8 +437,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	double avg=0;
 
 	double path_length_array[ROW][COL];
-    
-  if(depth==DEPTH){
+	  
+	if(depth==DEPTH){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -499,11 +499,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{break;}
 	}
 	}
-    
-  }
-  else{
-  dque.push_back(customer);
-  }
+	}
+	else{
+	dque.push_back(customer);
+	}
 
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
@@ -534,7 +533,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-  memcpy(cand.field,g_field,sizeof(g_field));
+	memcpy(cand.field,g_field,sizeof(g_field));
 	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -565,9 +564,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if(combo>=stop){
-    bestAction.path=ff[depth-1][j].true_path;
-    return bestAction;
-  }
+		bestAction.path=ff[depth-1][j].true_path;
+		return bestAction;
+	}
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
