@@ -556,6 +556,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	cand.calc_path();
 	cand.calc_hash();
+	if(depth==DEPTH){
+	int output;
+	if(tmp.path[3]==','){output=(int)tmp.path.length()-4;}
+	else if(tmp.path[2]==','){output=(int)tmp.path.length()-3;}
+	cout<<"tesuu="<<output<<endl;
+	cout<<tmp.path<<endl;
+	}
 	if(depth==1){
 	cand.path_length+=i+1;
 	}
