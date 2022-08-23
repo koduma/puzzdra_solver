@@ -557,8 +557,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_path();
 	cand.calc_hash();
 	if(depth==1){
-	if(tmp.path[3]==','){cand.path_length+=(int)tmp.path.length()-4;}
-	else if(tmp.path[2]==','){cand.path_length+=(int)tmp.path.length()-3;}
+	cand.path_length+=i+1;
 	}
 	else{
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
