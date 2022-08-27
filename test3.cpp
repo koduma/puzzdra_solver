@@ -856,15 +856,15 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	int po=9+(8*(COL-1))+ROW-1;
 
 	int d_maxcombo[DROP+1]={0};
-  
-  for(int i=1;i<=DROP;i++){
-  if(__builtin_popcountll(dropBB[i]&11294372655666688ll)>=3){ev+=11;}
-  if(__builtin_popcountll(dropBB[i]&11821983417238528ll)>=3){ev+=16;}
-  if(__builtin_popcountll(dropBB[i]&16888551049267200ll)>=3){ev+=8;}
-  if(__builtin_popcountll(dropBB[i]&571781282141184ll)>=3){ev+=1;}
-  if(__builtin_popcountll(dropBB[i]&2282638622469632ll)>=3){ev+=16;}
-  if(__builtin_popcountll(dropBB[i]&15762685201744896ll)>=3){ev+=13;}  
-  }
+	
+	for(int i=1;i<=DROP;i++){
+	if(__builtin_popcountll(dropBB[i]&11294372655666688ll)>=3){ev+=11;}
+	if(__builtin_popcountll(dropBB[i]&11821983417238528ll)>=3){ev+=16;}
+	if(__builtin_popcountll(dropBB[i]&16888551049267200ll)>=3){ev+=8;}
+	if(__builtin_popcountll(dropBB[i]&571781282141184ll)>=3){ev+=1;}
+	if(__builtin_popcountll(dropBB[i]&2282638622469632ll)>=3){ev+=16;}
+	if(__builtin_popcountll(dropBB[i]&15762685201744896ll)>=3){ev+=13;}  
+	}
 
 	while (1) {
 		int cmb = 0;
