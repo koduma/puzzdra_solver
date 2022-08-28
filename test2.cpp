@@ -203,6 +203,25 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
+
+string actiontoS(Action act){
+
+	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
+
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (act.moving[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(act.moving[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { path+=to_string(3); } //"LEFT"); }
+	if (dir==2) { path+=to_string(6); } //"UP"); }
+	if (dir==3) { path+=to_string(1); } //"DOWN"); }
+	if (dir==4) { path+=to_string(4); } //"RIGHT"); }
+	}
+	}
+	return path;
+}
+
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer) {
@@ -367,6 +386,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				bestAction.path=actiontoS(bestAction);
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -397,6 +417,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
+				bestAction.path=actiontoS(bestAction);
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
