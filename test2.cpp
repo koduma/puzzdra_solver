@@ -524,10 +524,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int maxValue = 0;
 
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
-  
-  emilib::HashMap<ll, bool> visited[ROW*COL];
-  
-  emilib::HashMap<ll, Action> actor[ROW*COL];
+	emilib::HashMap<ll, bool> visited[ROW*COL];
+	emilib::HashMap<ll, Action> actor[ROW*COL];
 
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
@@ -552,20 +550,20 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	Action tmp;
-  ll hash=0ll;
-  for(int r=0;r<ROW;r++){
-  for(int c=0;c<COL;c++){
-  hash^=zoblish_field[r][c][(int)f_field[r][c]];
-  }
-  }
-  if(visited[cand.pos][hash]){
-  tmp=actor[cand.pos][hash];
-  }
-  else{  
-  tmp=BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
-  visited[cand.pos][hash]=true;
-  actor[cand.pos][hash]=tmp;
-  }
+	ll hash=0ll;
+	for(int r=0;r<ROW;r++){
+	for(int c=0;c<COL;c++){
+	hash^=zoblish_field[r][c][(int)f_field[r][c]];
+	}
+	}
+	if(visited[cand.pos][hash]){
+	tmp=actor[cand.pos][hash];
+	}
+	else{  
+	tmp=BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
+	visited[cand.pos][hash]=true;
+	actor[cand.pos][hash]=tmp;
+	}
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
