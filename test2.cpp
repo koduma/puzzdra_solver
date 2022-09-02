@@ -799,6 +799,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		
+		cmb2*=4;
+		
 		for(int s=0;s<=COL-3;s+=COL-3){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -812,8 +814,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
-
-		cmb2*=4;
 
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
@@ -926,6 +926,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB^=linked[i];
 		}
 		
+		cmb2*=4;
+		
 		for(int s=0;s<=COL-3;s+=COL-3){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
@@ -939,8 +941,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
-		cmb2*=4;
 
 		for(int col=0;col<COL;col++){
 		ll bp=file_bb[col];
