@@ -949,17 +949,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-    
-    ll pat[7]={563053301735424ll,19808658259968ll,1715324208690176ll,4563042280149504ll,6230073703801344ll,11879381559550464ll,15830872101624832ll};
-    int pat_score[7]={18,6,6,9,4,3,9};
-    
-    for(int d=1;d<=DROP;d++){
-    for(int p=0;p<7;p++){
-    if(__builtin_popcountll(pat[p]&dropBB[d])>=3){
-    cmb2+=pat_score[p];
-    }
-    }
-    }
+		
+		ll pat[7]={563053301735424ll,19808658259968ll,1715324208690176ll,4563042280149504ll,6230073703801344ll,11879381559550464ll,15830872101624832ll};
+		int pat_score[7]={18,6,6,9,4,3,9};
+		
+		for(int d=1;d<=DROP;d++){
+		for(int p=0;p<7;p++){
+		if(__builtin_popcountll(pat[p]&dropBB[d])>=3){
+		cmb2+=pat_score[p];
+		}
+		}
+		}
 
 		*combo += cmb;
 		ev += cmb2;
