@@ -950,17 +950,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-    
-    ll pat[9]={2256387577625088ll,10163988600592896ll,14698400325705216ll,9045872222208ll,1688858454003712ll,3975852066080256ll,13528545955546112ll,14093807208116224ll,14663302524180480ll};
-    int pat_score[9]={8,16,4,4,12,4,20,12,4};
-    
-    for(int i=1;i<=DROP;i++){
-    for(int p=0;p<9;p++){
-    if(__builtin_popcountll(dropBB[i]&pat[p])>=3){
-    cmb2+=flip*pat_score[p];
-    }
-    }
-    }
+		
+		ll pat[9]={2256387577625088ll,10163988600592896ll,14698400325705216ll,9045872222208ll,1688858454003712ll,3975852066080256ll,13528545955546112ll,14093807208116224ll,14663302524180480ll};
+		int pat_score[9]={8,16,4,4,12,4,20,12,4};
+		
+		for(int i=1;i<=DROP;i++){
+		for(int p=0;p<9;p++){
+		if(__builtin_popcountll(dropBB[i]&pat[p])>=3){
+		cmb2+=flip*pat_score[p];
+		}
+		}
+		}
 
 		*combo += cmb;
 		ev += cmb2;
@@ -1138,8 +1138,8 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
-    printf("flip(1/-1)?=");
-    cin>>flip;
+		printf("flip(1/-1)?=");
+		cin>>flip;
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
