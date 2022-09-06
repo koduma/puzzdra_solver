@@ -474,7 +474,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int beta=actor.calc_path();
 	
 	if(alpha<beta){flip=1;}
-	else{flip=-1;}
+	else if(alpha>beta){flip=-1;}
+	else{flip=0;}
 
 	double start = omp_get_wtime();
 
