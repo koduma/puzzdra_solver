@@ -201,6 +201,23 @@ struct Action {//最終的に探索された手
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
+	
+	int calc_path(){
+
+	int path_length=0;
+
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (moving[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(moving[i]>>(3*k)));
+	if (dir==0){break;}
+	path_length++;
+	}
+	}
+	
+	return path_length;
+	
+	}
 };
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
@@ -447,6 +464,17 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
 	}
+	
+	flip=1;
+	Action actor=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	int alpha=actor.calc_path();
+	
+	flip=-1;
+	actor=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	int beta=actor.calc_path();
+	
+	if(alpha<beta){flip=1;}
+	else{flip=-1;}
 
 	double start = omp_get_wtime();
 
@@ -1138,8 +1166,6 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
-		printf("flip(1/-1)?=");
-		cin>>flip;
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
