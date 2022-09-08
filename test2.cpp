@@ -365,8 +365,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-        visited[fff[j].hash]++;
-        cout<<"visited="<<(int)visited[fff[j].hash]<<endl;
+				visited[fff[j].hash]++;
+				cout<<"visited="<<(int)visited[fff[j].hash]<<endl;
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
