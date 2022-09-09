@@ -361,17 +361,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-      int pos=(fff[j].nowR*COL)+fff[j].nowC;
-      if(visited[pos][fff[j].hash].score>=stop){
-      part2+=omp_get_wtime() - start;
-      return visited[pos][fff[j].hash];
-      }
+			int pos=(fff[j].nowR*COL)+fff[j].nowC;
+			if(visited[pos][fff[j].hash].score>=stop){
+			part2+=omp_get_wtime() - start;
+			return visited[pos][fff[j].hash];
+			}
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-        visited[pos][fff[j].hash]=bestAction;
+				visited[pos][fff[j].hash]=bestAction;
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
