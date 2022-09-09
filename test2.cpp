@@ -362,17 +362,22 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			int pos=(fff[j].nowR*COL)+fff[j].nowC;
-			if(visited[pos][fff[j].hash].score>=stop){
-			cout<<"visited="<<visited[pos][fff[j].hash].score<<endl;
+			Action actor=visited[pos][fff[j].hash];
+			if(actor.score>=stop){
+			cout<<"visited="<<actor.score<<endl;
 			part2+=omp_get_wtime() - start;
-			return visited[pos][fff[j].hash];
+			return actor;
 			}
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				visited[pos][fff[j].hash]=bestAction;
+				for(int a=0;a<ROW*COL;a++){
+				for(auto itr = checkNodeList[a].begin(); itr != checkNodeList[a].end(); ++itr) {
+				visited[pos][itr->first]=bestAction;	
+				}
+				}
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
