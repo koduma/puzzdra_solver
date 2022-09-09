@@ -363,7 +363,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			if (fff[j].combo != -1) {
 			int pos=(fff[j].nowR*COL)+fff[j].nowC;
 			if(visited[pos][fff[j].hash].score>=stop){
-			cout<<"visited="<<visited[pos][fff[j].hash]<<endl;
+			cout<<"visited="<<visited[pos][fff[j].hash].score<<endl;
 			part2+=omp_get_wtime() - start;
 			return visited[pos][fff[j].hash];
 			}
