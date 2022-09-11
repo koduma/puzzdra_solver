@@ -196,15 +196,11 @@ struct Action {//最終的に探索された手
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
-  int path_length;
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-
-emilib::HashMap<ll, int> visited[ROW*COL];
-
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -281,7 +277,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
 	int maxValue = 0;//最高スコア
-  int ret=TRN;
 
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
@@ -334,7 +329,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						ll ha;
+						cand.score = evaluate2(field, EVAL_FALL | EVAL_COMBO, &cmb, &ha,p_maxcombo);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -363,28 +359,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
-			int pos=(fff[j].nowR*COL)+fff[j].nowC;
-			int v=visited[pos][fff[j].hash];
-      if(0<v&&v<TRN){ret=min(ret,v+i+1);}
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				for(int a=0;a<ROW*COL;a++){
-				for(auto itr = checkNodeList[a].begin(); itr != checkNodeList[a].end(); ++itr) {
-        if(visited[pos][itr->first]==0){visited[pos][itr->first]=i+1;}
-        else{
-				visited[pos][itr->first]=min(visited[pos][itr->first],i+1);
-        }
-				}
-				}
-        if(ret<i+1){
-        bestAction.path_length=ret;
-        }
-        else{
-        bestAction.path_length=i+1;
-        }
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -443,6 +422,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
+
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -498,7 +478,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-  cand.path_length=tmp.path_length;
 	if(stop!=tmp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -577,7 +556,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
-  cand.path_length=tmp.path_length;
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -765,9 +743,13 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
+		int up[DROP+1];
+		int down[DROP+1];
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
+		up[i]=ROW;
+		down[i]=-1;
 		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -813,12 +795,14 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
 					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
+					up[(int)field[row][col]]=min(up[(int)field[row][col]],row);
+					down[(int)field[row][col]]=max(down[(int)field[row][col]],row);
                                 }
 			}
 		}
 		for(int i=1;i<=DROP;i++){
 		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
-		cmb2-=right[i]-left[i];
+		cmb2-=right[i]-left[i]+down[i]-up[i];
 		}
 		}
 
@@ -838,15 +822,15 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 
-		for(int col=0;col<COL;col++){
-		int y_bonus[DROP+1]={0};
-		for(int row=0;row<ROW;row++){
-		y_bonus[field[row][col]]++;
-		}
-		for(int i=1;i<=DROP;i++){
-		if(y_bonus[i]>=3){cmb2+=20;}
-		}
-		}
+		//for(int col=0;col<COL;col++){
+		//int y_bonus[DROP+1]={0};
+		//for(int row=0;row<ROW;row++){
+		//y_bonus[field[row][col]]++;
+		//}
+		//for(int i=1;i<=DROP;i++){
+		//if(y_bonus[i]>=3){cmb2+=20;}
+		//}
+		//}
 
 		*combo += cmb;
 		ev += cmb2;
@@ -1064,6 +1048,7 @@ int main() {
 
 
 	/*
+
 	testcase
 	
 	layout=367254402726710107527213362754
@@ -1071,24 +1056,34 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
+
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
+
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
+
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
+
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
+
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
+
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
+
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
+
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
+
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
+
 	*/
 
 	int i, j, k;
