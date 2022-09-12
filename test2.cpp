@@ -118,7 +118,8 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-int maxScore=114514;
+int maxScore=-114514;
+int minScore=114514;
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -400,7 +401,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
-				printf("maxScore=%d\n",maxScore);
+				printf("maxScore=%d,minScore=%d\n",maxScore,minScore);
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
@@ -413,7 +414,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1500;
 			vec[sco].push_front(j);
 			ks2++;
-			if(maxScore>sco){maxScore=sco;}
+			if(maxScore<sco){maxScore=sco;}
+			if(minScore>sco){minScore=sco;}
 			}
 		}
 		part2+=omp_get_wtime() - start;
