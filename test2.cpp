@@ -847,6 +847,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 
 		cmb2*=alpha;
+		
+		/*
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -871,6 +873,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
+		
+		*/
 
 		*combo += cmb;
 		ev += cmb2;
@@ -973,6 +977,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 
 		cmb2*=alpha;
+		
+		/*
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -995,6 +1001,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
+		
+		*/
 
 		*combo += cmb;
 		ev += cmb2;
