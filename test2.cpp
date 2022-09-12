@@ -219,7 +219,7 @@ int adder(F_T field[ROW][COL]){
     for(int d=1;d<=DROP;d++){
     for(int c=0;c<COL;c++){       
     for(int pos=c+1;pos<COL;pos++){
-    int dx=max(c-pos,pos-c);
+    int dx=pos-c;
     int dd=x_cnt[d][pos];
     ret+=dx*dd*x_cnt[d][c];
     }
@@ -229,7 +229,7 @@ int adder(F_T field[ROW][COL]){
     for(int d=1;d<=DROP;d++){
     for(int r=0;r<ROW;r++){       
     for(int pos=r+1;pos<ROW;pos++){
-    int dy=max(r-pos,pos-r);
+    int dy=pos-r;
     int dd=y_cnt[d][pos];
     ret+=dy*dd*y_cnt[d][r];
     }
@@ -393,7 +393,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[5001];
+		deque<int>vec[10001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -415,7 +415,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
-		int possible_score=5000;
+		int possible_score=10000;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
@@ -840,8 +840,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 
 		cmb2*=alpha;
-    
-    /*
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -866,8 +864,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
-    
-    */
 
 		*combo += cmb;
 		ev += cmb2;
@@ -970,8 +966,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 
 		cmb2*=alpha;
-    
-    /*
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -994,7 +988,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-    */
 
 		*combo += cmb;
 		ev += cmb2;
