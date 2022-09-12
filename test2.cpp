@@ -369,8 +369,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						cand.score += adder(field);
+						ll ha;
+						cand.score = evaluate2(field,EVAL_FALL | EVAL_COMBO, &cmb,&ha,p_maxcombo);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -786,12 +786,16 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
+		int x_cnt[DROP+1][COL]={0};
+		int y_cnt[DROP+1][ROW]={0};
 		for(int i=0;i<=DROP;i++){
 		right[i]=-1;
 		left[i]=COL;
 		}
 		for (int row = 0; row < ROW; row++) {
-			for (int col = 0; col < COL; col++) {
+			for (int col = 0; col < COL; col++){
+				x_cnt[(int)field[row][col]][col]++;
+				y_cnt[(int)field[row][col]][row]++;
 				F_T num = field[row][col];
 				cnt_drop[(int)num]++;
 				if(row==0){
@@ -867,6 +871,26 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		for(int i=1;i<=DROP;i++){
 		if(y_bonus[i]>=3){cmb2+=20;}
+		}
+		}
+		
+		for(int d=1;d<=DROP;d++){
+		for(int c=0;c<COL;c++){
+		for(int pos=c+1;pos<COL;pos++){
+		int dx=pos-c;
+		int dd=x_cnt[d][pos];
+		cmb2+=dx*dd*x_cnt[d][c];
+		}
+		}
+		}
+		
+		for(int d=1;d<=DROP;d++){
+		for(int r=0;r<ROW;r++){
+		for(int pos=r+1;pos<ROW;pos++){
+		int dy=pos-r;
+		int dd=y_cnt[d][pos];
+		cmb2+=dy*dd*y_cnt[d][r];
+		}
 		}
 		}
 
