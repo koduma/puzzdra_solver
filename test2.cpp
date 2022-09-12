@@ -118,7 +118,7 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-int maxScore=0;
+int maxScore=114514;
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -370,7 +370,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						cand.score += adder(field)/2;
+						cand.score -= adder(field);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -395,7 +395,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[10001];
+		deque<int>vec[5001];
 		int ks2 = 0;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
@@ -410,17 +410,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500;
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1500;
 			vec[sco].push_front(j);
 			ks2++;
-			if(maxScore<sco){maxScore=sco;}
+			if(maxScore>sco){maxScore=sco;}
 			}
 		}
 		part2+=omp_get_wtime() - start;
 		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
-		int possible_score=10000;
+		int possible_score=5000;
 		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
