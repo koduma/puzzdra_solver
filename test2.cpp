@@ -118,6 +118,8 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
+int maxScore=0;
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -398,6 +400,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
+				printf("maxScore=%d\n",maxScore);
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
@@ -407,8 +410,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500;
+			vec[sco].push_front(j);
 			ks2++;
+			if(maxScore<sco){maxScore=sco;}
 			}
 		}
 		part2+=omp_get_wtime() - start;
