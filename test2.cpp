@@ -368,7 +368,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-            cand.score += adder(field);
+						cand.score += adder(field);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -833,15 +833,11 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 			}
 		}
     
-    /*
-    
 		for(int i=1;i<=DROP;i++){
 		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
 		cmb2-=right[i]-left[i];
 		}
 		}
-    
-    */
 
 		cmb2*=alpha;
     
@@ -942,9 +938,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-    
-    /*
-
 
 		for(int i=1;i<=DROP;i++){
 
@@ -970,7 +963,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
 		}
-    */
 
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
