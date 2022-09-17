@@ -90,7 +90,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define DEPTH 2
+#define DEPTH 1
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
