@@ -628,8 +628,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		ll movei[(TRN/21)+1];
 		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 		bestAction.path=ff[depth-1][j].true_path;
-		cout<<"nest="<<depth<<endl;
-		cout<<"length="<<((int)bestAction.path.length()-3)<<endl;
 		return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
