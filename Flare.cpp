@@ -628,6 +628,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
+	if(depth==DEPTH&&push_node==0){
+	printf("predict=%d\n",possible_score);
+	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
 	//swap(vec[possible_score][0], vec[possible_score].back());
@@ -646,9 +649,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
-	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score);
-	}
 	checkNodeList[temp.pos][temp.hash]=true;
 	dque.push_back(temp);
 	push_node++;
