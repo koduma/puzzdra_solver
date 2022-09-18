@@ -587,13 +587,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_hash();
 	if(depth==DEPTH){
 	int output;
-	if(tmp.path[3]==','){output=(int)tmp.path.length()-4+i+1;}
-	else if(tmp.path[2]==','){output=(int)tmp.path.length()-3+i+1;}
+	if(tmp.path[3]==','){output=(int)tmp.path.length()-4;}
+	else if(tmp.path[2]==','){output=(int)tmp.path.length()-3;}
 	cout<<"tesuu="<<output<<endl;
-	//cout<<tmp.path<<endl;
+	cout<<tmp.path<<endl;
 	}
-	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4+i+1;}
-	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3+i+1;}
+	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
+	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -636,6 +636,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
+	if(depth==DEPTH&&push_node==0){
+	printf("predict=%d\n",possible_score);
+	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
 	//swap(vec[possible_score][0], vec[possible_score].back());
@@ -654,9 +657,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
-	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score);
-	}
 	checkNodeList[temp.pos][temp.hash]=true;
 	dque.push_back(temp);
 	push_node++;
