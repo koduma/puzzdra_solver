@@ -91,7 +91,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define DEPTH 
+#define DEPTH 1
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -659,7 +659,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
-  if(depth==DEPTH&&push_node==0){
+	if(depth==DEPTH&&push_node==0){
 	printf("predict=%d\n",possible_score);
 	}
 	checkNodeList[temp.pos][temp.hash]=true;
