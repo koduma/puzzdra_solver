@@ -629,7 +629,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	continue;
 	}
 	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score);
+	printf("predict=%d\n",possible_score+i+1);
 	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
