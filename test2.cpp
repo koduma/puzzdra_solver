@@ -446,6 +446,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 				bestAction.path=actiontoS(bestAction);
+				bestAction.path_length=i+1;
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
