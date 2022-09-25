@@ -395,7 +395,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			if (fff[j].combo != -1) {
 			int pos=(fff[j].nowR*COL)+fff[j].nowC;
 			int v=visited[pos][fff[j].hash];
-			if(0<v&&v<TRN){ret=min(ret,v);}
+			if(0<v&&v<TRN){ret=min(ret,v+i+1);}
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
 				bestAction.score = maxValue;
