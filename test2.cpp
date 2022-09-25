@@ -208,7 +208,6 @@ struct Action {//最終的に探索された手
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
 	string path;
-	int path_length;
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
@@ -314,8 +313,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
-	  
-	int ret=TRN;
 
 	ll rootBB[DROP+1]={0};
 
@@ -325,6 +322,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
 	}
+	  
+	int ret=TRN;
 
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
@@ -409,12 +408,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 					else{visited[pos][itr->first]=min(visited[pos][itr->first],i+1);}
 				}
 				}
+				int pl;
 				if(ret<i+1){
-				bestAction.path_length=ret;
+				pl=ret;
 				}
 				else{
-				bestAction.path_length=i+1;
+				pl=i+1;
 				}
+				string str="33,";
+				for(int a=0;a<pl;a++){str+='3';}
+				bestAction.path=str;
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -446,7 +449,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 				bestAction.path=actiontoS(bestAction);
-				bestAction.path_length=i+1;
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
@@ -521,7 +523,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	cand.path_length=tmpp.path_length;
+	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
+	else{cand.path_length=(int)tmpp.path.length()-3;}
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -606,10 +609,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_path();
 	cand.calc_hash();
 	if(depth==DEPTH){
-	cout<<"tesuu="<<tmp.path_length<<endl;
+	int output;
+	if(tmp.path[3]==','){output=(int)tmp.path.length()-4;}
+	else if(tmp.path[2]==','){output=(int)tmp.path.length()-3;}
+	cout<<"tesuu="<<output<<endl;
 	cout<<tmp.path<<endl;
 	}
-	cand.path_length=tmp.path_length;
+	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
+	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -639,7 +646,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		ll movei[(TRN/21)+1];
 		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 		bestAction.path=ff[depth-1][j].true_path;
-		bestAction.path_length=i+1;
 		return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
@@ -671,7 +677,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ll movei[(TRN/21)+1];
 	memcpy(bestAction.moving, temp.movei, sizeof(movei));
 	bestAction.path=temp.true_path;
-	bestAction.path_length=i+1;
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
