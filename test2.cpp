@@ -684,22 +684,21 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 int chain2(ll* visited,ll board,int y,int x,int po){
     
     int count=0;
-#define CHK_CF(Y,X) (((*visited>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
-    if (CHK_CF(y, x)) {
+#define CHK(Y,X) (((*visited>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
+    if (CHK(y, x)) {
     ++count;
-    *visited|=1ll<<(po-((8*(x))+y));
-        
-    if (0 < y && CHK_CF(y - 1, x)) {
-	count += dfs(visited,board,y-1,x,po);
+    *visited|=1ll<<(po-((8*(x))+y));        
+    if (0 < y && CHK(y - 1, x)) {
+	count += chain2(visited,board,y-1,x,po);
     }
-    if (y < ROW - 1 && CHK_CF(y + 1, x)) {
-	count += dfs(visited,board,y+1,x,po);
+    if (y < ROW - 1 && CHK(y + 1, x)) {
+	count += chain2(visited,board,y+1,x,po);
     }
-    if (0 < x && CHK_CF(y, x - 1)) {
-	count += dfs(visited,board,y,x-1,po);
+    if (0 < x && CHK(y, x - 1)) {
+	count += chain2(visited,board,y,x-1,po);
     }
-    if (x < COL - 1 && CHK_CF(y, x + 1)) {
-	count += dfs(visited,board,y,x+1,po);
+    if (x < COL - 1 && CHK(y, x + 1)) {
+	count += chain2(visited,board,y,x+1,po);
     }
     }
 	return count;
