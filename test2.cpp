@@ -91,6 +91,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
+#define PENALTY 30
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -124,14 +125,13 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
+int chain2(ll* visited,ll board,int y,int x,int po);
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
 }
-
-emilib::HashMap<ll, int> visited[ROW*COL];
 
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
@@ -378,10 +378,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-      int pos=(fff[j].nowR*COL)+fff[j].nowC;
-      int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500-(visited[pos][fff[j].hash])*10;
-      if(sco>5000){sco=5000;}
-      if(sco<0){sco=0;}
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1500;
+			if(sco<0){sco=0;cout<<"akan1"<<endl;}
+			if(sco>5000){sco=5000;cout<<"akan2"<<endl;}
 			vec[sco].push_front(j);
 			ks2++;
 			}
@@ -412,7 +411,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
-        visited[pos][temp.hash]++;
 				dque.push_back(temp);
 				push_node++;
 				}
@@ -436,6 +434,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
+
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -680,6 +679,29 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 			count += chain(nrw, ncl + 1, d, field, chkflag, delflag);
 		}
 	}
+	return count;
+}
+int chain2(ll* visited,ll board,int y,int x,int po){
+    
+    int count=0;
+#define CHK_CF(Y,X) (((*visited>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
+    if (CHK_CF(y, x)) {
+    ++count;
+    *visited|=1ll<<(po-((8*(x))+y));
+        
+    if (0 < y && CHK_CF(y - 1, x)) {
+	count += dfs(visited,board,y-1,x,po);
+    }
+    if (y < ROW - 1 && CHK_CF(y + 1, x)) {
+	count += dfs(visited,board,y+1,x,po);
+    }
+    if (0 < x && CHK_CF(y, x - 1)) {
+	count += dfs(visited,board,y,x-1,po);
+    }
+    if (x < COL - 1 && CHK_CF(y, x + 1)) {
+	count += dfs(visited,board,y,x+1,po);
+    }
+    }
 	return count;
 }
 int evaluate(F_T field[ROW][COL], int flag) {
@@ -978,6 +1000,29 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
+	
+	int penalty=0;
+	
+	ll board=0ll;
+	
+	for(int i=1;i<=DROP;i++){
+	board=board|dropBB[i];
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*PENALTY;
+	}
+	
+	ll v=0ll;
+	
+	int alone=0;
+	
+	for(int y=0;y<ROW;y++){
+	for(int x=0;x<COL;x++){
+	int connect=chain2(&v,board,y,x,po);
+	if(connect>0){alone++;}
+	}
+	}
+	
+	ev-=penalty*alone;
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -1055,6 +1100,7 @@ int main() {
 
 
 	/*
+
 	testcase
 	
 	layout=367254402726710107527213362754
@@ -1062,24 +1108,34 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
+
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
+
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
+
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
+
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
+
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
+
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
+
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
+
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
+
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
+
 	*/
 
 	int i, j, k;
