@@ -393,7 +393,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1500].push_front(j);
 			ks2++;
 			}
 		}
