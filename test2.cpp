@@ -87,7 +87,7 @@ using namespace std;
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
 #define BEAM_WIDTH2 3//MAX30
-#define PROBLEM 1//問題数
+#define PROBLEM 10//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
