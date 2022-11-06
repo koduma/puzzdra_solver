@@ -203,6 +203,31 @@ struct Action {//最終的に探索された手
 	}
 };
 
+int adder(F_T field[ROW][COL]){
+  
+    int x_cnt[DROP+1][COL]={0};
+    
+    for(int r=0;r<ROW;r++){
+    for(int c=0;c<COL;c++){
+        x_cnt[(int)field[r][c]][c]++;
+    }
+    }
+    
+    int ret=0;
+     
+    for(int d=1;d<=DROP;d++){
+    for(int c=0;c<COL;c++){       
+    for(int pos=c+1;pos<COL;pos++){
+    int dx=pos-c;
+    int dd=x_cnt[d][pos];
+    ret+=dx*dd*x_cnt[d][c];
+    }
+    }
+    }
+
+    return ret;
+}
+
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -332,6 +357,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						cand.score -= adder(field);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -370,7 +396,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
 			ks2++;
 			}
 		}
@@ -411,6 +437,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
+
+	int ALPHA=1;
 
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -539,6 +567,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pus[nnn.path_length].push_front(nnn);
 	if(i==0){
 	printf("path_length=%d\n",nnn.path_length);
+    ALPHA+=nnn.path_length;
 	}
 	}
 
@@ -672,6 +701,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
+	}
+    if(push_node==0){
+	printf("predict=%d\n",i+ALPHA+possible_score);
 	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
