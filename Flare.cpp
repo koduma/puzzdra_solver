@@ -27,7 +27,7 @@ vi Flare.cpp
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
-MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
 
 //run
 ./Flare
