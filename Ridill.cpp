@@ -27,7 +27,7 @@ vi Ridill.cpp
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large
-MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -ldl
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -ldl
 
 //run
 ./Ridill
