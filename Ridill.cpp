@@ -567,7 +567,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pus[nnn.path_length].push_front(nnn);
 	if(i==0){
 	printf("path_length=%d\n",nnn.path_length);
-    ALPHA+=nnn.path_length;
+	ALPHA+=nnn.path_length;
 	}
 	}
 
@@ -702,7 +702,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	possible_score++;
 	continue;
 	}
-    if(push_node==0){
+	if(push_node==0){
 	printf("predict=%d\n",i+ALPHA+possible_score);
 	}
 	int v=vec[possible_score][0];
