@@ -35,7 +35,7 @@ vi test2.cpp
 
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large
-MacOS:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -ldl
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -ldl
 
 //run
 
@@ -211,6 +211,31 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
+
+int adder(F_T field[ROW][COL]){
+  
+    int x_cnt[DROP+1][COL]={0};
+    
+    for(int r=0;r<ROW;r++){
+    for(int c=0;c<COL;c++){
+        x_cnt[(int)field[r][c]][c]++;
+    }
+    }
+    
+    int ret=0;
+     
+    for(int d=1;d<=DROP;d++){
+    for(int c=0;c<COL;c++){       
+    for(int pos=c+1;pos<COL;pos++){
+    int dx=pos-c;
+    int dd=x_cnt[d][pos];
+    ret+=dx*dd*x_cnt[d][c];
+    }
+    }
+    }
+
+    return ret;
+}
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -340,6 +365,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						cand.score -= adder(field);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -378,10 +404,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1500;
-			if(sco<0){sco=0;cout<<"akan1"<<endl;}
-			if(sco>5000){sco=5000;cout<<"akan2"<<endl;}
-			vec[sco].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
 			ks2++;
 			}
 		}
@@ -434,7 +457,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
 	ll hash;//盤面のハッシュ値
-
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -1021,7 +1043,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 	
 	ev-=penalty*alone;
-	
+    
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -1099,7 +1121,6 @@ int main() {
 
 
 	/*
-
 	testcase
 	
 	layout=367254402726710107527213362754
