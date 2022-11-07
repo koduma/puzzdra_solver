@@ -38,6 +38,7 @@ MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excal
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
 #pragma GCC target ("sse4.2")
+#pragma GCC optimize("unroll-loops")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
