@@ -39,6 +39,7 @@ MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ld
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
 #pragma GCC target ("sse4.2")
+#pragma GCC optimize("unroll-loops")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
