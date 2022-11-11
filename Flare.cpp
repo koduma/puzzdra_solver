@@ -364,6 +364,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	string path;
 	*/
 	if((int)cmb>=stop){
+	printf("atta\n");
 	Action acept;
 	acept.first_te=ca.first_te;
 	acept.score=stop;
