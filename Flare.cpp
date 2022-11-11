@@ -525,6 +525,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
 	
 	stop=tmpp.score;
+		
+	int best=TRN;	
+		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	F_T g_field[ROW][COL];
@@ -555,7 +558,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash));
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
+	//cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
+	int ccc=cand.calc_pl(cand.hash);
+	if(best>ccc){
+	cand.path_length=ccc;
+	best=ccc;
+	}
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
