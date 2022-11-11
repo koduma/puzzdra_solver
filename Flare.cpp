@@ -1,39 +1,28 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
-
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Flare.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
-
 //run
 ./Flare
-
 //input
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -102,13 +91,10 @@ int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
-
 int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
-
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
-
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
@@ -118,60 +104,11 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-
-emilib::HashMap<ll, ll> visited;
-
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
 }
-
-struct hash_chain{
-	
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	vector<ll>hashchain;
-	
-	ll check_hash(F_T board[ROW][COL]){
-
-	ll hash=0ll;
-
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = board[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
-	}
-	}
-		
-	return hash;
-		
-	}
-
-	
-	void calc_hashchain(){
-		
-	int pos=XX(first_te)+YY(first_te)*COL;
-		
-	hashchain.push_back(check_hash(field));
-	
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (movei[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(movei[i]>>(3*k)));
-	if (dir==0){break;}
-	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
-	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL;  } //"UP"); }
-	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL;  } //"DOWN"); }
-	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(field));
-	}
-	}
-		
-	}
-};
-
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -192,9 +129,7 @@ struct node {//どういう手かの構造体
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
-
 struct node2 {
-
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -205,13 +140,9 @@ struct node2 {
 	ll hash;
 	string true_path;
 	int true_path_length;
-
 	void calc_path(){
-
 	path_length=0;
-
 	path=to_string(XX(first_te))+to_string(YY(first_te)+5)+",";
-
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
 	for(int k=0;k<21;k++){
@@ -225,25 +156,8 @@ struct node2 {
 	}
 	}
 	}
-	
-	int calc_pl(ll ha){
-	ll cur=ha;
-	int pl=0;
-	bool eof;
-	while(1){
-	if(visited[cur]==(ll)0){eof=false;break;}
-	if(visited[cur]==(ll)1){eof=true;break;}	
-	cur=visited[cur];
-	pl++;
-	}
-	if(!eof){pl=TRN;}
-	return pl;	
-	}
-
 	void calc_hash(){
-
 	hash=0ll;
-
 	for (int row = 0; row < ROW; row++) {
 	for (int col = 0; col < COL; col++) {
 	F_T num = field[row][col];
@@ -251,9 +165,7 @@ struct node2 {
 	}
 	}
 	}
-
 }ff[DEPTH][DIR*BEAM_WIDTH2];
-
 struct Action {//最終的に探索された手
 	T_T first_te;
 	int score;//コンボ数
@@ -265,11 +177,8 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-
 string actiontoS(Action act){
-
 	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
-
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (act.moving[i] == 0ll) { break; }
 	for(int k=0;k<21;k++){
@@ -283,17 +192,13 @@ string actiontoS(Action act){
 	}
 	return path;
 }
-
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer) {
   
   if(depth==0){
-
 	int po=9+(8*(COL-1))+ROW-1;
-
 	int p_maxcombo[DROP+1] = {0};
-
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -306,12 +211,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		p_maxcombo[i]=drop[i]/3;
 	}
 	MAXCOMBO += (double)stop;
-
 	vector<node>dque;
 	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
-
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -355,45 +258,21 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
-	/*	
-	struct Action {//最終的に探索された手
-	T_T first_te;
-	int score;//コンボ数
-	int maxcombo;//理論コンボ数
-	ll moving[(TRN/21)+1];//スワイプ移動座標
-	string path;
-	*/
-	if((int)cmb>=stop){
-	Action acept;
-	acept.first_te=ca.first_te;
-	acept.score=stop;
-	acept.maxcombo=stop;
-	for (int trn = 0; trn <= TRN/21; trn++) {
-	acept.moving[trn] = 0ll;
-	}
-	acept.path=to_string(XX(acept.first_te))+to_string(YY(acept.first_te)+5)+",";
-	return acept;
-	}
 	dque.push_back(ca);
 	}
-
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
 	int maxValue = 0;//最高スコア
-
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
-
 	ll rootBB[DROP+1]={0};
-
 	for(int row=0;row<ROW;row++){
 	for(int col=0;col<COL;col++){
 	int pos=po-((8*col)+row);
 	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
 	}
-
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
@@ -468,29 +347,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				bestAction.path=actiontoS(bestAction);
-				hash_chain hc;
-				F_T abc[ROW][COL];
-				memcpy(hc.field,f_field,sizeof(abc));
-				hc.first_te=fff[j].first_te;
-				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
-				hc.calc_hashchain();
-				ll cur=hc.hashchain[0];
-				int pl=1;
-				bool eof;
-				while(1){
-				if(visited[cur]==(ll)0){eof=false;break;}
-				if(visited[cur]==(ll)1){eof=true;break;}	
-				cur=visited[cur];
-				pl++;
-				}				
-				if(pl>(int)hc.hashchain.size()||(!eof)){
-				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
-				cur=hc.hashchain[r];
-				ll nexthash=hc.hashchain[r+1];
-				visited[cur]=nexthash;
-				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
-				}
-				}
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -550,15 +406,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
 	}
-
 	double start = omp_get_wtime();
-
 	vector<node2>dque;
-
 	deque<node2>pus[TRN+1];
-
 	double avg=0;
-
 	double path_length_array[ROW][COL];
 	  
 	if(depth==DEPTH){
@@ -568,7 +419,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
 	
 	stop=tmpp.score;
-
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	F_T g_field[ROW][COL];
@@ -596,12 +446,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	/*	
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
-	*/
-	printf("Beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash));
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -613,23 +459,17 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
       
 	double delta_t = omp_get_wtime()-start;
-
 	double variance=0;
-
 	avg/=(double)(ROW*COL);
-
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
 	}
-
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
-
 	printf("\n-----search_start_2/2-----\n");
 	int cnt=0;
-
 	for(int i=0;i<TRN;i++){
 	if((int)pus[i].size()==0){continue;}
 	while(1){
@@ -647,18 +487,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{
 	dque.push_back(customer);
 	}
-
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;
 	int maxValue = 0;
-
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
-
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
 	for (int k = 0; k < ks; k++) {
-
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
 	node2 cand = temp;
@@ -685,10 +521,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	cand.calc_path();
 	cand.calc_hash();
-	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
-	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
-	/*	
 	if(depth==DEPTH){
 	int output;
 	if(tmp.path[3]==','){output=(int)tmp.path.length()-4;}
@@ -698,7 +530,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	*/
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -769,7 +600,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}
 	}//for(int i=0;
-
 	return bestAction;
   
   }
@@ -831,7 +661,6 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 }
 int evaluate(F_T field[ROW][COL], int flag) {
 	int combo = 0;
-
 	while (1) {
 		int cmb = 0;
 		F_T chkflag[ROW][COL]={0};
@@ -876,14 +705,12 @@ int evaluate(F_T field[ROW][COL], int flag) {
 				if (delflag[row][col]> 0) { field[row][col] = 0; }
 			}
 		}
-
 		if (flag & EVAL_FALL){
 		for(int x=0;x<COL;x++){
 		fall(x,GetHeight[x],field);
 		}
 		}//落下処理発生
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
-
 	}
 	return combo;
 }
@@ -893,7 +720,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
-
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -932,9 +758,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
-
 		F_T erase_x[COL]={0};
-
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (delflag[row][col]>0) {
@@ -959,9 +783,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-
 		cmb2*=4;
-
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -975,7 +797,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
-
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
 		for(int row=0;row<ROW;row++){
@@ -985,7 +806,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
-
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -999,7 +819,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
-
 	}
 	ev += oti;
 	*hash=ha;
@@ -1010,30 +829,20 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	*combo = 0;
 	int oti = 0;
 	ll occBB=0;
-
 	for(int i=1;i<=DROP;i++){
 	occBB|=dropBB[i];
 	}
-
 	int po=9+(8*(COL-1))+ROW-1;
-
 	int d_maxcombo[DROP+1]={0};
-
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
-
 		ll linked[DROP+1]={0};
-
 		for(int i=1;i<=DROP;i++){
-
 		ll vert = (dropBB[i]) & (dropBB[i] << 1) & (dropBB[i] << 2);
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
-
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
-
 		}
-
 		for(int i=1;i<=DROP;i++){
 		long long tmp_linked=(long long)linked[i];
 		while(1){
@@ -1055,20 +864,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
-
 		for(int i=1;i<=DROP;i++){
-
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
-
 		ll erased_dropBB=(dropBB[i])^(linked[i]);
-
 		if(erased_dropBB==0ll){continue;}
-
 		int c=__builtin_popcountll(erased_dropBB);
-
 		if(c<3){continue;}
-
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
 		ll exist=(ll)t;
@@ -1081,14 +882,11 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
 		}
-
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-
 		cmb2*=4;
-
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
@@ -1102,7 +900,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
 		for(int col=0;col<COL;col++){
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
@@ -1110,15 +907,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
-
 		ll mask=calc_mask(occBB);
-
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]=fallBB(dropBB[i],occBB,mask);
 		}
@@ -1181,15 +975,11 @@ ll xor128() {//xorshift整数乱数
 	return (rw = (rw ^ (rw >> 19)) ^ (rt ^ (rt >> 8)));
 }
 ll calc_mask(ll bitboard){
-
 ll ret=0;
-
 for(int i=0;i<COL;i++){
 ret|=fill_64[__builtin_popcountll((bitboard & file_bb[i]))] << (8*(COL-i));
 }
-
 return ret;
-
 }
 ll fallBB(ll p,ll rest, ll mask)
 {
@@ -1197,12 +987,8 @@ p = _pext_u64(p, rest);
 p = _pdep_u64(p, mask);
 return p;
 }
-
 int main() {
-
-
 	/*
-
 	testcase
 	
 	layout=367254402726710107527213362754
@@ -1210,36 +996,25 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
-
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
-
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
-
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
-
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
-
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
-
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
-
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
-
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
-
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
-
 	*/
-
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
@@ -1260,26 +1035,22 @@ int main() {
 	table[ ha >> 58 ] = i;
 	ha <<= 1;
 	}
-
 	ll res=2ll;
 	fill_64[1]=res;
 	for(i=2;i<64;i++){
 	fill_64[i]=res+(1ll<<i);
 	res=fill_64[i];
 	}
-
 	for(i=0;i<COL;i++){
 	for(j=0;j<ROW;j++){
 	file_bb[i] |= (1ll << (po-j));
 	}
 	po-=8;
 	}
-
 	string bestans="";
 	string layout="";
 	string date="";
 	string url="";
-
 	double avg = 0;//平均コンボ数
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
@@ -1313,16 +1084,13 @@ int main() {
 		int tgt=0;
 		string top="";
 		while(1){
-
 		if(bestans[tgt]==','){tgt++;break;}
 		top+=bestans[tgt];
 		tgt++;
-
 		}
 		int pos;
 		if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 		else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-
 		for(j=tgt;j<(int)bestans.size();j++){
 		if(bestans[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
 		if(bestans[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
@@ -1349,7 +1117,6 @@ int main() {
 		cout<<url<<endl;
 		printf("\ncompleted\n");
 		printf("\n}\n");
-
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
