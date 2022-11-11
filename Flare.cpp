@@ -151,7 +151,7 @@ struct hash_chain{
 		
 	int pos=XX(first_te)+YY(first_te)*COL;
 		
-	hashchain.push_back(check_hash(field^zoblish_field2[pos]));
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
 	
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
@@ -162,7 +162,7 @@ struct hash_chain{
 	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL;  } //"UP"); }
 	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL;  } //"DOWN"); }
 	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(field^zoblish_field2[pos]));
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
 	}
 	}
 		
