@@ -600,7 +600,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	*/
-	cand.path_length=cand.calc_pl(cand.hash);
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -684,7 +684,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	cand.calc_path();
 	cand.calc_hash();
-	cand.path_length=cand.calc_pl(cand.hash);
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
 	/*	
 	if(depth==DEPTH){
 	int output;
