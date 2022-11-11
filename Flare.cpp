@@ -116,6 +116,7 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
 emilib::HashMap<ll, ll> visited;
+ll zoblish_field2[ROW*COL];
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -150,7 +151,7 @@ struct hash_chain{
 		
 	int pos=XX(first_te)+YY(first_te)*COL;
 		
-	hashchain.push_back(check_hash(field));
+	hashchain.push_back(check_hash(field^zoblish_field2[pos]));
 	
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
@@ -161,7 +162,7 @@ struct hash_chain{
 	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL;  } //"UP"); }
 	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL;  } //"DOWN"); }
 	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(field));
+	hashchain.push_back(check_hash(field^zoblish_field2[pos]));
 	}
 	}
 		
@@ -526,8 +527,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	
 	stop=tmpp.score;
 		
-	int best=TRN;	
-		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	F_T g_field[ROW][COL];
@@ -558,12 +557,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash));
-	//cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
-	int ccc=cand.calc_pl(cand.hash);
-	if(best>ccc){
-	cand.path_length=ccc;
-	best=ccc;
-	}
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -1140,6 +1134,11 @@ int main() {
 	}
 	}
 	}
+	
+	for(i=0;i<ROW*COL;i++){
+	zoblish_field2[i]=xor128();
+	}
+	
 	int po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
