@@ -88,7 +88,7 @@ using namespace std;
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
 #define BEAM_WIDTH2 3//MAX30
-#define PROBLEM 10//問題数
+#define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -128,12 +128,49 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 int chain2(ll* visited,ll board,int y,int x,int po);
 
+
+emilib::HashMap<ll, ll> visited;	
+ll zoblish_field2[ROW*COL];
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
 }
 
+struct hash_chain{
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	vector<ll>hashchain;
+	ll check_hash(F_T board[ROW][COL]){
+	ll hash=0ll;
+	for (int row = 0; row < ROW; row++) {
+	for (int col = 0; col < COL; col++) {
+	F_T num = board[row][col];
+	hash ^= zoblish_field[row][col][(int)num];
+	}
+	}
+	return hash;
+	}
+	
+	void calc_hashchain(){
+	int pos=XX(first_te)+YY(first_te)*COL;
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (movei[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(movei[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
+	}
+	}
+	}
+};
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -198,6 +235,20 @@ struct node2 {
 	hash ^= zoblish_field[row][col][(int)num];
 	}
 	}
+	}
+	
+	int calc_pl(ll ha){
+	ll cur=ha;
+	int pl=0;
+	bool eof;
+	while(1){
+	if(visited[cur]==(ll)0){eof=false;break;}
+	if(visited[cur]==(ll)1){eof=true;break;}	
+	cur=visited[cur];
+	pl++;
+	}
+	if(!eof){pl=TRN;}
+	return pl;	
 	}
 
 }ff[DIR*BEAM_WIDTH2];
@@ -306,6 +357,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
+	if((int)cmb>=stop){
+	Action accept;
+	accept.first_te=ca.first_te;
+	accept.score=stop;
+	accept.maxcombo=stop;
+	for (int trn = 0; trn <= TRN/21; trn++) {
+	accept.moving[trn] = 0ll;
+	}
+	accept.path=to_string(XX(accept.first_te))+to_string(YY(accept.first_te)+5)+",";
+	return accept;
+	}
 	dque.push_back(ca);
 	}
 
@@ -400,6 +462,29 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				hash_chain hc;
+				F_T abc[ROW][COL];
+				memcpy(hc.field,f_field,sizeof(abc));
+				hc.first_te=fff[j].first_te;
+				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
+				hc.calc_hashchain();
+				ll cur=hc.hashchain[0];
+				int pl=1;
+				bool eof;
+				while(1){
+				if(visited[cur]==(ll)0){eof=false;break;}
+				if(visited[cur]==(ll)1){eof=true;break;}	
+				cur=visited[cur];
+				pl++;
+				}				
+				if(pl>(int)hc.hashchain.size()||(!eof)){
+				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
+				cur=hc.hashchain[r];
+				ll nexthash=hc.hashchain[r+1];
+				visited[cur]=nexthash;
+				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
+				}
+				}
 				part2+=omp_get_wtime() - start;
 				return bestAction;
 			}
@@ -513,6 +598,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -591,6 +677,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -1022,7 +1109,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
-	
+
 	int penalty=0;
 	
 	ll board=0ll;
@@ -1044,7 +1131,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 	
 	ev-=penalty*alone;
-    
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -1167,6 +1253,11 @@ int main() {
 	}
 	}
 	}
+	
+	for(i=0;i<ROW*COL;i++){
+	zoblish_field2[i]=xor128();
+	}
+	
 	int po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
