@@ -454,7 +454,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
-		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -485,9 +484,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
 				}
 				}
-				congrats=true;
-				//part2+=omp_get_wtime() - start;
-				//return bestAction;
+				part2+=omp_get_wtime() - start;
+				return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -496,7 +494,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
