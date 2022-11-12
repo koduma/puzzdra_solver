@@ -365,7 +365,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	accept.moving[trn] = 0ll;
 	}
-	accept.path=to_string(XX(accept.first_te))+to_string(YY(accept.first_te)+5)+",";
 	return accept;
 	}
 	dque.push_back(ca);
