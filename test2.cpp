@@ -126,7 +126,7 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-int chain2(ll* visited,ll board,int y,int x,int po);
+int chain2(ll* v,ll board,int y,int x,int po);
 
 
 emilib::HashMap<ll, ll> visited;	
@@ -791,24 +791,24 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 	}
 	return count;
 }
-int chain2(ll* visited,ll board,int y,int x,int po){
+int chain2(ll* v,ll board,int y,int x,int po){
     
     int count=0;
-#define CHK(Y,X) (((*visited>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
+#define CHK(Y,X) (((*v>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
     if (CHK(y, x)) {
     ++count;
-    *visited|=1ll<<(po-((8*(x))+y));        
+    *v|=1ll<<(po-((8*(x))+y));        
     if (0 < y && CHK(y - 1, x)) {
-	count += chain2(visited,board,y-1,x,po);
+	count += chain2(v,board,y-1,x,po);
     }
     if (y < ROW - 1 && CHK(y + 1, x)) {
-	count += chain2(visited,board,y+1,x,po);
+	count += chain2(v,board,y+1,x,po);
     }
     if (0 < x && CHK(y, x - 1)) {
-	count += chain2(visited,board,y,x-1,po);
+	count += chain2(v,board,y,x-1,po);
     }
     if (x < COL - 1 && CHK(y, x + 1)) {
-	count += chain2(visited,board,y,x+1,po);
+	count += chain2(v,board,y,x+1,po);
     }
     }
 	return count;
