@@ -1,37 +1,27 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
-
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Flare.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
-
 //run
 ./Flare
-
 //input
 */
 #pragma warning(disable:4710)
@@ -114,46 +104,32 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-
-multimap<ll, ll> visited;
+emilib::HashMap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
-
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
 }
-
-int dfs(ll cur,int depth){
-auto p = visited.equal_range(cur);
-int pl=TRN;
-for (auto it = p.first; it != p.second; ++it) {
-if((it->second)==(ll)1){pl=min(pl,depth);}
-else{pl=min(pl,dfs(it->second,depth+1));}
-}
-return pl;
-}
-
-ll check_hash(F_T board[ROW][COL]){
-
-ll hash=0ll;
-
-for (int row = 0; row < ROW; row++) {
-for (int col = 0; col < COL; col++) {
-F_T num = board[row][col];
-hash ^= zoblish_field[row][col][(int)num];
-}
-}
-return hash;		
-}
-
-
 struct hash_chain{
 	
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
 	vector<ll>hashchain;
+	
+	ll check_hash(F_T board[ROW][COL]){
+	ll hash=0ll;
+	for (int row = 0; row < ROW; row++) {
+	for (int col = 0; col < COL; col++) {
+	F_T num = board[row][col];
+	hash ^= zoblish_field[row][col][(int)num];
+	}
+	}
+		
+	return hash;
+		
+	}
 	
 	void calc_hashchain(){
 		
@@ -176,7 +152,6 @@ struct hash_chain{
 		
 	}
 };
-
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -225,10 +200,26 @@ struct node2 {
 	}
 	}
 	void calc_hash(){
-	hash=check_hash(field);
+	hash=0ll;
+	for (int row = 0; row < ROW; row++) {
+	for (int col = 0; col < COL; col++) {
+	F_T num = field[row][col];
+	hash ^= zoblish_field[row][col][(int)num];
 	}
-	int calc_pl(ll cur){
-	return dfs(cur,0);	
+	}
+	}
+	int calc_pl(ll ha){
+	ll cur=ha;
+	int pl=0;
+	bool eof;
+	while(1){
+	if(visited[cur]==(ll)0){eof=false;break;}
+	if(visited[cur]==(ll)1){eof=true;break;}	
+	cur=visited[cur];
+	pl++;
+	}
+	if(!eof){pl=TRN;}
+	return pl;	
 	}
 }ff[DEPTH][DIR*BEAM_WIDTH2];
 struct Action {//最終的に探索された手
@@ -257,9 +248,9 @@ string actiontoS(Action act){
 	}
 	return path;
 }
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]); //ルート探索関数
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]) {
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer) {
   
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
@@ -409,13 +400,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				}
 			}
 		}
-		printf("depth=%d/%d\n",i+1,MAX_TRN);
+		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
-		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -430,18 +420,25 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				hc.first_te=fff[j].first_te;
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
-				if((int)hc.hashchain.size()>0){
 				ll cur=hc.hashchain[0];
+				int pl=1;
+				bool eof;
+				while(1){
+				if(visited[cur]==(ll)0){eof=false;break;}
+				if(visited[cur]==(ll)1){eof=true;break;}	
+				cur=visited[cur];
+				pl++;
+				}				
+				if(pl>(int)hc.hashchain.size()||(!eof)){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
-				visited.emplace(cur,nexthash);
-				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+				visited[cur]=nexthash;
+				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
 				}
 				}
-				congrats=true;
-				//part2+=omp_get_wtime() - start;
-				//return bestAction;
+				part2+=omp_get_wtime() - start;
+				return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -450,7 +447,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){printf("logout\n");return bestAction;}//koko
+		if(i==MAX_TRN-1){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -509,7 +506,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	printf("\n-----search_start_1/2-----\n");
 		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
 	
 	stop=tmpp.score;
 		
@@ -527,7 +524,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.calc_hash();
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer,root_field);
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -543,6 +540,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
@@ -610,8 +608,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
-	if(depth==1){printf("login\n");}//koko
-	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand,root_field);
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -627,9 +624,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	if(depth==1){//koko
-	printf("ks=%d/%d,dir=%d/%d,beam=%d,visited=%d\n",k+1,ks,j+1,DIR,cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
-	}
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
@@ -644,61 +639,27 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	//if(depth==DEPTH){//koko
-	printf("i=%d/%d,depth=%d\n",i+1,MAX_TRN,depth);
-	//}
+	if(depth==DEPTH){
+	printf("depth=%d/%d\n",i+1,MAX_TRN);
+	}
 	dque.clear();
 	deque<int>vec[1001];
-	bool congrats=false;
 	for(int j=0;j<4*ks;j++){
 	if(ff[depth-1][j].path_length!=-1){
 	F_T g_field[ROW][COL];
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if(combo>=stop){
-	bestAction.score = combo;
-	bestAction.first_te = ff[depth-1][j].first_te;
-	ll movei[(TRN/21)+1];
-	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
-	bestAction.path=ff[depth-1][j].true_path;
-	memcpy(g_field,root_field,sizeof(g_field));
-	int tgt=0;
-	string tp="";
-	while(1){
-	if(bestAction.path[tgt]==','){tgt++;break;}
-	tp+=bestAction.path[tgt];
-	tgt++;
-	}
-	int point;
-	if((int)tp.size()==2){int x=tp[0]-'0';int y=(tp[1]-'0')-5;point=(y*COL)+x;}
-	else{int x=tp[0]-'0';int y=5;point=(y*COL)+x;}
-	vector<ll>hashchain;
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-	bool look=false;
-	for(int p2=0;p2<(int)bestAction.path.size();p2++){
-	if(bestAction.path[p2]==','){look=true;continue;}
-	if(!look){continue;}
-	if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
-	if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
-	if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
-	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-	}
-	if((int)hashchain.size()>0){
-        for(int p2=0;p2<(int)hashchain.size()-1;p2++){
-        ll cur=hashchain[p2];
-        ll nexthash=hashchain[p2+1];
-        visited.emplace(cur,nexthash);
-        if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
-        }
-	}
-	//return bestAction;
-	congrats=true;
+		bestAction.score = combo;
+		bestAction.first_te = ff[depth-1][j].first_te;
+		ll movei[(TRN/21)+1];
+		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
+		bestAction.path=ff[depth-1][j].true_path;
+		return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
-	if(congrats){return bestAction;}
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
@@ -708,6 +669,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	continue;
 	}
 	if(depth==DEPTH&&push_node==0){
+	printf("predict=%d\n",possible_score+i+1);
 	printf("predict=%d\n",possible_score);
 	}
 	int v=vec[possible_score][0];
@@ -1131,34 +1093,24 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
-	
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
-	
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
-	
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
-	
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
-	
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
-	
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
-	
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
-	
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
-	
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
-	
 	*/
 	int i, j, k;
 	for(i=0;i<ROW;++i){
@@ -1225,7 +1177,7 @@ int main() {
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
 		node2 customer;
-		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field);
+		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
