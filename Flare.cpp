@@ -450,7 +450,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){return bestAction;}
+		if(congrats){printf("escape\n");return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
