@@ -115,7 +115,7 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-emilib::HashMap<ll, ll> visited;
+multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
 int MSB64bit(ll v) {
@@ -124,28 +124,37 @@ int MSB64bit(ll v) {
    return out;
 }
 
+int dfs(ll cur,int depth){
+if(cur==(ll)0){return TRN;}
+auto p = visited.equal_range(cur);
+int pl=TRN;
+for (auto it = p.first; it != p.second; ++it) {
+if((it->second)==(ll)1){pl=min(pl,depth);}
+else{pl=min(pl,dfs(it->second,depth+1));}
+}
+return pl;
+}
+
+ll check_hash(F_T board[ROW][COL]){
+
+ll hash=0ll;
+
+for (int row = 0; row < ROW; row++) {
+for (int col = 0; col < COL; col++) {
+F_T num = board[row][col];
+hash ^= zoblish_field[row][col][(int)num];
+}
+}
+return hash;		
+}
+
+
 struct hash_chain{
 	
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
 	vector<ll>hashchain;
-	
-	ll check_hash(F_T board[ROW][COL]){
-
-	ll hash=0ll;
-
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = board[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
-	}
-	}
-		
-	return hash;
-		
-	}
-
 	
 	void calc_hashchain(){
 		
@@ -217,26 +226,10 @@ struct node2 {
 	}
 	}
 	void calc_hash(){
-	hash=0ll;
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = field[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
+	hash=check_hash(field);
 	}
-	}
-	}
-	int calc_pl(ll ha){
-	ll cur=ha;
-	int pl=0;
-	bool eof;
-	while(1){
-	if(visited[cur]==(ll)0){eof=false;break;}
-	if(visited[cur]==(ll)1){eof=true;break;}	
-	cur=visited[cur];
-	pl++;
-	}
-	if(!eof){pl=TRN;}
-	return pl;	
+	int calc_pl(ll cur){
+	return dfs(cur,0);	
 	}
 }ff[DEPTH][DIR*BEAM_WIDTH2];
 struct Action {//最終的に探索された手
@@ -423,6 +416,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
+        bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -438,24 +432,15 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
 				ll cur=hc.hashchain[0];
-				int pl=1;
-				bool eof;
-				while(1){
-				if(visited[cur]==(ll)0){eof=false;break;}
-				if(visited[cur]==(ll)1){eof=true;break;}	
-				cur=visited[cur];
-				pl++;
-				}				
-				if(pl>(int)hc.hashchain.size()||(!eof)){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
-				visited[cur]=nexthash;
-				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
+                visited.emplace(cur,nexthash);
+				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
 				}
-				}
-				part2+=omp_get_wtime() - start;
-				return bestAction;
+                congrats=true;
+				//part2+=omp_get_wtime() - start;
+				//return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -464,7 +449,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(i==MAX_TRN-1){return bestAction;}
+		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -670,6 +655,26 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		ll movei[(TRN/21)+1];
 		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 		bestAction.path=ff[depth-1][j].true_path;
+        memcpy(g_field,f_field,sizeof(g_field));
+        int point=YY(ff[depth-1][j].first_te)*COL+XX(ff[depth-1][j].first_te);
+        vector<ll>hashchain;
+        hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+        bool look=false;
+        for(int p2=0;p2<(int)bestAction.path.size();p2++){
+        if(bestAction.path[p2]==','){look=true;continue;}
+        if(!look){continue;}
+        if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
+        if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
+        if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
+        if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
+        hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+        }
+        for(int p2=0;p2<(int)hashchain.size()-1;p2++){
+        ll cur=hashchain[p2];
+        ll nexthash=hashchain[p2+1];
+        visited.emplace(cur,nexthash);
+        if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+        }
 		return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
