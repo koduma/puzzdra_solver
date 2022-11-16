@@ -417,6 +417,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
+			printf("j=%d/%d\n",j+1,4*ks);
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
