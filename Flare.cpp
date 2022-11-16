@@ -417,9 +417,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
-			if(i==40){
-			printf("j=%d/%d\n",j+1,4*ks);
-			}
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
@@ -436,7 +433,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				if((int)hc.hashchain.size()>0){
 				ll cur=hc.hashchain[0];
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
-				printf("r=%d/%d\n",r+1,(int)hc.hashchain.size()-1);
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
 				visited.emplace(cur,nexthash);
@@ -630,7 +626,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	if(depth==DEPTH-1){//koko
+	if(depth==DEPTH){//koko
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
