@@ -416,7 +416,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
-        bool congrats=false;
+		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -435,10 +435,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
-                visited.emplace(cur,nexthash);
+				visited.emplace(cur,nexthash);
 				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
 				}
-                congrats=true;
+				congrats=true;
 				//part2+=omp_get_wtime() - start;
 				//return bestAction;
 			}
@@ -541,7 +541,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.true_path_length=0;
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
-	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
@@ -625,6 +625,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
+	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
@@ -650,32 +651,32 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if(combo>=stop){
-		bestAction.score = combo;
-		bestAction.first_te = ff[depth-1][j].first_te;
-		ll movei[(TRN/21)+1];
-		memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
-		bestAction.path=ff[depth-1][j].true_path;
-        memcpy(g_field,f_field,sizeof(g_field));
-        int point=YY(ff[depth-1][j].first_te)*COL+XX(ff[depth-1][j].first_te);
-        vector<ll>hashchain;
-        hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-        bool look=false;
-        for(int p2=0;p2<(int)bestAction.path.size();p2++){
-        if(bestAction.path[p2]==','){look=true;continue;}
-        if(!look){continue;}
-        if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
-        if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
-        if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
-        if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
-        hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-        }
+	bestAction.score = combo;
+	bestAction.first_te = ff[depth-1][j].first_te;
+	ll movei[(TRN/21)+1];
+	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
+	bestAction.path=ff[depth-1][j].true_path;
+	memcpy(g_field,f_field,sizeof(g_field));
+	int point=YY(ff[depth-1][j].first_te)*COL+XX(ff[depth-1][j].first_te);
+	vector<ll>hashchain;
+	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+	bool look=false;
+	for(int p2=0;p2<(int)bestAction.path.size();p2++){
+	if(bestAction.path[p2]==','){look=true;continue;}
+	if(!look){continue;}
+	if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
+	if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
+	if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
+	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
+	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+	}
         for(int p2=0;p2<(int)hashchain.size()-1;p2++){
         ll cur=hashchain[p2];
         ll nexthash=hashchain[p2+1];
         visited.emplace(cur,nexthash);
         if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
-		return bestAction;
+	return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
@@ -1112,24 +1113,34 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
+	
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
+	
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
+	
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
+	
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
+	
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
+	
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
+	
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
+	
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
+	
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
+	
 	*/
 	int i, j, k;
 	for(i=0;i<ROW;++i){
