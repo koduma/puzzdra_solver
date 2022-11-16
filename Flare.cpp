@@ -628,7 +628,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	if(depth==1){//koko
-	printf("ks=%d/%d,beam=%d,visited=%d\n",k+1,ks,cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
+	printf("ks=%d/%d,dir=%d/%d,beam=%d,visited=%d\n",k+1,ks,j+1,DIR,cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
