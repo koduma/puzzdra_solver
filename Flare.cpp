@@ -643,7 +643,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	if(depth==DEPTH){
+	if(depth==DEPTH-1){
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	}
 	dque.clear();
