@@ -450,7 +450,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){printf("logout\n");return bestAction;}
+		if(congrats){printf("logout\n");return bestAction;}//koko
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -610,7 +610,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
-	if(depth==1){printf("login\n");}
+	if(depth==1){printf("login\n");}//koko
 	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand,root_field);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -627,8 +627,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	if(depth==DEPTH){//koko
-	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
+	if(depth==1){//koko
+	printf("ks=%d/%d,beam=%d,visited=%d\n",k+1,ks,cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
@@ -644,7 +644,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	if(depth==1){
+	if(depth==1){//koko
 	printf("ZZZZZZZ=%d/%d\n",i+1,MAX_TRN);
 	}
 	dque.clear();
