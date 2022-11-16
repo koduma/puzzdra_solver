@@ -417,7 +417,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
-			if(j%10000==0){printf("j=%d/%d\n",j+1,4*ks);}
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
@@ -434,6 +433,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				if((int)hc.hashchain.size()>0){
 				ll cur=hc.hashchain[0];
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
+				printf("r=%d/%d\n",r+1,(int)hc.hashchain.size()-1);
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
 				visited.emplace(cur,nexthash);
