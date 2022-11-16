@@ -125,7 +125,6 @@ int MSB64bit(ll v) {
 }
 
 int dfs(ll cur,int depth){
-if(depth>=200){printf("akan\n");}
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -410,7 +409,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				}
 			}
 		}
-		//printf("depth=%d/%d\n",i+1,MAX_TRN);
+		printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
@@ -627,7 +626,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	if(depth==DEPTH){
+	if(depth==DEPTH-1){//koko
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
@@ -644,7 +643,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	if(depth==DEPTH-1){
+	if(depth==DEPTH){
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	}
 	dque.clear();
