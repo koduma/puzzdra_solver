@@ -432,11 +432,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
 				ll cur=hc.hashchain[0];
+				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
 				visited.emplace(cur,nexthash);
 				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+				}
 				}
 				congrats=true;
 				//part2+=omp_get_wtime() - start;
@@ -672,12 +674,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
 	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
 	}
+	if((int)hashchain.size()>0){
         for(int p2=0;p2<(int)hashchain.size()-1;p2++){
         ll cur=hashchain[p2];
         ll nexthash=hashchain[p2+1];
         visited.emplace(cur,nexthash);
         if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
+	}
 	return bestAction;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
