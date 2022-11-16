@@ -125,7 +125,6 @@ int MSB64bit(ll v) {
 }
 
 int dfs(ll cur,int depth){
-if(cur==(ll)0){return TRN;}
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -258,9 +257,9 @@ string actiontoS(Action act){
 	}
 	return path;
 }
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer); //ルート探索関数
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer) {
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]) {
   
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
@@ -510,7 +509,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	printf("\n-----search_start_1/2-----\n");
 		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer);
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
 	
 	stop=tmpp.score;
 		
@@ -528,7 +527,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.calc_hash();
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer);
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer,root_field);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -611,7 +610,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
-	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand);
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand,root_field);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -628,7 +627,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	if(depth==DEPTH){
-	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
@@ -649,6 +648,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	dque.clear();
 	deque<int>vec[1001];
+	bool congrats=false;
 	for(int j=0;j<4*ks;j++){
 	if(ff[depth-1][j].path_length!=-1){
 	F_T g_field[ROW][COL];
@@ -660,8 +660,17 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ll movei[(TRN/21)+1];
 	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 	bestAction.path=ff[depth-1][j].true_path;
-	memcpy(g_field,f_field,sizeof(g_field));
-	int point=YY(ff[depth-1][j].first_te)*COL+XX(ff[depth-1][j].first_te);
+	memcpy(g_field,root_field,sizeof(g_field));
+	int tgt=0;
+	string tp="";
+	while(1){
+	if(bestAction.path[tgt]==','){tgt++;break;}
+	tp+=bestAction.path[tgt];
+	tgt++;
+	}
+	int point;
+	if((int)tp.size()==2){int x=tp[0]-'0';int y=(tp[1]-'0')-5;point=(y*COL)+x;}
+	else{int x=tp[0]-'0';int y=5;point=(y*COL)+x;}
 	vector<ll>hashchain;
 	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
 	bool look=false;
@@ -682,11 +691,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
         if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
 	}
-	return bestAction;
+	//return bestAction;
+	congrats=true;
 	}
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
+	if(congrats){return bestAction;}
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
@@ -1213,7 +1224,7 @@ int main() {
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
 		node2 customer;
-		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer);
+		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
