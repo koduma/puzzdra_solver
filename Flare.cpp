@@ -1,27 +1,38 @@
 /*
 Windows10,Windows11,Linux,MacOS
+
 Linux導入手続き
+
 //メモリ容量確認
 free -h
+
 //g++インストール
 sudo apt install -y g++
+
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
+
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
+
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
+
 //ビーム幅調整
 vi Flare.cpp
+
 //コンパイル
+
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
+
 //run
 ./Flare
+
 //input
 */
 #pragma warning(disable:4710)
@@ -540,7 +551,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
-	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
@@ -624,7 +634,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
@@ -669,7 +678,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	continue;
 	}
 	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score+i+1);
 	printf("predict=%d\n",possible_score);
 	}
 	int v=vec[possible_score][0];
@@ -1093,22 +1101,31 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
+	
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
+	
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
+	
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
+	
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
+	
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
+	
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
+	
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
+	
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
+	
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
 	*/
