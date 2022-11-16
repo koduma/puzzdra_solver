@@ -125,6 +125,7 @@ int MSB64bit(ll v) {
 }
 
 int dfs(ll cur,int depth){
+if(depth>=200){printf("akan\n");}
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
