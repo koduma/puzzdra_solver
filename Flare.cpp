@@ -430,8 +430,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				hc.first_te=fff[j].first_te;
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
-				ll cur=hc.hashchain[0];
 				if((int)hc.hashchain.size()>0){
+				ll cur=hc.hashchain[0];
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
 				cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
