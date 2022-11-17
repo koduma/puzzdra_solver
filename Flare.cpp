@@ -124,7 +124,11 @@ int MSB64bit(ll v) {
    return out;
 }
 
+int call=0;
+
 int dfs(ll cur,int depth){
+if(depth>200){printf("akan\n");}
+call++;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -635,6 +639,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(depth==DEPTH){//koko
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
+	printf("depth=%d,call=%d\n",depth,call);
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
