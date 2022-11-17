@@ -124,10 +124,10 @@ int MSB64bit(ll v) {
    return out;
 }
 
-int dfs(ll cur,int depth,emilib::HashMap<ll, bool>v){
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
 if(depth>200){printf("akan\n");}
-if(v[cur]){return TRN;}
-v[cur]=true;
+if(*v[cur]){return TRN;}
+*v[cur]=true;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -232,7 +232,7 @@ struct node2 {
 	}
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
-	return dfs(cur,0,v);	
+	return dfs(cur,0,&v);	
 	}
 }ff[DEPTH][DIR*BEAM_WIDTH2];
 struct Action {//最終的に探索された手
