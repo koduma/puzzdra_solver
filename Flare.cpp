@@ -441,8 +441,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				}
 				if(!find){
 				visited.emplace(cur,nexthash);
-				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
 				}
+				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
 				}
 				}
 				congrats=true;
@@ -700,8 +700,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
         }
         if(!find){
 	visited.emplace(cur,nexthash);
-        if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
+	if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
 	}
 	//return bestAction;
