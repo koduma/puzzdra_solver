@@ -125,7 +125,7 @@ int MSB64bit(ll v) {
 }
 
 int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-if(depth>200){printf("akan\n");}
+//if(depth>200){printf("akan\n");}
 if((*v)[cur]){return TRN;}
 (*v)[cur]=true;
 auto p = visited.equal_range(cur);
