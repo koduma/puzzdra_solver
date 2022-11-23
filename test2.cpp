@@ -128,14 +128,25 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 int chain2(ll* v,ll board,int y,int x,int po);
 
-
-emilib::HashMap<ll, ll> visited;	
+multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
+}
+
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
+if((*v)[cur]){return TRN;}
+(*v)[cur]=true;
+auto p = visited.equal_range(cur);
+int pl=TRN;
+for (auto it = p.first; it != p.second; ++it) {
+if((it->second)==(ll)1){pl=min(pl,depth);break;}
+else{pl=min(pl,dfs(it->second,depth+1,v));}
+}
+return pl;
 }
 
 ll c_hash(F_T board[ROW][COL]){
@@ -241,18 +252,9 @@ struct node2 {
 	}
 	}
 	
-	int calc_pl(ll ha){
-	ll cur=ha;
-	int pl=0;
-	bool eof;
-	while(1){
-	if(visited[cur]==(ll)0){eof=false;break;}
-	if(visited[cur]==(ll)1){eof=true;break;}	
-	cur=visited[cur];
-	pl++;
-	}
-	if(!eof){pl=TRN;}
-	return pl;	
+	int calc_pl(ll cur){
+	emilib::HashMap<ll, bool>v;
+	return dfs(cur,0,&v);	
 	}
 
 }ff[DIR*BEAM_WIDTH2];
@@ -458,6 +460,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
+		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -471,25 +474,22 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				hc.first_te=fff[j].first_te;
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
-				ll cur=hc.hashchain[0];
-				int pl=1;
-				bool eof;
-				while(1){
-				if(visited[cur]==(ll)0){eof=false;break;}
-				if(visited[cur]==(ll)1){eof=true;break;}	
-				cur=visited[cur];
-				pl++;
-				}				
-				if(pl>(int)hc.hashchain.size()||(!eof)){
+				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
-				cur=hc.hashchain[r];
+				ll cur=hc.hashchain[r];
 				ll nexthash=hc.hashchain[r+1];
-				visited[cur]=nexthash;
-				if(r==(int)hc.hashchain.size()-2){visited[nexthash]=(ll)1;}
+				bool find=false;
+				auto p = visited.equal_range(cur);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==nexthash){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(cur,nexthash);
+				}
+				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
 				}
 				}
-				part2+=omp_get_wtime() - start;
-				return bestAction;
+				congrats=true;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -498,6 +498,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
+		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
