@@ -610,7 +610,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 		layout+=field[b/COL][b%COL]-1+'0';
 		}
 		cout<<"layout="<<layout<<endl;
-		cout<<"prev="<<cand.prev<<endl;
+		cout<<"prev="<<(int)cand.prev<<endl;
 		cout<<"pos="<<cand.pos+1<<endl;
 	}
 	cand.path_length=min(cand.path_length,MLEN);
@@ -700,7 +700,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	layout+=f_field[b/COL][b%COL]-1+'0';
 	}
 	cout<<"layout="<<layout<<endl;
-	cout<<"prev="<<cand.prev<<endl;
+	cout<<"prev="<<(int)cand.prev<<endl;
 	cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
