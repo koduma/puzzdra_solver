@@ -607,7 +607,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if(cand.path_length>MLEN){
 		string layout="";
 		for(int b=0;b<ROW*COL;b++){
-		layout+=f_field[b/COL][b%COL]-1+'0';
+		layout+=field[b/COL][b%COL]-1+'0';
 		}
 		cout<<"layout="<<layout<<endl;
 		cout<<"prev="<<cand.prev<<endl;
