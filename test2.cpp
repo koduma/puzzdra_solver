@@ -138,20 +138,24 @@ int MSB64bit(ll v) {
    return out;
 }
 
+ll c_hash(F_T board[ROW][COL]){
+ll hash=0ll;
+for (int row = 0; row < ROW; row++) {
+for (int col = 0; col < COL; col++) {
+F_T num = board[row][col];
+hash ^= zoblish_field[row][col][(int)num];
+}
+}
+return hash;
+}
+
 struct hash_chain{
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
 	vector<ll>hashchain;
 	ll check_hash(F_T board[ROW][COL]){
-	ll hash=0ll;
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = board[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
-	}
-	}
-	return hash;
+	return c_hash(board);
 	}
 	
 	void calc_hashchain(){
@@ -580,7 +584,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
+	int MLEN=cand.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
+	Action tmp=BEAM_SEARCH(field,1,MLEN,-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	node2 cand;
@@ -596,9 +601,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmp.score){cand.path_length=TRN;}
+	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	cand.path_length=min(cand.path_length,MLEN);
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
@@ -668,7 +673,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	Action tmp = BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
+	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
+	Action tmp = BEAM_SEARCH(f_field,i+2,MLEN,cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -676,7 +682,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	if(stop!=tmp.score){cand.path_length=TRN;}
+	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	cand.path_length=min(cand.path_length,MLEN);
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
