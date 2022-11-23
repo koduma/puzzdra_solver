@@ -603,15 +603,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
 	if(stop!=tmp.score){cand.path_length=TRN;}
-	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
 	if(cand.path_length>MLEN){
 		string layout="";
 		for(int b=0;b<ROW*COL;b++){
 		layout+=field[b/COL][b%COL]-1+'0';
 		}
-		cout<<"layout="<<layout<<endl;
-		cout<<"prev="<<(int)cand.prev<<endl;
-		cout<<"pos="<<cand.pos+1<<endl;
+		//cout<<"layout="<<layout<<endl;
+		//cout<<"prev="<<(int)cand.prev<<endl;
+		//cout<<"pos="<<cand.pos+1<<endl;
 	}
 	cand.path_length=min(cand.path_length,MLEN);
 	pus[cand.path_length].push_front(cand);
@@ -693,15 +693,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_path();
 	cand.calc_hash();
 	if(stop!=tmp.score){cand.path_length=TRN;}
-	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
 	if(cand.path_length>MLEN){
 	string layout="";
 	for(int b=0;b<ROW*COL;b++){
 	layout+=f_field[b/COL][b%COL]-1+'0';
 	}
-	cout<<"layout="<<layout<<endl;
-	cout<<"prev="<<(int)cand.prev<<endl;
-	cout<<"pos="<<cand.pos+1<<endl;
+	//cout<<"layout="<<layout<<endl;
+	//cout<<"prev="<<(int)cand.prev<<endl;
+	//cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
 	ff[(4 * k) + j] = cand;
