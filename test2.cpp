@@ -241,8 +241,15 @@ struct node2 {
 	}
 
 	void calc_hash(){
+	
+	hash=0ll;
 
-	hash=c_hash(field);
+	for (int row = 0; row < ROW; row++) {
+	for (int col = 0; col < COL; col++) {
+	F_T num = field[row][col];
+	hash ^= zoblish_field[row][col][(int)num];
+	}
+	}
 	}
 	
 	int calc_pl(ll cur){
