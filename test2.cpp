@@ -92,7 +92,6 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define PENALTY 30
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -126,7 +125,6 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-int chain2(ll* v,ll board,int y,int x,int po);
 
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
@@ -810,28 +808,6 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 	}
 	return count;
 }
-int chain2(ll* v,ll board,int y,int x,int po){
-    
-    int count=0;
-#define CHK(Y,X) (((*v>>(po-((8*(X))+Y)))&1) == 0 && ((board>>(po-((8*(X))+Y)))&1) == 1)
-    if (CHK(y, x)) {
-    ++count;
-    *v|=1ll<<(po-((8*(x))+y));        
-    if (0 < y && CHK(y - 1, x)) {
-	count += chain2(v,board,y-1,x,po);
-    }
-    if (y < ROW - 1 && CHK(y + 1, x)) {
-	count += chain2(v,board,y+1,x,po);
-    }
-    if (0 < x && CHK(y, x - 1)) {
-	count += chain2(v,board,y,x-1,po);
-    }
-    if (x < COL - 1 && CHK(y, x + 1)) {
-	count += chain2(v,board,y,x+1,po);
-    }
-    }
-	return count;
-}
 int evaluate(F_T field[ROW][COL], int flag) {
 	int combo = 0;
 
@@ -1128,28 +1104,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
-
-	int penalty=0;
-	
-	ll board=0ll;
-	
-	for(int i=1;i<=DROP;i++){
-	board=board|dropBB[i];
-	penalty+=(p_maxcombo[i]-d_maxcombo[i])*PENALTY;
-	}
-	
-	ll v=0ll;
-	
-	int alone=0;
-	
-	for(int y=0;y<ROW;y++){
-	for(int x=0;x<COL;x++){
-	int connect=chain2(&v,board,y,x,po);
-	if(connect>0){alone++;}
-	}
-	}
-	
-	ev-=penalty*alone;
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
