@@ -261,6 +261,30 @@ string actiontoS(Action act){
 	}
 	return path;
 }
+int adder(F_T field[ROW][COL]){
+  
+    int x_cnt[DROP+1][COL]={0};
+    
+    for(int r=0;r<ROW;r++){
+    for(int c=0;c<COL;c++){
+        x_cnt[(int)field[r][c]][c]++;
+    }
+    }
+    
+    int ret=0;
+     
+    for(int d=1;d<=DROP;d++){
+    for(int c=0;c<COL;c++){       
+    for(int pos=c+1;pos<COL;pos++){
+    int dx=pos-c;
+    int dd=x_cnt[d][pos];
+    ret+=dx*dd*x_cnt[d][c];
+    }
+    }
+    }
+
+    return ret;
+}
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]) {
@@ -393,6 +417,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 						//st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+						cand.score -= adder(field);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -455,7 +480,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+500].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
 			ks2++;
 			}
 		}
