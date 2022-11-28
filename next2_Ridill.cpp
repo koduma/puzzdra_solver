@@ -560,10 +560,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
-    
-    if(read_file_mode!=0){
-	    string lt="";
-	    for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
+	string lt="";
+	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
+	if(read_file_mode!=0){
 	    ifstream myf ("visited"+lt+".txt");
 	    string ls;
 	    while(getline(myf,ls)){
@@ -579,7 +578,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 		    visited.emplace(stoull(parent),stoull(child));
 	    }
 	    myf.close();
-    }
+	}
 	
 	int ALPHA=1;
 
@@ -777,6 +776,14 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	file << mystring;
 	}
 	file.close();
+		
+	ofstream fi("visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		fi<<mystr;
+	}
+	fi.close();
+		
 	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
@@ -1471,12 +1478,6 @@ int main() {
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
-	ofstream file("visited"+layout+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-		file<<mystr;
-	}
-	file.close();
     
 	cin>>i;
 	cin>>j;
