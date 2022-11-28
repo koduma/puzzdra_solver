@@ -349,7 +349,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
-    if((int)cmb>=stop){
+	if((int)cmb>=stop){
 	Action accept;
 	accept.first_te=ca.first_te;
 	accept.score=stop;
@@ -732,8 +732,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	file << mystring;
 	}
 	file.close();
-    
-    for (int k = 0; k < ks; k++) {
+	
+	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
@@ -1020,11 +1020,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-        
-        //cmb2*=4;
-
+		//cmb2*=4;
 		cmb2+=cmb2;
-        cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1152,9 +1150,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 
 		//cmb2*=4;
-
 		cmb2+=cmb2;
-        cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1315,8 +1312,8 @@ int main() {
 	}
 	}
 	}
-    
-    for(i=0;i<ROW*COL;i++){
+	
+	for(i=0;i<ROW*COL;i++){
 	zoblish_field2[i]=xor128();
 	}
     
