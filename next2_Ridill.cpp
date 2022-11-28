@@ -235,16 +235,15 @@ struct hash_chain{
 	T_T first_te;
 	ll movei[(TRN/21)+1];
 	vector<ll>hashchain;
-    node n;
+	node n;
     
 	ll check_hash(F_T board[ROW][COL]){
 	return c_hash(board);
 	}
 	
 	void calc_hashchain(){
-        
-    /*
-    ll movei[(TRN/21)+1];//スワイプ移動座標
+	/*
+	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
 	int score;//評価値
 	int prev_score;//1手前の評価値
@@ -254,27 +253,25 @@ struct hash_chain{
 	sc nowC;//今どのx座標にいるか
 	sc nowR;//今どのy座標にいるか
 	sc prev;//1手前は上下左右のどっちを選んだか
-    */    
+	*/    
     
 	int pos=XX(first_te)+YY(first_te)*COL;
-        
-    for(int i=0;i<=TRN/21;i++){
-    n.movei[i]=0ll;
-    }
-    n.hash=check_hash(field);
-    n.score=0;
-    n.prev_score=0;
-    n.first_te=first_te;
-    n.improving=0;
-    n.combo=0;
-    n.nowC=pos%COL;
-    n.nowR=pos/COL;
-    n.prev=-1;
-    mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	for(int i=0;i<=TRN/21;i++){
+	n.movei[i]=0ll;
+	}
+	n.hash=check_hash(field);
+	n.score=0;
+	n.prev_score=0;
+	n.first_te=first_te;
+	n.improving=0;
+	n.combo=0;
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
         
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
-        
-    int pl=0;
+	int pl=0;
         
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
@@ -285,14 +282,14 @@ struct hash_chain{
 	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
 	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
 	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
-    n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
-    n.hash=check_hash(field);
-    n.nowC=pos%COL;
-    n.nowR=pos/COL;
-    n.prev=dir-1;
-    mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
+	n.hash=check_hash(field);
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=dir-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
-    pl++;
+	pl++;
 	}
 	}
 	}
@@ -392,7 +389,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
-    if((int)cmb>=stop){
+	if((int)cmb>=stop){
 	Action accept;
 	accept.first_te=ca.first_te;
 	accept.score=stop;
@@ -565,40 +562,25 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
     
     if(read_file_mode!=0){
-    
-    string lt="";
-        
-    for(int i=0;i<ROW*COL;i++){
-    lt+=((int)field[i/COL][i%COL]-1)+'0';
+	    string lt="";
+	    for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
+	    ifstream myf ("visited"+lt+".txt");
+	    string ls;
+	    while(getline(myf,ls)){
+		    string parent="";
+		    string child="";
+		    bool comma=false;
+		    for(int i=0;i<(int)ls.size();i++){
+			    if(ls[i]=='\n'){break;}
+			    if(ls[i]==','){comma=true;continue;}
+			    if(comma){child+=ls[i];}
+			    else{parent+=ls[i];}
+		    }
+		    visited.emplace(stoull(parent),stoull(child));
+	    }
+	    myf.close();
     }
-        
-    ifstream myf ("visited"+lt+".txt");
-    
-	string ls;
-
-	while(getline(myf,ls)){
-        
-    string parent="";
-    string child="";
-    bool comma=false;    
-    for(int i=0;i<(int)ls.size();i++){
-    if(ls[i]=='\n'){break;}
-    if(ls[i]==','){comma=true;continue;}
-    if(comma){
-    child+=ls[i];
-    }
-    else{
-    parent+=ls[i];
-    }
-    }
-        
-    visited.emplace(stoull(parent),stoull(child));
-        
-	}
-    myf.close();
-    
-    }
-
+	
 	int ALPHA=1;
 
 	int stop=0;
@@ -741,7 +723,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	ALPHA+=nnn.path_length;
 	}
 	}
-    }
+	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
@@ -795,8 +777,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	file << mystring;
 	}
 	file.close();
-    
-    for (int k = 0; k < ks; k++) {
+	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
@@ -1083,11 +1064,10 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-        
-        //cmb2*=4;
+		//cmb2*=4;
 
 		cmb2+=cmb2;
-        cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1215,9 +1195,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 
 		//cmb2*=4;
-
 		cmb2+=cmb2;
-        cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1378,8 +1357,8 @@ int main() {
 	}
 	}
 	}
-    
-    for(i=0;i<ROW*COL;i++){
+	
+	for(i=0;i<ROW*COL;i++){
 	zoblish_field2[i]=xor128();
 	}
     
@@ -1492,15 +1471,12 @@ int main() {
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
-    
-    ofstream file("visited"+layout+".txt");
-    
-    for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-       string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-       file<<mystr;
-    }
-    file.close();
-    
+	ofstream file("visited"+layout+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		file<<mystr;
+	}
+	file.close();
     
 	cin>>i;
 	cin>>j;
