@@ -1478,6 +1478,13 @@ int main() {
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	
+	ofstream fi("visited"+layout+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();
     
 	cin>>i;
 	cin>>j;
