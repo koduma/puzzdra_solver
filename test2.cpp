@@ -1,44 +1,35 @@
 /*
-
 Windows10,Windows11,Linux,MacOS
 
 Linux導入手続き
 
 //メモリ容量確認
-
 free -h
 
 //g++インストール
-
 sudo apt install -y g++
 
 //wgetインストール
-
 sudo apt-get update
 sudo apt-get install -y wget
 
 //test2.cppをダウンロード
-
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/test2.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
-
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
-
 vi test2.cpp
 
 //コンパイル
-
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -ldl
 
 //run
-
 ./test2
 
 //input
@@ -92,6 +83,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
+#define priority_drop 5
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -157,6 +149,33 @@ hash ^= zoblish_field[row][col][(int)num];
 }
 return hash;
 }
+
+struct hash_chain{
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	vector<ll>hashchain;
+	ll check_hash(F_T board[ROW][COL]){
+	return c_hash(board);
+	}
+	
+	void calc_hashchain(){
+	int pos=XX(first_te)+YY(first_te)*COL;
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (movei[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(movei[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
+	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
+	}
+	}
+	}
+};
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -177,8 +196,6 @@ struct node {//どういう手かの構造体
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
-
-map<ll,struct node> mapobj;
 
 struct node2 {
 
@@ -236,75 +253,7 @@ struct Action {//最終的に探索された手
 	}
 };
 
-struct hash_chain{
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	vector<ll>hashchain;
-    node n;
-    
-	ll check_hash(F_T board[ROW][COL]){
-	return c_hash(board);
-	}
-	
-	void calc_hashchain(){
-        
-    /*
-    ll movei[(TRN/21)+1];//スワイプ移動座標
-	ll hash;//盤面のハッシュ値
-	int score;//評価値
-	int prev_score;//1手前の評価値
-	T_T first_te;
-	uc improving;//評価値改善回数
-	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
-	sc prev;//1手前は上下左右のどっちを選んだか
-    */    
-    
-	int pos=XX(first_te)+YY(first_te)*COL;
-        
-    for(int i=0;i<=TRN/21;i++){
-    n.movei[i]=0ll;
-    }
-    n.hash=check_hash(field);
-    n.score=0;
-    n.prev_score=0;
-    n.first_te=first_te;
-    n.improving=0;
-    n.combo=0;
-    n.nowC=pos%COL;
-    n.nowR=pos/COL;
-    n.prev=-1;
-    mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
-        
-	hashchain.push_back(n.hash^zoblish_field2[pos]);
-        
-    int pl=0;
-        
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (movei[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(movei[i]>>(3*k)));
-	if (dir==0){break;}
-	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
-	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
-	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
-	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
-    n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
-    n.hash=check_hash(field);
-    n.nowC=pos%COL;
-    n.nowR=pos/COL;
-    n.prev=dir-1;
-    mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
-	hashchain.push_back(n.hash^zoblish_field2[pos]);
-    pl++;
-	}
-	}
-	}
-};
-
-int adder(F_T field[ROW][COL]){
+int adder(F_T field[ROW][COL],int* tgt){	
   
     int x_cnt[DROP+1][COL]={0};
     
@@ -315,6 +264,9 @@ int adder(F_T field[ROW][COL]){
     }
     
     int ret=0;
+	
+    int drop_d[DROP+1]={0};
+    int maxd=-1;
      
     for(int d=1;d<=DROP;d++){
     for(int c=0;c<COL;c++){       
@@ -322,26 +274,17 @@ int adder(F_T field[ROW][COL]){
     int dx=pos-c;
     int dd=x_cnt[d][pos];
     ret+=dx*dd*x_cnt[d][c];
+    drop_d[d]+=ret;
     }
     }
+    if(drop_d[d]>maxd){
+    maxd=drop_d[d];
+    *tgt=d;
     }
+    }
+	
 
     return ret;
-}
-int nexti(ll movei[(TRN/21)+1]){
-    
-    int ni=0;
-
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (movei[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(movei[i]>>(3*k)));
-	if (dir==0){break;}
-	ni++;
-	}
-	}
-    return ni;
-
 }
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
@@ -368,8 +311,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
-    
-    int root_i=0;
 
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
@@ -424,33 +365,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	return accept;
 	}
-    int counter=0;
-    emilib::HashMap<ll, bool> v;
-    queue<pair<node,int> > que;
-    que.push(make_pair(ca,0));
-    while (!que.empty()) {
-    node n = que.front().first; // キューから先頭頂点を取り出す
-    int depth=que.front().second;
-    que.pop();
-    if(v[n.hash^zoblish_field2[(n.nowR*COL)+n.nowC]]){continue;}
-    v[n.hash^zoblish_field2[(n.nowR*COL)+n.nowC]]=true;
-    if(depth==MAX_TRN/2){
-    counter++;
-    dque.push_back(n);
-    continue;
-    }
-    auto p = visited.equal_range(n.hash^zoblish_field2[(n.nowR*COL)+n.nowC]);
-    for (auto it = p.first; it != p.second; ++it) {
-        if(it->second==(ll)1){continue;}
-        que.push(make_pair(mapobj[it->second],depth+1));
-    }
-    }
-    if(counter==0){    
 	dque.push_back(ca);
-    }
-    else{
-    root_i=MAX_TRN/2;
-    }
 	}
 
 	int dx[DIR] = { -1, 0,0,1 },
@@ -471,7 +386,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 
 	//2手目以降をビームサーチで探索
-	for (int i = root_i; i < MAX_TRN; i++) {
+	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
 		start = omp_get_wtime();
 #pragma omp parallel for
@@ -506,12 +421,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						field[ny][nx]=tmp;
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
-                        int ni=nexti(cand.movei);
-						cand.movei[ni/21] |= (((ll)(j+1))<<((3*ni)%63));
+						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						sc cmb;
-						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
-						cand.score -= adder(field);
+						int tgt;
+						cand.score = -adder(field,&tgt);
+						cand.score += evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo,tgt);
 						cand.combo = cmb;
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -1073,7 +988,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	*hash=ha;
 	return ev;
 }
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int tgt) {
 	int ev = 0;
 	*combo = 0;
 	int oti = 0;
@@ -1147,7 +1062,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		int MSB=MSB64bit(erased_dropBB);
 		if(MSB==0){continue;}
 		MSB=(po-MSB)/8;
-		cmb2-=LSB-MSB;
+		if(i==tgt){cmb2-=(LSB-MSB)*priority_drop;}
+		else{cmb2-=LSB-MSB;}
 		}
 
 		for(int i=1;i<=DROP;i++){
