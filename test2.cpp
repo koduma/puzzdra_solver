@@ -119,6 +119,8 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -1113,6 +1115,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
+}
+int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
+	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
 }
 int sum_evaluate(F_T field[ROW][COL]) {//落としも落ちコンも有りコンボ数判定関数
 	return evaluate(field, EVAL_FS | EVAL_COMBO);
