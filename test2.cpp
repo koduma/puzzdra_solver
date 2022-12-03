@@ -103,14 +103,12 @@ int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコン�
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
 
 int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
-int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int tgt);//落とし減点評価関数
-int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
 ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
@@ -1112,12 +1110,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int
 	}
 	ev += oti;
 	return ev;
-}
-int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
-	return evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, combo,p_maxcombo);
-}
-int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
-	return evaluate2(field, EVAL_FALL | EVAL_COMBO, combo,hash,p_maxcombo);
 }
 int sum_e(F_T field[ROW][COL]) {//落とし有り、落ちコン無しコンボ数判定関数
 	return evaluate(field, EVAL_FALL | EVAL_COMBO);
