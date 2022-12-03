@@ -280,7 +280,7 @@ int adder(F_T field[ROW][COL],int* tgt){
     drop_d[d]+=ret;
     }
     }
-    if(drop_d[d]>0){
+    if(drop_d[d]>0&&mass[d]>=2.9){
     if(mass[d]/(double)drop_d[d]>maxd){
     maxd=mass[d]/(double)drop_d[d];
     *tgt=d;
