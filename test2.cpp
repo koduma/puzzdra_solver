@@ -109,7 +109,7 @@ ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 
 ll sqBB[64];
-int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
+int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int tgt);//落とし減点評価関数
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
 ll around(ll bitboard);
 int table[64];
