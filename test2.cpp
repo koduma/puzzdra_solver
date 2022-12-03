@@ -253,20 +253,23 @@ struct Action {//最終的に探索された手
 	}
 };
 
-int adder(F_T field[ROW][COL],int* tgt){	
+int adder(F_T field[ROW][COL],int* tgt){
+	
+    double mass[DROP+1]={0};
   
     int x_cnt[DROP+1][COL]={0};
     
     for(int r=0;r<ROW;r++){
     for(int c=0;c<COL;c++){
         x_cnt[(int)field[r][c]][c]++;
+	mass[(int)field[r][c]]+=1.0;
     }
     }
     
     int ret=0;
 	
     int drop_d[DROP+1]={0};
-    int maxd=-1;
+    double maxd=-1.0;
      
     for(int d=1;d<=DROP;d++){
     for(int c=0;c<COL;c++){       
@@ -277,9 +280,11 @@ int adder(F_T field[ROW][COL],int* tgt){
     drop_d[d]+=ret;
     }
     }
-    if(drop_d[d]>maxd){
-    maxd=drop_d[d];
+    if(drop_d[d]>0){
+    if(mass[d]/(double)drop_d[d]>maxd){
+    maxd=mass[d]/(double)drop_d[d];
     *tgt=d;
+    }
     }
     }
 	
@@ -1062,7 +1067,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int
 		int MSB=MSB64bit(erased_dropBB);
 		if(MSB==0){continue;}
 		MSB=(po-MSB)/8;
-		if(i==tgt){cmb2-=(LSB-MSB)/priority_drop;}
+		if(i==tgt){cmb2-=(LSB-MSB)*priority_drop;}
 		else{cmb2-=LSB-MSB;}
 		}
 
