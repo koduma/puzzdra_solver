@@ -1067,7 +1067,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1],int
 		int MSB=MSB64bit(erased_dropBB);
 		if(MSB==0){continue;}
 		MSB=(po-MSB)/8;
-		if(i==tgt){cmb2-=(LSB-MSB)*priority_drop;}
+		if(i==tgt){cmb2-=(LSB-MSB)/priority_drop;}
 		else{cmb2-=LSB-MSB;}
 		}
 
