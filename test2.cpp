@@ -90,7 +90,7 @@ using namespace std;
 #define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
-#define OTI_BONUS 100
+#define OTI_BONUS 30
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
 typedef char F_T;//盤面型
@@ -984,8 +984,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 
 	}
 	//ev += oti;
-	int c=(int)(*combo+1);
-	ev+=OTI_BONUS*oti/c;
+	ev+=OTI_BONUS*oti;
 	*hash=ha;
 	return ev;
 }
@@ -1111,8 +1110,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	//ev += oti;
-	int c=(int)(*combo+1);
-	ev+=OTI_BONUS*oti/c;
+	ev+=OTI_BONUS*oti;
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
