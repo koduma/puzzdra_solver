@@ -2,6 +2,8 @@
 [![windows-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/windows-latest.yml)
 [![macos-latest](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml/badge.svg?branch=master)](https://github.com/koduma/puzzdra_solver/actions/workflows/macos-latest.yml)
 
+パズドラ定石メーカーで斜めなし+盤面最大コンボ+最短手数を求めるプログラムです。
+
 # コンタクト https://twitter.com/tekitouk
 
 # パズドラ定石メーカー懸賞問題
@@ -27,9 +29,7 @@
 	layout=224234425402054400304510125043
 	:手数=30,8combo
 	layout=053241405407470557104053134522
-	:手数=41,10combo
-	
-## 説明：パズドラ定石メーカーで斜めなし+盤面最大コンボ+最短手数を求めるプログラムです。	
+	:手数=41,10combo	
 
 # Puzzle & Dragons Solver
 
