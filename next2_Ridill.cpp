@@ -613,7 +613,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
-	Action tmp=BEAM_SEARCH(field,1,MLEN-1,-1,(i*COL)+j,stop);
+	Action tmp=BEAM_SEARCH(field,1,max(0,MLEN-1),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
@@ -805,7 +805,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
-	Action tmp = BEAM_SEARCH(f_field,i+2,MLEN-1,cand.prev,cand.pos,stop);
+	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,MLEN-1),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
