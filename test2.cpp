@@ -503,7 +503,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int push_node=0;
 		int possible_score=5000;
 		int dB=1;
-		if(i>=17){dB=(int)floor(sqrt((double)i-16));}
+		if(i>=10){dB=(int)floor(sqrt((double)i-9));}
 		for (int j = 0; push_node < BEAM_WIDTH/dB ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
@@ -695,7 +695,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_path();
 	cand.calc_hash();
 	if(stop!=tmp.score){cand.path_length=TRN;}
-	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
 	if(cand.path_length>MLEN){
 	string layout="";
 	for(int b=0;b<ROW*COL;b++){
