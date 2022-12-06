@@ -503,7 +503,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		int push_node=0;
 		int possible_score=5000;
 		int dB=1;
-		if(i>=17){dB=i-16;}
+		if(i>=7){dB=i-6;}
 		for (int j = 0; push_node < BEAM_WIDTH/dB ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
