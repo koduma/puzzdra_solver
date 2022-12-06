@@ -512,7 +512,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				if(!find){
 				visited.emplace(cur,nexthash);
 				}
-				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+				if(r==(int)hc.hashchain.size()-2){
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
+				}
 				}
 				}
 				congrats=true;
