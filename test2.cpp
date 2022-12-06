@@ -493,7 +493,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
-		int dB=(int)floor(sqrt((double)i+2));
+		int dB=1;
+		if(i>=17){dB=(int)floor(sqrt((double)i-16));}
 		for (int j = 0; push_node < BEAM_WIDTH/dB ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
