@@ -165,6 +165,7 @@ struct node {//どういう手かの構造体
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
+		this->prev_score = -1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
 	bool operator < (const node& n)const {//スコアが高い方が優先される
