@@ -332,7 +332,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 			cand.improving=0;
 			cand.hash=ha;
-			dque.push_back(cand.hash);
+			dque.push_back(cand.hash^zoblish_field2[(i*COL)+j]);
       mapobj.insert(pair<ll,struct node>(cand.hash^zoblish_field2[(i*COL)+j],cand));
 		}
 	}// L, U,D,R //
@@ -368,7 +368,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	return accept;
 	}
-	dque.push_back(ca.hash);
+	dque.push_back(ca.hash^zoblish_field2[now_pos]);
   mapobj.insert(pair<ll,struct node>(ca.hash^zoblish_field2[now_pos],ca));  
 	}
 
@@ -451,7 +451,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				}
 			}
 		}
-		printf("depth=%d/%d\n",i+1,MAX_TRN);
+		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
