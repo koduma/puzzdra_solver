@@ -87,7 +87,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 30//MAX300
+#define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -307,10 +307,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	MAXCOMBO += (double)stop;
 
-	vector<node>dque;
+	vector<ll>dque;
 	double start, st;
-	//1手目を全通り探索する
 	dque.clear();
+	
+	unordered_map<ll,struct node> mapobj;
 
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
@@ -330,7 +331,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 			cand.improving=0;
 			cand.hash=ha;
-			dque.push_back(cand);
+			dque.push_back(cand.hash);
+			mapobj.insert(pair<ll,struct node>(cand.hash,cand));
 		}
 	}// L, U,D,R //
 	}
@@ -365,7 +367,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	return accept;
 	}
-	dque.push_back(ca);
+	dque.push_back(ca.hash);
+	mapobj.insert(pair<ll,struct node>(ca.hash,ca));	
 	}
 
 	int dx[DIR] = { -1, 0,0,1 },
@@ -391,7 +394,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 #pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
-			node temp = dque[k];//que.front(); que.pop();
+			ll mtemp=dque[k];
+			node temp = mapobj[mtemp];//que.front(); que.pop();
 			F_T temp_field[ROW][COL];
 			ll temp_dropBB[DROP+1]={0};
 			memcpy(temp_field, f_field, sizeof(temp_field));
@@ -479,14 +483,14 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				visited.emplace(cur,nexthash);
 				}
 				if(r==(int)hc.hashchain.size()-2){
-					find=false;
-					p=visited.equal_range(nexthash);
-					for (auto it = p.first; it != p.second; ++it) {
-						if(it->second==(ll)1){find=true;break;}
-					}
-					if(!find){
-					visited.emplace(nexthash,(ll)1);
-					}
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
 				}
 				}
 				}
@@ -503,9 +507,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
-		int dB=1;
-		if(i>=7){dB=i-6;}
-		for (int j = 0; push_node < BEAM_WIDTH/dB ;j++) {
+		mapobj.clear();
+		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
 			possible_score--;
@@ -526,8 +529,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
-				dque.push_back(temp);
+				dque.push_back(temp.hash);
 				push_node++;
+				mapobj.insert(pair<ll,struct node>(temp.hash,temp));
 				}
 			}
 		}
@@ -696,7 +700,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_path();
 	cand.calc_hash();
 	if(stop!=tmp.score){cand.path_length=TRN;}
-	printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
 	if(cand.path_length>MLEN){
 	string layout="";
 	for(int b=0;b<ROW*COL;b++){
