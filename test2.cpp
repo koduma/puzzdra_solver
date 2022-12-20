@@ -451,7 +451,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				}
 			}
 		}
-		//printf("depth=%d/%d\n",i+1,MAX_TRN);
+		printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
