@@ -255,6 +255,151 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
+
+class NTupleNetwork {
+public:
+	float learningRate = 0.01;
+	float weights[38][8] = {};
+	float bias = 0;
+	float tanh_prime(float x) { // x already tanhed
+        return 1.0 - x*x;
+	}
+	
+	explicit NTupleNetwork() {
+	
+	}
+	
+	void learn(vector<int> tuples, float target) {//8列の丸と勝敗
+        float score = 0;
+        for (size_t i=0; i < tuples.size(); i++) {
+            score += weights[i][tuples[i]];
+        }
+
+        score = tanh(score+bias);
+
+        float error = target - score;
+        float delta = error * tanh_prime(score);
+        for (size_t i=0; i < tuples.size(); i++) {
+            weights[i][tuples[i]] += learningRate * delta;
+        }
+        bias += learningRate * delta;
+	}
+	
+	float predict(vector<int> tuples) {
+        float output = 0;
+        for (size_t i=0; i < tuples.size(); i++) {
+            output += weights[i][tuples[i]];
+        }
+        return tanh(output+bias)*150.0;
+	}
+	
+	void show_param(){
+	printf("weights\n");
+	for(int i=0;i<38;i++){
+	printf("{%f,%f,%f,%f,%f,%f,%f,%f},\n",weights[i][0],weights[i][1],weights[i][2],weights[i][3],weights[i][4],weights[i][5],weights[i][6],weights[i][7]);
+	}
+	printf("bias\n");
+	printf("%f\n",bias);
+	}
+};
+
+NTupleNetwork network[ROW*COL];
+
+float wei[ROW*COL][38][8]={
+{//1
+	
+},
+{//2
+	
+},
+{//3
+	
+},
+{//4
+	
+},
+{//5
+	
+},
+{//6
+	
+},
+{//7
+	
+},
+{//8
+	
+},
+{//9
+	
+},
+{//10
+	
+},
+{//11
+	
+},
+{//12
+	
+},
+{//13
+	
+},
+{//14
+	
+},
+{//15
+	
+},	
+{//16
+	
+},
+{//17
+	
+},
+{//18
+	
+},
+{//19
+	
+},
+{//20
+	
+},
+{//21
+	
+},
+{//22
+	
+},
+{//23
+	
+},
+{//24
+	
+},
+{//25
+	
+},
+{//26
+	
+},
+{//27
+	
+},
+{//28
+	
+},
+{//29
+	
+},
+{//30
+	
+}
+};
+
+float bi[ROW*COL]={,,,,,,,,,,,,,,,,,,,,,,,,,,,,,};
+
 string actiontoS(Action act){
 	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
@@ -668,8 +813,35 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cout<<"tesuu="<<output<<endl;
 	cout<<tmp.path<<endl;
 	}
+	if(depth!=DEPTH-1){
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
+	}
+	else{
+	vector<int>vvv;
+        //tate
+        for(int r=0;r<ROW-2;r++){
+        for(int c=0;c<COL;c++){
+        if(cand.field[r][c]!=cand.field[r+1][c]&&cand.field[r][c]!=cand.field[r+2][c]&&cand.field[r+1][c]!=cand.field[r+2][c]){vvv.push_back(0);}
+        if(cand.field[r+1][c]==cand.field[r+2][c]&&cand.field[r][c]!=cand.field[r+1][c]){vvv.push_back(3);}
+        if(cand.field[r][c]==cand.field[r+2][c]&&cand.field[r][c]!=cand.field[r+1][c]){vvv.push_back(5);}
+        if(cand.field[r][c]==cand.field[r+1][c]&&cand.field[r][c]!=cand.field[r+2][c]){vvv.push_back(6);}
+        if(cand.field[r][c]==cand.field[r+1][c]&&cand.field[r][c]==cand.field[r+2][c]){vvv.push_back(7);}
+        }
+        }
+        //yoko
+            
+        for(int r=0;r<ROW;r++){
+        for(int c=0;c<COL-2;c++){
+        if(cand.field[r][c]!=cand.field[r][c+1]&&cand.field[r][c]!=cand.field[r][c+2]&&cand.field[r][c+1]!=cand.field[r][c+2]){vvv.push_back(0);}
+        if(cand.field[r][c+1]==cand.field[r][c+2]&&cand.field[r][c]!=cand.field[r][c+1]){vvv.push_back(3);}
+        if(cand.field[r][c]==cand.field[r][c+2]&&cand.field[r][c]!=cand.field[r][c+1]){vvv.push_back(5);}
+        if(cand.field[r][c]==cand.field[r][c+1]&&cand.field[r][c]!=cand.field[r][c+2]){vvv.push_back(6);}
+        if(cand.field[r][c]==cand.field[r][c+1]&&cand.field[r][c]==cand.field[r][c+2]){vvv.push_back(7);}
+        }
+        }	
+	cand.path_length=(int)floor(network[cand.pos].predict(vvv));
+	}
 	if(depth==DEPTH){
 	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
 	}
@@ -1246,6 +1418,14 @@ int main() {
 	file_bb[i] |= (1ll << (po-j));
 	}
 	po-=8;
+	}
+	for(i=0;i<ROW*COL;i++){
+	network[i].bias=bi[i];
+	for(j=0;j<38;j++){
+	for(k=0;k<8;k++){
+	network[i].weights[j][k]=wei[i][j][k];
+	}
+	}
 	}
 	string bestans="";
 	string layout="";
