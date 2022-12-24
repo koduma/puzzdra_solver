@@ -616,6 +616,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	double avg=0;
 
 	double path_length_array[ROW][COL];
+	
+	vector<int>pro_league;
 
 	if(read_file_mode==0){
 
@@ -623,7 +625,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
-	Action tmp=BEAM_SEARCH(field,1,max(0,MLEN-1),-1,(i*COL)+j,stop);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
+	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
@@ -656,6 +660,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());	
 	}
 	}
 
@@ -778,6 +784,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
+	pro_league.clear();	
 	
 	ofstream file("input.txt");
 
@@ -815,7 +822,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
-	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,MLEN-1),cand.prev,cand.pos,stop);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
+	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -835,6 +844,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	//cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());	
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
