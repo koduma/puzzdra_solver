@@ -86,13 +86,12 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 1//MAX2800000
+#define BEAM_WIDTH 2800000//MAX2800000
 #define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define DEPTH 2
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -110,10 +109,13 @@ int evaluate(F_T field[ROW][COL], int flag); //コンボ数判定関数
 int sum_e(F_T field[ROW][COL]);//落とし有り、落ちコン無しコンボ数判定関数
 int sum_evaluate(F_T field[ROW][COL]);//落としも落ちコンも有りコンボ数判定関数
 void operation(F_T field[ROW][COL], T_T first_te,ll route[(TRN/21)+1],ll dropBB[DROP+1]); //スワイプ処理関数
+
 int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//評価関数
+
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
+
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
@@ -124,7 +126,7 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
-multimap<ll, ll> visited;
+multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
 int MSB64bit(ll v) {
@@ -134,7 +136,6 @@ int MSB64bit(ll v) {
 }
 
 int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-//if(depth>200){printf("akan\n");}
 if((*v)[cur]){return TRN;}
 (*v)[cur]=true;
 auto p = visited.equal_range(cur);
@@ -146,49 +147,43 @@ else{pl=min(pl,dfs(it->second,depth+1,v));}
 return pl;
 }
 
-ll check_hash(F_T board[ROW][COL]){
-
+ll c_hash(F_T board[ROW][COL]){
 ll hash=0ll;
-
 for (int row = 0; row < ROW; row++) {
 for (int col = 0; col < COL; col++) {
 F_T num = board[row][col];
 hash ^= zoblish_field[row][col][(int)num];
 }
 }
-return hash;		
+return hash;
 }
 
-
 struct hash_chain{
-	
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
 	vector<ll>hashchain;
+	ll check_hash(F_T board[ROW][COL]){
+	return c_hash(board);
+	}
 	
 	void calc_hashchain(){
-		
 	int pos=XX(first_te)+YY(first_te)*COL;
-		
 	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
 	for(int k=0;k<21;k++){
 	int dir = (int)(7ll&(movei[i]>>(3*k)));
 	if (dir==0){break;}
 	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
-	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL;  } //"UP"); }
-	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL;  } //"DOWN"); }
-	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++;  } //"RIGHT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
 	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
 	}
 	}
-		
 	}
 };
-
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -203,13 +198,16 @@ struct node {//どういう手かの構造体
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
+		this->prev_score = -1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
+
 struct node2 {
+
 	F_T field[ROW][COL];
 	T_T first_te;
 	ll movei[(TRN/21)+1];
@@ -220,9 +218,13 @@ struct node2 {
 	ll hash;
 	string true_path;
 	int true_path_length;
+
 	void calc_path(){
+
 	path_length=0;
+
 	path=to_string(XX(first_te))+to_string(YY(first_te)+5)+",";
+
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
 	if (movei[i] == 0ll) { break; }
 	for(int k=0;k<21;k++){
@@ -236,185 +238,30 @@ struct node2 {
 	}
 	}
 	}
+
 	void calc_hash(){
-	hash=check_hash(field);
+	
+	hash=c_hash(field);
 	}
+	
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
 	return dfs(cur,0,&v);	
 	}
-}ff[DEPTH][DIR*BEAM_WIDTH2];
+
+}ff[DIR*BEAM_WIDTH2];
+
 struct Action {//最終的に探索された手
 	T_T first_te;
 	int score;//コンボ数
 	int maxcombo;//理論コンボ数
 	ll moving[(TRN/21)+1];//スワイプ移動座標
-	string path;
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
 
-class NTupleNetwork {
-public:
-	float learningRate = 0.01;
-	float weights[38][8] = {};
-	float bias = 0;
-	float tanh_prime(float x) { // x already tanhed
-        return 1.0 - x*x;
-	}
-	
-	explicit NTupleNetwork() {
-	
-	}
-	
-	void learn(vector<int> tuples, float target) {//8列の丸と勝敗
-        float score = 0;
-        for (size_t i=0; i < tuples.size(); i++) {
-            score += weights[i][tuples[i]];
-        }
-
-        score = tanh(score+bias);
-
-        float error = target - score;
-        float delta = error * tanh_prime(score);
-        for (size_t i=0; i < tuples.size(); i++) {
-            weights[i][tuples[i]] += learningRate * delta;
-        }
-        bias += learningRate * delta;
-	}
-	
-	float predict(vector<int> tuples) {
-        float output = 0;
-        for (size_t i=0; i < tuples.size(); i++) {
-            output += weights[i][tuples[i]];
-        }
-        return tanh(output+bias)*150.0;
-	}
-	
-	void show_param(){
-	printf("weights\n");
-	for(int i=0;i<38;i++){
-	printf("{%f,%f,%f,%f,%f,%f,%f,%f},\n",weights[i][0],weights[i][1],weights[i][2],weights[i][3],weights[i][4],weights[i][5],weights[i][6],weights[i][7]);
-	}
-	printf("bias\n");
-	printf("%f\n",bias);
-	}
-};
-
-NTupleNetwork network[ROW*COL];
-
-float wei[ROW*COL][38][8]={
-{//1
-	
-},
-{//2
-	
-},
-{//3
-	
-},
-{//4
-	
-},
-{//5
-	
-},
-{//6
-	
-},
-{//7
-	
-},
-{//8
-	
-},
-{//9
-	
-},
-{//10
-	
-},
-{//11
-	
-},
-{//12
-	
-},
-{//13
-	
-},
-{//14
-	
-},
-{//15
-	
-},	
-{//16
-	
-},
-{//17
-	
-},
-{//18
-	
-},
-{//19
-	
-},
-{//20
-	
-},
-{//21
-	
-},
-{//22
-	
-},
-{//23
-	
-},
-{//24
-	
-},
-{//25
-	
-},
-{//26
-	
-},
-{//27
-	
-},
-{//28
-	
-},
-{//29
-	
-},
-{//30
-	
-}
-};
-
-float bi[ROW*COL]={,,,,,,,,,,,,,,,,,,,,,,,,,,,,,};
-
-string actiontoS(Action act){
-	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (act.moving[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(act.moving[i]>>(3*k)));
-	if (dir==0){break;}
-	if (dir==1) { path+=to_string(3); } //"LEFT"); }
-	if (dir==2) { path+=to_string(6); } //"UP"); }
-	if (dir==3) { path+=to_string(1); } //"DOWN"); }
-	if (dir==4) { path+=to_string(4); } //"RIGHT"); }
-	}
-	}
-	return path;
-}
 int adder(F_T field[ROW][COL]){
   
     int x_cnt[DROP+1][COL]={0};
@@ -439,13 +286,14 @@ int adder(F_T field[ROW][COL]){
 
     return ret;
 }
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]); //ルート探索関数
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]) {
-  
-  if(depth==0){
+Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
+
 	int po=9+(8*(COL-1))+ROW-1;
+
 	int p_maxcombo[DROP+1] = {0};
+
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -458,10 +306,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		p_maxcombo[i]=drop[i]/3;
 	}
 	MAXCOMBO += (double)stop;
+
 	vector<node>dque;
 	double start, st;
 	//1手目を全通り探索する
 	dque.clear();
+
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -513,24 +363,28 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	accept.moving[trn] = 0ll;
 	}
-	accept.path=to_string(XX(accept.first_te))+to_string(YY(accept.first_te)+5)+",";
 	return accept;
 	}
 	dque.push_back(ca);
 	}
+
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
 	int maxValue = 0;//最高スコア
+
 	bestAction.maxcombo = stop;
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
+
 	ll rootBB[DROP+1]={0};
+
 	for(int row=0;row<ROW;row++){
 	for(int col=0;col<COL;col++){
 	int pos=po-((8*col)+row);
 	rootBB[f_field[row][col]]|=(1ll << (pos));
 	}
 	}
+
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
@@ -606,7 +460,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				bestAction.path=actiontoS(bestAction);
 				hash_chain hc;
 				F_T abc[ROW][COL];
 				memcpy(hc.field,f_field,sizeof(abc));
@@ -625,12 +478,19 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				if(!find){
 				visited.emplace(cur,nexthash);
 				}
-				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+				if(r==(int)hc.hashchain.size()-2){
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
+				}
 				}
 				}
 				congrats=true;
-				//part2+=omp_get_wtime() - start;
-				//return bestAction;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -659,7 +519,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				bestAction.score = maxValue;
 				bestAction.first_te = temp.first_te;
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				bestAction.path=actiontoS(bestAction);
 			}
 			if (i < MAX_TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
@@ -673,55 +532,73 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		part3 += omp_get_wtime() - start;
 	}
 	return bestAction;
-    
-  }
-  else{
-	stop=0;
+}
+string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
+string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
+
+/*
+	T_T first_te;
+	ll movei[(TRN/21)+1];//スワイプ移動座標
+	int score;//評価値
+	sc combo;//コンボ数
+	sc nowC;//今どのx座標にいるか
+	sc nowR;//今どのy座標にいるか
+	sc prev;//1手前は上下左右のどっちを選んだか
+	int prev_score;//1手前の評価値
+	uc improving;//評価値改善回数
+	ll hash;//盤面のハッシュ値
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	string path;
+	int path_length;
+	int pos;
+	sc prev;
+	ll hash;
+	string true_path;
+	int true_path_length;
+*/
+
+	int stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
-			if (1 <= f_field[row][col] && f_field[row][col] <= DROP) {
-				drop[(int)f_field[row][col]]++;
+			if (1 <= field[row][col] && field[row][col] <= DROP) {
+				drop[field[row][col]]++;
 			}
 		}
 	}
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
 	}
+
 	double start = omp_get_wtime();
-	vector<node2>dque;
-	deque<node2>pus[TRN+1];
-	double avg=0;
-	double path_length_array[ROW][COL];
-	  
-	if(depth==DEPTH){
-		
+
 	printf("\n-----search_start_1/2-----\n");
-		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
-	
-	stop=tmpp.score;
-		
+
+	vector<node2>dque;
+	vector<int>pro_league;
+
+	deque<node2>pus[TRN+1];
+
+	double avg=0;
+
+	double path_length_array[ROW][COL];
+
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	F_T g_field[ROW][COL];
-	memcpy(customer.field,f_field,sizeof(g_field));
-	customer.first_te=(T_T)YX(i,j);
+	node2 cand,cand2;
+	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}
+	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
+	if(i==0&&j==0){stop=0;}
+	stop=max(stop,tmp.score);
+	F_T f_field[ROW][COL];
+	memcpy(cand.field,field,sizeof(f_field));
+	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
-	customer.movei[trn] = 0ll;
-	}
-	customer.calc_path();
-	customer.pos = (i*COL)+j;
-	customer.prev = -1;
-	customer.calc_hash();
-	customer.true_path=to_string(j)+to_string(i+5)+",";
-	customer.true_path_length=0;
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer,root_field);
-	node2 cand;
-	memcpy(cand.field,f_field,sizeof(g_field));
-	cand.first_te = tmpp.first_te;
-	for (int trn = 0; trn <= TRN/21; trn++) {
-	cand.movei[trn] = tmpp.moving[trn];
+	cand.movei[trn] = tmp.moving[trn];
 	}
 	cand.calc_path();
 	cand.pos = (i*COL)+j;
@@ -729,32 +606,46 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
-	else{cand.path_length=(int)tmpp.path.length()-3;}
-	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
-	if(stop!=tmpp.score){cand.path_length=TRN;}
+	if(stop!=tmp.score){cand.path_length=TRN;}
+	printf("beam=%d,visited=%d,lim=%d\n",cand.path_length,MLEN,lim);
+	if(cand.path_length>MLEN){
+		string layout="";
+		for(int b=0;b<ROW*COL;b++){
+		layout+=field[b/COL][b%COL]-1+'0';
+		}
+		//cout<<"layout="<<layout<<endl;
+		//cout<<"prev="<<(int)cand.prev<<endl;
+		//cout<<"pos="<<cand.pos+1<<endl;
+	}
+	cand.path_length=min(cand.path_length,MLEN);
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
-	cout<<"combo="<<tmpp.score<<"/"<<stop<<endl;
+	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());
 	}
 	}
-      
 	double delta_t = omp_get_wtime()-start;
+
 	double variance=0;
+
 	avg/=(double)(ROW*COL);
+
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
 	}
+
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
+
 	printf("\n-----search_start_2/2-----\n");
 	int cnt=0;
+
 	for(int i=0;i<TRN;i++){
 	if((int)pus[i].size()==0){continue;}
 	while(1){
@@ -768,18 +659,19 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{break;}
 	}
 	}
-	}
-	else{
-	dque.push_back(customer);
-	}
+
 	int dx[DIR] = { -1, 0,0,1 };
 	int dy[DIR] = { 0,-1,1,0 };
-	Action bestAction;
+	string bestAction;
 	int maxValue = 0;
+
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
+
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
+	pro_league.clear();	
 	for (int k = 0; k < ks; k++) {
+
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
 	node2 cand = temp;
@@ -787,140 +679,68 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int y=cand.pos/COL;
 	if (0 <= x + dx[j] && x + dx[j] < COL &&0 <= y + dy[j] && y + dy[j] < ROW) {
 	if (cand.prev + j != 3) {
-	F_T g_field[ROW][COL];
-	memcpy(g_field,cand.field,sizeof(g_field));
+	F_T f_field[ROW][COL];
+	memcpy(f_field,cand.field,sizeof(f_field));
 	int nx=x + dx[j];
 	int ny=y + dy[j];
-	swap(g_field[y][x],g_field[ny][nx]);
+	swap(f_field[y][x],f_field[ny][nx]);
 	cand.pos = (ny*COL)+nx;
 	if(j==0){cand.true_path+=to_string(3);}
 	else if(j==1){cand.true_path+=to_string(6);}
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	memcpy(cand.field,g_field,sizeof(g_field));
-	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand,root_field);
+	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
+	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
 	}
+	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
-	if(depth==DEPTH){
-	int output;
-	if(tmp.path[3]==','){output=(int)tmp.path.length()-4;}
-	else if(tmp.path[2]==','){output=(int)tmp.path.length()-3;}
-	cout<<"tesuu="<<output<<endl;
-	cout<<tmp.path<<endl;
+	if(stop!=tmp.score){cand.path_length=TRN;}
+	printf("beam=%d,visited=%d,lim=%d\n",cand.path_length,MLEN,lim);
+	if(cand.path_length>MLEN){
+	string layout="";
+	for(int b=0;b<ROW*COL;b++){
+	layout+=f_field[b/COL][b%COL]-1+'0';
 	}
-	if(depth!=DEPTH-1){
-	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
-	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
-	}
-	else{
-	vector<int>vvv;
-        //tate
-        for(int r=0;r<ROW-2;r++){
-        for(int c=0;c<COL;c++){
-        if(cand.field[r][c]!=cand.field[r+1][c]&&cand.field[r][c]!=cand.field[r+2][c]&&cand.field[r+1][c]!=cand.field[r+2][c]){vvv.push_back(0);}
-        if(cand.field[r+1][c]==cand.field[r+2][c]&&cand.field[r][c]!=cand.field[r+1][c]){vvv.push_back(3);}
-        if(cand.field[r][c]==cand.field[r+2][c]&&cand.field[r][c]!=cand.field[r+1][c]){vvv.push_back(5);}
-        if(cand.field[r][c]==cand.field[r+1][c]&&cand.field[r][c]!=cand.field[r+2][c]){vvv.push_back(6);}
-        if(cand.field[r][c]==cand.field[r+1][c]&&cand.field[r][c]==cand.field[r+2][c]){vvv.push_back(7);}
-        }
-        }
-        //yoko
-            
-        for(int r=0;r<ROW;r++){
-        for(int c=0;c<COL-2;c++){
-        if(cand.field[r][c]!=cand.field[r][c+1]&&cand.field[r][c]!=cand.field[r][c+2]&&cand.field[r][c+1]!=cand.field[r][c+2]){vvv.push_back(0);}
-        if(cand.field[r][c+1]==cand.field[r][c+2]&&cand.field[r][c]!=cand.field[r][c+1]){vvv.push_back(3);}
-        if(cand.field[r][c]==cand.field[r][c+2]&&cand.field[r][c]!=cand.field[r][c+1]){vvv.push_back(5);}
-        if(cand.field[r][c]==cand.field[r][c+1]&&cand.field[r][c]!=cand.field[r][c+2]){vvv.push_back(6);}
-        if(cand.field[r][c]==cand.field[r][c+1]&&cand.field[r][c]==cand.field[r][c+2]){vvv.push_back(7);}
-        }
-        }	
-	cand.path_length=(int)floor(network[cand.pos].predict(vvv));
-	}
-	if(depth==DEPTH){
-	//printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
-	}
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
-	ff[depth-1][(4 * k) + j] = cand;
+	//cout<<"layout="<<layout<<endl;
+	//cout<<"prev="<<(int)cand.prev<<endl;
+	//cout<<"pos="<<cand.pos+1<<endl;
+	}	
+	cand.path_length=min(cand.path_length,MLEN);
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());	
+	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
-	ff[depth-1][(4 * k) + j] = cand;
+	ff[(4 * k) + j] = cand;
 	}
 	}//if(0<=x+dx[j]
 	else {
 	cand.path_length = -1;
-	ff[depth-1][(4 * k) + j] = cand;
+	ff[(4 * k) + j] = cand;
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	if(depth==DEPTH){//koko
+
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
-	}
 	dque.clear();
 	deque<int>vec[1001];
-	bool congrats=false;
 	for(int j=0;j<4*ks;j++){
-	if(ff[depth-1][j].path_length!=-1){
-	F_T g_field[ROW][COL];
-	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
-	int combo = sum_e(g_field);
-	if(combo>=stop){
-	bestAction.score = combo;
-	bestAction.first_te = ff[depth-1][j].first_te;
-	ll movei[(TRN/21)+1];
-	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
-	bestAction.path=ff[depth-1][j].true_path;
-	memcpy(g_field,root_field,sizeof(g_field));
-	int tgt=0;
-	string tp="";
-	while(1){
-	if(bestAction.path[tgt]==','){tgt++;break;}
-	tp+=bestAction.path[tgt];
-	tgt++;
-	}
-	int point;
-	if((int)tp.size()==2){int x=tp[0]-'0';int y=(tp[1]-'0')-5;point=(y*COL)+x;}
-	else{int x=tp[0]-'0';int y=5;point=(y*COL)+x;}
-	vector<ll>hashchain;
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-	bool look=false;
-	for(int p2=0;p2<(int)bestAction.path.size();p2++){
-	if(bestAction.path[p2]==','){look=true;continue;}
-	if(!look){continue;}
-	if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
-	if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
-	if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
-	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
-	}
-	if((int)hashchain.size()>0){
-        for(int p2=0;p2<(int)hashchain.size()-1;p2++){
-        ll cur=hashchain[p2];
-        ll nexthash=hashchain[p2+1];
-        bool find=false;
-        auto p = visited.equal_range(cur);
-        for (auto it = p.first; it != p.second; ++it) {
-        if(it->second==nexthash){find=true;break;}
-        }
-        if(!find){
-	visited.emplace(cur,nexthash);
-        }
-	if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
-        }
-	}
-	//return bestAction;
-	congrats=true;
-	}
-	vec[ff[depth-1][j].path_length].push_front(j);
+	if(ff[j].path_length!=-1){
+	F_T f_field[ROW][COL];
+	memcpy(f_field,ff[j].field,sizeof(f_field));
+	int combo = sum_e(f_field);
+	if(combo>=stop){return ff[j].true_path;}
+	vec[ff[j].path_length].push_front(j);
 	}
 	}
-	if(congrats){return bestAction;}
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
@@ -929,24 +749,17 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
-	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score);
-	}
 	int v=vec[possible_score][0];
-	node2 temp = ff[depth-1][v];
+	node2 temp = ff[v];
 	//swap(vec[possible_score][0], vec[possible_score].back());
 	//vec[possible_score].pop_back();
 	vec[possible_score].pop_front();
-	F_T g_field[ROW][COL];
-	memcpy(g_field,temp.field,sizeof(g_field));
-	int combo = sum_e(g_field);
+	F_T f_field[ROW][COL];
+	memcpy(f_field,temp.field,sizeof(f_field));
+	int combo = sum_e(f_field);
 	if (maxValue < combo) {//コンボ数が増えたらその手を記憶する
 	maxValue = combo;
-	bestAction.score = combo;
-	bestAction.first_te = temp.first_te;
-	ll movei[(TRN/21)+1];
-	memcpy(bestAction.moving, temp.movei, sizeof(movei));
-	bestAction.path=temp.true_path;
+	bestAction=temp.true_path;
 	}
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
@@ -957,10 +770,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}
 	}//for(int i=0;
+
 	return bestAction;
-  
-  }
-    
+
 }
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
@@ -1018,6 +830,7 @@ int chain(int nrw, int ncl, F_T d, F_T field[ROW][COL],
 }
 int evaluate(F_T field[ROW][COL], int flag) {
 	int combo = 0;
+
 	while (1) {
 		int cmb = 0;
 		F_T chkflag[ROW][COL]={0};
@@ -1062,12 +875,14 @@ int evaluate(F_T field[ROW][COL], int flag) {
 				if (delflag[row][col]> 0) { field[row][col] = 0; }
 			}
 		}
+
 		if (flag & EVAL_FALL){
 		for(int x=0;x<COL;x++){
 		fall(x,GetHeight[x],field);
 		}
 		}//落下処理発生
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
+
 	}
 	return combo;
 }
@@ -1077,6 +892,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -1115,7 +931,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
+
 		F_T erase_x[COL]={0};
+
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (delflag[row][col]>0) {
@@ -1140,7 +958,11 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-		cmb2*=4;
+
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
+
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -1154,6 +976,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
+
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
 		for(int row=0;row<ROW;row++){
@@ -1163,6 +986,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1176,6 +1000,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
+
 	}
 	ev += oti;
 	*hash=ha;
@@ -1186,20 +1011,30 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	*combo = 0;
 	int oti = 0;
 	ll occBB=0;
+
 	for(int i=1;i<=DROP;i++){
 	occBB|=dropBB[i];
 	}
+
 	int po=9+(8*(COL-1))+ROW-1;
+
 	int d_maxcombo[DROP+1]={0};
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
+
 		ll linked[DROP+1]={0};
+
 		for(int i=1;i<=DROP;i++){
+
 		ll vert = (dropBB[i]) & (dropBB[i] << 1) & (dropBB[i] << 2);
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
+
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
+
 		}
+
 		for(int i=1;i<=DROP;i++){
 		long long tmp_linked=(long long)linked[i];
 		while(1){
@@ -1221,12 +1056,20 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
+
+
 		for(int i=1;i<=DROP;i++){
+
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
+
 		ll erased_dropBB=(dropBB[i])^(linked[i]);
+
 		if(erased_dropBB==0ll){continue;}
+
 		int c=__builtin_popcountll(erased_dropBB);
+
 		if(c<3){continue;}
+
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
 		ll exist=(ll)t;
@@ -1239,11 +1082,16 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
 		}
+
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-		cmb2*=4;
+
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
+
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
@@ -1257,6 +1105,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
+
 		for(int col=0;col<COL;col++){
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
@@ -1264,12 +1113,15 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
+
 		ll mask=calc_mask(occBB);
+
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]=fallBB(dropBB[i],occBB,mask);
 		}
@@ -1332,11 +1184,15 @@ ll xor128() {//xorshift整数乱数
 	return (rw = (rw ^ (rw >> 19)) ^ (rt ^ (rt >> 8)));
 }
 ll calc_mask(ll bitboard){
+
 ll ret=0;
+
 for(int i=0;i<COL;i++){
 ret|=fill_64[__builtin_popcountll((bitboard & file_bb[i]))] << (8*(COL-i));
 }
+
 return ret;
+
 }
 ll fallBB(ll p,ll rest, ll mask)
 {
@@ -1344,7 +1200,10 @@ p = _pext_u64(p, rest);
 p = _pdep_u64(p, mask);
 return p;
 }
+
 int main() {
+
+
 	/*
 	testcase
 	
@@ -1353,35 +1212,36 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
-	
+
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
-	
+
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
-	
+
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
-	
+
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
-	
+
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
-	
+
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
-	
+
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
-	
+
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
-	
+
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
-	
+
 	*/
+
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
@@ -1407,30 +1267,26 @@ int main() {
 	table[ ha >> 58 ] = i;
 	ha <<= 1;
 	}
+
 	ll res=2ll;
 	fill_64[1]=res;
 	for(i=2;i<64;i++){
 	fill_64[i]=res+(1ll<<i);
 	res=fill_64[i];
 	}
+
 	for(i=0;i<COL;i++){
 	for(j=0;j<ROW;j++){
 	file_bb[i] |= (1ll << (po-j));
 	}
 	po-=8;
 	}
-	for(i=0;i<ROW*COL;i++){
-	network[i].bias=bi[i];
-	for(j=0;j<38;j++){
-	for(k=0;k<8;k++){
-	network[i].weights[j][k]=wei[i][j][k];
-	}
-	}
-	}
+
 	string bestans="";
 	string layout="";
 	string date="";
 	string url="";
+
 	double avg = 0;//平均コンボ数
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
@@ -1452,11 +1308,8 @@ int main() {
 		printf("\n");
 		show_field(f_field);//盤面表示
 		printf("\n");
-		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
-		node2 customer;
-		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field);
-		bestans=act.path;
+		bestans=BEAM_SEARCH2(f_field,TRN);
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
 		double diff = omp_get_wtime() - start;
@@ -1464,13 +1317,16 @@ int main() {
 		int tgt=0;
 		string top="";
 		while(1){
+
 		if(bestans[tgt]==','){tgt++;break;}
 		top+=bestans[tgt];
 		tgt++;
+
 		}
 		int pos;
 		if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 		else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+
 		for(j=tgt;j<(int)bestans.size();j++){
 		if(bestans[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
 		if(bestans[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
@@ -1497,6 +1353,7 @@ int main() {
 		cout<<url<<endl;
 		printf("\ncompleted\n");
 		printf("\n}\n");
+
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
