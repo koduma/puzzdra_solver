@@ -592,7 +592,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
 	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}
-  if(lim<MLEN&&MLEN<TRN){continue;}
+	if(lim<MLEN&&MLEN<TRN){continue;}
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
