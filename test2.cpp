@@ -492,9 +492,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				}
 				congrats=true;
 			}
-			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			bool improve=false;
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;improve=true;}	
 			fff[j].prev_score=fff[j].score;
+			if(ks2==0||improve){
 			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
+			}
 			ks2++;
 			}
 		}
@@ -591,8 +594,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
 	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}
-	if(lim<MLEN&&MLEN<TRN){continue;}
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
@@ -694,12 +696,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}
-	if(lim<MLEN&&MLEN<TRN){
-	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
-	continue;
-	}
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
