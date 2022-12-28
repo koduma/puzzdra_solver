@@ -495,7 +495,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			bool improve=false;
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;improve=true;}	
 			fff[j].prev_score=fff[j].score;
-			if(ks2==0||improve){
+			if(ks2<=10000||improve){
 			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
 			}
 			ks2++;
