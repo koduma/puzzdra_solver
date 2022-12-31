@@ -616,21 +616,25 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	if(cand.path_length!=TRN){
 	avg+=(double)cand.path_length;
-	}
-	path_length_array[i][j]=(double)cand.path_length;
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());	
+	}
+	path_length_array[i][j]=(double)cand.path_length;	
 	}
 	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
-
-	avg/=(double)(ROW*COL);
+	
+	if((int)pro_league.size()>0){
+	avg/=(double)(pro_league.size());
+	}
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+	if(path_length_array[i][j]<=149.0){
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
+	}
 	}
 	}
 
