@@ -540,48 +540,48 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
                 }
                 }
                 if(fff[j].combo >= stop){
-				maxValue = fff[j].combo;
-				bestAction.score = maxValue;
-				bestAction.first_te = fff[j].first_te;
-				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				hash_chain hc;
-				F_T abc[ROW][COL];
-				memcpy(hc.field,f_field,sizeof(abc));
-				hc.first_te=fff[j].first_te;
-				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
-				hc.calc_hashchain();
-				if((int)hc.hashchain.size()>0){
-				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
-				ll cur=hc.hashchain[r];
-				ll nexthash=hc.hashchain[r+1];
-				bool find=false;
-				auto p = visited.equal_range(cur);
-				for (auto it = p.first; it != p.second; ++it) {
-				if(it->second==nexthash){find=true;break;}
-				}
-				if(!find){
-				visited.emplace(cur,nexthash);
-				}
-				if(r==(int)hc.hashchain.size()-2){
-				find=false;
-				p=visited.equal_range(nexthash);
-				for (auto it = p.first; it != p.second; ++it) {
-				if(it->second==(ll)1){find=true;break;}
-				}
-				if(!find){
-				visited.emplace(nexthash,(ll)1);
-				}
-				}
-				}
-				}
-				congrats=true;
-			}
-			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
-			fff[j].prev_score=fff[j].score;
-			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000;
-			vec[sco].push_front(j);
-			ks2++;
-			}
+		maxValue = fff[j].combo;
+		bestAction.score = maxValue;
+		bestAction.first_te = fff[j].first_te;
+		memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+		hash_chain hc;
+		F_T abc[ROW][COL];
+		memcpy(hc.field,f_field,sizeof(abc));
+		hc.first_te=fff[j].first_te;
+		memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
+		hc.calc_hashchain();
+		if((int)hc.hashchain.size()>0){
+		for(int r=0;r<(int)hc.hashchain.size()-1;r++){
+		ll cur=hc.hashchain[r];
+		ll nexthash=hc.hashchain[r+1];
+		bool find=false;
+		auto p = visited.equal_range(cur);
+		for (auto it = p.first; it != p.second; ++it) {
+		if(it->second==nexthash){find=true;break;}
+		}
+		if(!find){
+		visited.emplace(cur,nexthash);
+		}
+		if(r==(int)hc.hashchain.size()-2){
+		find=false;
+		p=visited.equal_range(nexthash);
+		for (auto it = p.first; it != p.second; ++it) {
+		if(it->second==(ll)1){find=true;break;}
+		}
+		if(!find){
+		visited.emplace(nexthash,(ll)1);
+		}
+		}
+		}
+		}
+		congrats=true;
+		}
+		if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+		fff[j].prev_score=fff[j].score;
+		int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000;
+		vec[sco].push_front(j);
+		ks2++;
+		}
 		}
 		part2+=omp_get_wtime() - start;
 		if(congrats){return bestAction;}
