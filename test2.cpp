@@ -234,7 +234,7 @@ struct node2 {
 	
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
-    pair<int,ll>p=dfs(cur,0,&v);
+	pair<int,ll>p=dfs(cur,0,&v);
 	return p.first;
 	}
 
@@ -508,9 +508,9 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		deque<int>vec[5001];
 		int ks2 = 0;
 		bool congrats=false;
-        int ni=TRN;
+		int ni=TRN;
 		for (int j = 0; j < 4 * ks; j++) {
-			if (fff[j].combo != -1) {
+		if (fff[j].combo != -1) {
                 if(type==0){
                 ll curr=fff[j].hash^zoblish_field2[(fff[j].nowR*COL)+fff[j].nowC];
                 if(mapobj[curr].prev_score!=-1){
@@ -563,7 +563,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				visited.emplace(cur,nexthash);
 				}
 				if(r==(int)hc.hashchain.size()-2){
-        find=false;
+				find=false;
 				p=visited.equal_range(nexthash);
 				for (auto it = p.first; it != p.second; ++it) {
 				if(it->second==(ll)1){find=true;break;}
@@ -571,14 +571,14 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				if(!find){
 				visited.emplace(nexthash,(ll)1);
 				}
-        }
+				}
 				}
 				}
 				congrats=true;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-            int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000;
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000;
 			vec[sco].push_front(j);
 			ks2++;
 			}
@@ -666,8 +666,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	double avg=0;
 
 	double path_length_array[ROW][COL];
-    
-  vector<int>pro_league;
+	
+	vector<int>pro_league;
 
 	if(read_file_mode==0){
 
@@ -675,7 +675,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
-  int lim=TRN;
+	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];} 
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop,0);
 	if(i==0&&j==0){stop=0;}
@@ -692,8 +692,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.calc_hash();
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
-  if(cand.path_length>lim){
-  tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop,1);
+	if(cand.path_length>lim){
+	tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop,1);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -702,15 +702,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.pos = (i*COL)+j;
 	cand.prev = -1;
 	cand.calc_hash();
-  }
-  if(stop!=tmp.score){cand.path_length=TRN;}
+	}
+	if(stop!=tmp.score){cand.path_length=TRN;}
 	cand.path_length=min(cand.path_length,MLEN);
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
-  pro_league.push_back(cand.path_length);
+	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());    
 	path_length_array[i][j]=(double)cand.path_length;
 	}
@@ -872,7 +872,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
-  int lim=TRN;
+	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	    
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop,0);
 	cand.first_te = tmp.first_te;
@@ -882,18 +882,18 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
-  if(cand.path_length>lim){
-  tmp=BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop,1);
+	if(cand.path_length>lim){
+	tmp=BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop,1);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
 	}
 	cand.calc_path();
 	cand.calc_hash();
-  }    
+	}    
 	if(stop!=tmp.score){cand.path_length=TRN;}
 	cand.path_length=min(cand.path_length,MLEN);
-  pro_league.push_back(cand.path_length);
+	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());    
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
