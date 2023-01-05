@@ -118,6 +118,8 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
+int BW[DEPTH+1]={10000,100,1};
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -234,7 +236,7 @@ struct node2 {
 	emilib::HashMap<ll, bool>v;
 	return dfs(cur,0,&v);	
 	}
-}ff[DEPTH][DIR*BEAM_WIDTH2];
+}ff[DEPTH][DIR*BEAM_WIDTH];
 struct Action {//最終的に探索された手
 	T_T first_te;
 	int score;//コンボ数
@@ -471,7 +473,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				if(!find){
 				visited.emplace(cur,nexthash);
 				}
-				if(r==(int)hc.hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
+				if(r==(int)hc.hashchain.size()-2){
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
+				}
 				}
 				}
 				congrats=true;
@@ -489,7 +500,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
-		for (int j = 0; push_node < BEAM_WIDTH ;j++) {
+		for (int j = 0; push_node < BW[depth] ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
 			possible_score--;
@@ -550,6 +561,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+//if(i*COL+j!=22){continue;}
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
 	customer.first_te=(T_T)YX(i,j);
@@ -607,7 +619,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((int)pus[i].size()==0){break;}
 	node2 cand=pus[i][0];
 	pus[i].pop_front();
-	if(cnt<BEAM_WIDTH2){
+	if(cnt<BW[depth]){
 	dque.push_back(cand);
 	cnt++;
 	}
@@ -742,7 +754,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(congrats){return bestAction;}
 	int push_node=0;
 	int possible_score=0;
-	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
+	for (int j = 0; push_node < BW[depth] ;j++) {
 	if(possible_score>1000){break;}
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
