@@ -1014,7 +1014,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	int penalty=0;
 
 	for(int i=1;i<=DROP;i++){
-	penalty+=(p_maxcombo[i]-d_maxcombo[i])*30;
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
 
 	int alone=0;
@@ -1158,7 +1158,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 
 	for(int i=1;i<=DROP;i++){
 	board=board|dropBB[i];
-	penalty+=(p_maxcombo[i]-d_maxcombo[i])*30;
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
 
 	int alone=0;
