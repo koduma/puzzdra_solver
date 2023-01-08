@@ -1010,8 +1010,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 
 	}
 	ev += oti;
-  
-  int penalty=0;
+	
+	int penalty=0;
 
 	for(int i=1;i<=DROP;i++){
 	penalty+=(p_maxcombo[i]-d_maxcombo[i])*30;
@@ -1151,8 +1151,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
-  
-  int penalty=0;
+	
+	int penalty=0;
 
 	ll board=0ll;
 
