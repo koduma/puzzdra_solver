@@ -1018,13 +1018,18 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	}
 
 	int alone=0;
+	
+	bool find=false;
 
 	for(int x=0;x<COL;x++){
-	if(field[ROW-1][x] == 0){alone++;}
+	if(field[ROW-1][x] == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}	
 	}
 
 	ev-=penalty*alone;
-  
   
 	*hash=ha;
 	return ev;
@@ -1162,9 +1167,15 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 
 	int alone=0;
+	
+	bool find=false;
 
 	for(int x=0;x<COL;x++){
-	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){alone++;}
+	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}
 	}
 
 	ev-=penalty*alone;
