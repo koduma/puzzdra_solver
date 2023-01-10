@@ -119,10 +119,36 @@ ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 
+multimap<ll, ll> visited;	
+ll zoblish_field2[ROW*COL];
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
    return out;
+}
+
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
+if((*v)[cur]){return TRN;}
+(*v)[cur]=true;
+auto p = visited.equal_range(cur);
+int pl=TRN;
+for (auto it = p.first; it != p.second; ++it) {
+if((it->second)==(ll)1){pl=min(pl,depth);break;}
+else{pl=min(pl,dfs(it->second,depth+1,v));}
+}
+return pl;
+}
+
+ll c_hash(F_T board[ROW][COL]){
+ll hash=0ll;
+for (int row = 0; row < ROW; row++) {
+for (int col = 0; col < COL; col++) {
+F_T num = board[row][col];
+hash ^= zoblish_field[row][col][(int)num];
+}
+}
+return hash;
 }
 
 struct node {//どういう手かの構造体    
@@ -139,12 +165,15 @@ struct node {//どういう手かの構造体
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
+		this->prev_score = -1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
+
+map<ll,struct node> mapobj;
 
 struct node2 {
 
@@ -180,15 +209,13 @@ struct node2 {
 	}
 
 	void calc_hash(){
-
-	hash=0ll;
-
-	for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-	F_T num = field[row][col];
-	hash ^= zoblish_field[row][col][(int)num];
+	
+	hash=c_hash(field);
 	}
-	}
+	
+	int calc_pl(ll cur){
+	emilib::HashMap<ll, bool>v;
+	return dfs(cur,0,&v);	
 	}
 
 }ff[DIR*BEAM_WIDTH2];
@@ -201,6 +228,71 @@ struct Action {//最終的に探索された手
 	Action() {//初期化
 		this->score = 0;
 		//memset(this->moving, STP, sizeof(this->moving));
+	}
+};
+
+struct hash_chain{
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	vector<ll>hashchain;
+	node n;
+    
+	ll check_hash(F_T board[ROW][COL]){
+	return c_hash(board);
+	}
+	
+	void calc_hashchain(){
+	/*
+	ll movei[(TRN/21)+1];//スワイプ移動座標
+	ll hash;//盤面のハッシュ値
+	int score;//評価値
+	int prev_score;//1手前の評価値
+	T_T first_te;
+	uc improving;//評価値改善回数
+	sc combo;//コンボ数
+	sc nowC;//今どのx座標にいるか
+	sc nowR;//今どのy座標にいるか
+	sc prev;//1手前は上下左右のどっちを選んだか
+	*/    
+    
+	int pos=XX(first_te)+YY(first_te)*COL;
+	for(int i=0;i<=TRN/21;i++){
+	n.movei[i]=0ll;
+	}
+	n.hash=check_hash(field);
+	n.score=0;
+	n.prev_score=0;
+	n.first_te=first_te;
+	n.improving=0;
+	n.combo=0;
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+        
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	int pl=0;
+        
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (movei[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(movei[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
+	n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
+	n.hash=check_hash(field);
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=dir-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	pl++;
+	}
+	}
 	}
 };
 
@@ -298,6 +390,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
+	if((int)cmb>=stop){
+	Action accept;
+	accept.first_te=ca.first_te;
+	accept.score=stop;
+	accept.maxcombo=stop;
+	for (int trn = 0; trn <= TRN/21; trn++) {
+	accept.moving[trn] = 0ll;
+	}
+	return accept;
+	}
 	dque.push_back(ca);
 	}
 
@@ -385,6 +487,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		dque.clear();
 		deque<int>vec[5001];
 		int ks2 = 0;
+		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
@@ -392,8 +495,37 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				bestAction.score = maxValue;
 				bestAction.first_te = fff[j].first_te;
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
-				part2+=omp_get_wtime() - start;
-				return bestAction;
+				hash_chain hc;
+				F_T abc[ROW][COL];
+				memcpy(hc.field,f_field,sizeof(abc));
+				hc.first_te=fff[j].first_te;
+				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
+				hc.calc_hashchain();
+				if((int)hc.hashchain.size()>0){
+				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
+				ll cur=hc.hashchain[r];
+				ll nexthash=hc.hashchain[r+1];
+				bool find=false;
+				auto p = visited.equal_range(cur);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==nexthash){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(cur,nexthash);
+				}
+				if(r==(int)hc.hashchain.size()-2){
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
+				}
+				}
+				}
+				congrats=true;
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
@@ -402,7 +534,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(i==MAX_TRN-1){return bestAction;}
+		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -438,7 +570,26 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
-
+	string lt="";
+	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
+	if(read_file_mode!=0){
+	    ifstream myf ("visited"+lt+".txt");
+	    string ls;
+	    while(getline(myf,ls)){
+		    string parent="";
+		    string child="";
+		    bool comma=false;
+		    for(int i=0;i<(int)ls.size();i++){
+			    if(ls[i]=='\n'){break;}
+			    if(ls[i]==','){comma=true;continue;}
+			    if(comma){child+=ls[i];}
+			    else{parent+=ls[i];}
+		    }
+		    visited.emplace(stoull(parent),stoull(child));
+	    }
+	    myf.close();
+	}
+	
 	int ALPHA=1;
 
 	int stop=0;
@@ -465,17 +616,20 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	double avg=0;
 
 	double path_length_array[ROW][COL];
+	
+	vector<int>pro_league;
 
 	if(read_file_mode==0){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	int ppp=(i*COL)+j+1;
-	//if(ppp!=24){continue;}
-	Action tmp=BEAM_SEARCH(field,1,TRN,-1,(i*COL)+j,stop);
+	node2 cand,cand2;
+	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
+	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
-	node2 cand;
 	F_T f_field[ROW][COL];
 	memcpy(cand.field,field,sizeof(f_field));
 	cand.first_te = tmp.first_te;
@@ -489,12 +643,27 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.true_path_length=0;
 	if(stop!=tmp.score){cand.path_length=TRN;}
+	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	if(cand.path_length>MLEN){
+		string layout="";
+		for(int b=0;b<ROW*COL;b++){
+		layout+=field[b/COL][b%COL]-1+'0';
+		}
+		//cout<<"layout="<<layout<<endl;
+		//cout<<"prev="<<(int)cand.prev<<endl;
+		//cout<<"pos="<<cand.pos+1<<endl;
+	}
+	cand.path_length=min(cand.path_length,MLEN);
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
+	if(cand.path_length!=TRN){
 	avg+=(double)cand.path_length;
-	path_length_array[i][j]=(double)cand.path_length;
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());	
+	}
+	path_length_array[i][j]=(double)cand.path_length;	
 	}
 	}
 
@@ -571,33 +740,22 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	ALPHA+=nnn.path_length;
 	}
 	}
-
-/*
-
-	F_T field[ROW][COL];//ok
-	T_T first_te;//ok
-	ll movei[(TRN/21)+1];//ok
-	string path;//ok
-	int path_length;//ok
-	int pos;//ok
-	sc prev;//ok
-	ll hash;//ok
-	string true_path;//ok
-	int true_path_length;//ok
-*/
-
 	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
 
-	avg/=(double)(ROW*COL);
+	if((int)pro_league.size()>0){
+	avg/=(double)(pro_league.size());
+	}
 	
 	if(read_file_mode==0){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+	if(path_length_array[i][j]<=149.0){	
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
+	}
 	}
 	}
 	
@@ -632,6 +790,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
+	pro_league.clear();	
 	
 	ofstream file("input.txt");
 
@@ -640,10 +799,17 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	file << mystring;
 	}
 	file.close();
+		
+	ofstream fi("visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		fi<<mystr;
+	}
+	fi.close();
+		
 	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
-	
 	for (int j = 0; j < DIR; j++) {
 	node2 cand = temp;
 	int x=cand.pos%COL;
@@ -661,7 +827,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else if(j==2){cand.true_path+=to_string(1);}
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
-	Action tmp = BEAM_SEARCH(f_field,i+2,TRN,cand.prev,cand.pos,stop);
+	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
+	int lim=TRN;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
+	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -669,6 +838,20 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(cand.field,f_field,sizeof(f_field));
 	cand.calc_path();
 	cand.calc_hash();
+	if(stop!=tmp.score){cand.path_length=TRN;}
+	//printf("beam=%d,visited=%d\n",cand.path_length,MLEN);
+	if(cand.path_length>MLEN){
+	string layout="";
+	for(int b=0;b<ROW*COL;b++){
+	layout+=f_field[b/COL][b%COL]-1+'0';
+	}
+	//cout<<"layout="<<layout<<endl;
+	//cout<<"prev="<<(int)cand.prev<<endl;
+	//cout<<"pos="<<cand.pos+1<<endl;
+	}	
+	cand.path_length=min(cand.path_length,MLEN);
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());	
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -915,8 +1098,10 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
+		//cmb2*=4;
 
-		cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1043,7 +1228,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB^=linked[i];
 		}
 
-		cmb2*=4;
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1204,6 +1391,11 @@ int main() {
 	}
 	}
 	}
+	
+	for(i=0;i<ROW*COL;i++){
+	zoblish_field2[i]=xor128();
+	}
+    
 	int po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
@@ -1313,6 +1505,14 @@ int main() {
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	
+	ofstream fi("visited"+layout+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();
+    
 	cin>>i;
 	cin>>j;
 	cin>>k;
