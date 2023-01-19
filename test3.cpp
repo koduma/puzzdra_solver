@@ -1118,7 +1118,7 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		
 		for(int x=0;x<COL;x++){
-		int pos1=po-(8*x+ROW-1);
+		int pos1=po-((8*x)+ROW-1);
 		int pos2=po-(8*x);
 		if(((occBB>>pos1)&1) == 0){
 		cmb2++;
