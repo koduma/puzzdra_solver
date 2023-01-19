@@ -953,6 +953,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					}
 					field[row][col]=0;
 					erase_x[col]=1;
+          if(row==ROW-1||col==COL-1){cmb2++;}
 				}
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
@@ -1115,6 +1116,28 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
+    
+    for(int x=0;x<COL;x++){
+		int pos1=po-(8*x+ROW-1);
+		int pos2=po-(8*x);
+    if(((occBB>>pos1)&1) == 0){
+      cmb2++;
+    }
+    if(((occBB>>pos2)&1) == 0){
+      cmb2++;
+    }
+    }
+    
+    for(int y=0;y<ROW;y++){
+    int pos1=po-(8*(COL-1)+y);
+    int pos2=po-y;
+    if(((occBB>>pos1)&1) == 0){
+      cmb2++;
+    }
+    if(((occBB>>pos2)&1) == 0){
+      cmb2++;
+    }
+    }
 
 		//cmb2*=4;
 		cmb2+=cmb2;
