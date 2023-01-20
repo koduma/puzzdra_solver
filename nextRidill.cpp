@@ -1,47 +1,39 @@
 /*
-
 Windows10,Windows11,Linux,MacOS
 
 Linux導入手続き
 
 //メモリ容量確認
-
 free -h
 
 //g++インストール
-
 sudo apt install -y g++
 
 //wgetインストール
-
 sudo apt-get update
 sudo apt-get install -y wget
 
-//test2.cppをダウンロード
-
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/test2.cpp
+//Ridill.cppをダウンロード
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Ridill.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
-
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
-
-vi test2.cpp
+vi Ridill.cpp
 
 //コンパイル
-
-Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large -ldl
-Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -mcmodel=large
-MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread test2.cpp loguru.cpp -o test2 -ldl
+Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large -ldl
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -mcmodel=large
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -ldl
 
 //run
-
-./test2
+./Ridill
 
 //input
+
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -87,7 +79,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 2800000//MAX2800000
-#define BEAM_WIDTH2 3//MAX30
+#define BEAM_WIDTH2 1000//MAX1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -115,6 +107,7 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
+int read_file_mode;
 
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
@@ -158,33 +151,7 @@ hash ^= zoblish_field[row][col][(int)num];
 return hash;
 }
 
-struct hash_chain{
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	vector<ll>hashchain;
-	ll check_hash(F_T board[ROW][COL]){
-	return c_hash(board);
-	}
-	
-	void calc_hashchain(){
-	int pos=XX(first_te)+YY(first_te)*COL;
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (movei[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(movei[i]>>(3*k)));
-	if (dir==0){break;}
-	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
-	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
-	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
-	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	}
-	}
-	}
-};
-struct node {//どういう手かの構造体
+struct node {//どういう手かの構造体    
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
 	int score;//評価値
@@ -205,6 +172,8 @@ struct node {//どういう手かの構造体
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
+
+map<ll,struct node> mapobj;
 
 struct node2 {
 
@@ -262,6 +231,71 @@ struct Action {//最終的に探索された手
 	}
 };
 
+struct hash_chain{
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	vector<ll>hashchain;
+	node n;
+    
+	ll check_hash(F_T board[ROW][COL]){
+	return c_hash(board);
+	}
+	
+	void calc_hashchain(){
+	/*
+	ll movei[(TRN/21)+1];//スワイプ移動座標
+	ll hash;//盤面のハッシュ値
+	int score;//評価値
+	int prev_score;//1手前の評価値
+	T_T first_te;
+	uc improving;//評価値改善回数
+	sc combo;//コンボ数
+	sc nowC;//今どのx座標にいるか
+	sc nowR;//今どのy座標にいるか
+	sc prev;//1手前は上下左右のどっちを選んだか
+	*/    
+    
+	int pos=XX(first_te)+YY(first_te)*COL;
+	for(int i=0;i<=TRN/21;i++){
+	n.movei[i]=0ll;
+	}
+	n.hash=check_hash(field);
+	n.score=0;
+	n.prev_score=0;
+	n.first_te=first_te;
+	n.improving=0;
+	n.combo=0;
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+        
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	int pl=0;
+        
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (movei[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(movei[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
+	n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
+	n.hash=check_hash(field);
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=dir-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	pl++;
+	}
+	}
+	}
+};
+
 int adder(F_T field[ROW][COL]){
   
     int x_cnt[DROP+1][COL]={0};
@@ -286,6 +320,7 @@ int adder(F_T field[ROW][COL]){
 
     return ret;
 }
+
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -535,29 +570,27 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
-
-/*
-	T_T first_te;
-	ll movei[(TRN/21)+1];//スワイプ移動座標
-	int score;//評価値
-	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
-	sc prev;//1手前は上下左右のどっちを選んだか
-	int prev_score;//1手前の評価値
-	uc improving;//評価値改善回数
-	ll hash;//盤面のハッシュ値
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	string path;
-	int path_length;
-	int pos;
-	sc prev;
-	ll hash;
-	string true_path;
-	int true_path_length;
-*/
+	string lt="";
+	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
+	if(read_file_mode!=0){
+	    ifstream myf ("visited"+lt+".txt");
+	    string ls;
+	    while(getline(myf,ls)){
+		    string parent="";
+		    string child="";
+		    bool comma=false;
+		    for(int i=0;i<(int)ls.size();i++){
+			    if(ls[i]=='\n'){break;}
+			    if(ls[i]==','){comma=true;continue;}
+			    if(comma){child+=ls[i];}
+			    else{parent+=ls[i];}
+		    }
+		    visited.emplace(stoull(parent),stoull(child));
+	    }
+	    myf.close();
+	}
+	
+	int ALPHA=1;
 
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -586,12 +619,14 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	
 	vector<int>pro_league;
 
+	if(read_file_mode==0){
+
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
 	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
@@ -631,20 +666,99 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	path_length_array[i][j]=(double)cand.path_length;	
 	}
 	}
+
+	}
+	else{
+		
+	Action tmpp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	
+	stop=tmpp.score;
+
+	int kosu=0;
+	string line;
+	string t_path[BEAM_WIDTH2];
+	ifstream myfile ("input.txt");
+
+	while(getline(myfile,line)){
+
+	t_path[kosu]=line;
+	kosu++;
+
+	}
+	myfile.close();
+
+	for(int i=0;i<kosu;i++){
+	
+	node2 nnn;
+	
+	nnn.true_path.clear();
+
+	F_T f_field[ROW][COL];
+	memcpy(f_field,field,sizeof(f_field));
+
+	int tgt=0;
+	string top="";
+	while(1){
+	nnn.true_path.push_back(t_path[i][tgt]);
+	if(t_path[i][tgt]==','){tgt++;break;}
+	top+=t_path[i][tgt];
+	tgt++;
+
+	}
+	int pos;
+	sc pre_v;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+
+	nnn.first_te=(T_T)YX(pos/COL,pos%COL);
+
+	for(int j=0;j<=TRN/21;j++){
+	nnn.movei[j]=0ll;
+	}
+	int basyo=0;
+
+	for(int j=tgt;j<(int)t_path[i].size();j++){
+	if(t_path[i][j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
+	else if(t_path[i][j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
+	else if(t_path[i][j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
+	else if(t_path[i][j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else{continue;}
+	nnn.true_path.push_back(t_path[i][j]);
+	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
+	basyo++;
+	}
+	nnn.prev=pre_v;
+	nnn.pos=pos;
+	memcpy(nnn.field,f_field,sizeof(f_field));
+	nnn.calc_path();
+	nnn.calc_hash();
+	//nnn.true_path=t_path[i];
+	nnn.true_path_length=nnn.path_length;
+	pus[nnn.path_length].push_front(nnn);
+	if(i==0){
+	printf("path_length=%d\n",nnn.path_length);
+	ALPHA+=nnn.path_length;
+	}
+	}
+	}
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
-	
+
 	if((int)pro_league.size()>0){
 	avg/=(double)(pro_league.size());
 	}
+	
+	if(read_file_mode==0){
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	if(path_length_array[i][j]<=149.0){
+	if(path_length_array[i][j]<=149.0){	
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
 	}
 	}
+	}
+	
 	}
 
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
@@ -677,6 +791,22 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
 	pro_league.clear();	
+	
+	ofstream file("input.txt");
+
+	for (int k = 0; k < ks; k++) {
+	string mystring=dque[k].true_path+'\n';
+	file << mystring;
+	}
+	file.close();
+		
+	ofstream fi("visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		fi<<mystr;
+	}
+	fi.close();
+		
 	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
@@ -699,7 +829,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -755,6 +885,9 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
+	}
+	if(push_node==0){
+	printf("predict=%d\n",i+ALPHA+possible_score);
 	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
@@ -953,7 +1086,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					}
 					field[row][col]=0;
 					erase_x[col]=1;
-					if(row==ROW-1||col==COL-1){cmb2++;}
 				}
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
@@ -966,8 +1098,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-
 		//cmb2*=4;
+
 		cmb2+=cmb2;
 		cmb2+=cmb2;
 
@@ -1030,8 +1162,8 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	else{find=false;}	
 	}
 
-	ev-=penalty*alone;
-  
+	ev-=penalty*alone;	
+	
 	*hash=ha;
 	return ev;
 }
@@ -1116,28 +1248,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-		
-		for(int x=0;x<COL;x++){
-		int pos1=po-((8*x)+ROW-1);
-		int pos2=po-(8*x);
-		if(((occBB>>pos1)&1) == 0){
-		cmb2++;
-		}
-		if(((occBB>>pos2)&1) == 0){
-		cmb2++;
-		}
-		}
-		
-		for(int y=0;y<ROW;y++){
-		int pos1=po-(8*(COL-1)+y);
-		int pos2=po-y;
-		if(((occBB>>pos1)&1) == 0){
-		cmb2++;
-		}
-		if(((occBB>>pos2)&1) == 0){
-		cmb2++;
-		}
-		}
 
 		//cmb2*=4;
 		cmb2+=cmb2;
@@ -1201,7 +1311,8 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 
 	ev-=penalty*alone;
-  
+	
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -1279,6 +1390,7 @@ int main() {
 
 
 	/*
+
 	testcase
 	
 	layout=367254402726710107527213362754
@@ -1328,7 +1440,7 @@ int main() {
 	for(i=0;i<ROW*COL;i++){
 	zoblish_field2[i]=xor128();
 	}
-	
+    
 	int po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
@@ -1368,6 +1480,13 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
+		read_file_mode=0;
+		string suru;
+		printf("readfile?(y/n)=");
+		cin>>suru;
+		if(suru=="y"){
+		read_file_mode=1;
+		}
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
@@ -1431,6 +1550,14 @@ int main() {
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	
+	ofstream fi("visited"+layout+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();
+    
 	cin>>i;
 	cin>>j;
 	cin>>k;
