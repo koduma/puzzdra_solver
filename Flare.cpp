@@ -118,7 +118,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={10000,100,1};
+int BW[DEPTH+1]={BEAM_WIDTH,100,1};
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
