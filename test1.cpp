@@ -267,7 +267,7 @@ struct node2 {
 	return dfs(cur,0,&v);	
 	}
 
-}ff[DIR*BEAM_WIDTH2];
+}ff[DIR*BEAM_WIDTH2],gg[DIR*BEAM_WIDTH2];
 
 struct Action {//最終的に探索された手
 	T_T first_te;
@@ -994,16 +994,16 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	memcpy(cand.field,f_field,sizeof(f_field));
 	printf("path_length=%d\n",cand.path_length);	
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}
 	}//if(0<=x+dx[j]
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	gg[(4 * k) + j] = cand;
 	}
 	}//for(int j=0;
 	}//for(int k=0;
@@ -1012,12 +1012,12 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	dque.clear();
 	deque<int>vec[1001];
 	for(int j=0;j<4*ks;j++){
-	if(ff[j].path_length!=-1){
+	if(gg[j].path_length!=-1){
 	F_T f_field[ROW][COL];
-	memcpy(f_field,ff[j].field,sizeof(f_field));
+	memcpy(f_field,gg[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
-	if(combo>=stop){return ff[j].true_path;}
-	vec[ff[j].path_length].push_front(j);
+	if(combo>=stop){return gg[j].true_path;}
+	vec[gg[j].path_length].push_front(j);
 	}
 	}
 	int push_node=0;
@@ -1029,7 +1029,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	continue;
 	}
 	int v=vec[possible_score][0];
-	node2 temp = ff[v];
+	node2 temp = gg[v];
 	//swap(vec[possible_score][0], vec[possible_score].back());
 	//vec[possible_score].pop_back();
 	vec[possible_score].pop_front();
