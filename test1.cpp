@@ -154,29 +154,26 @@ int calc_ev(string str,F_T field[ROW][COL]){
 F_T f_field[ROW][COL];
 memcpy(f_field,field,sizeof(f_field));
 
-		int tgt=0;
-		string top="";
-		while(1){
+int tgt=0;
+string top="";
+while(1){
+if(str[tgt]==','){tgt++;break;}
+top+=str[tgt];
+tgt++;
+}
+int pos;
+if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
 
-		if(str[tgt]==','){tgt++;break;}
-		top+=str[tgt];
-		tgt++;
-
-		}
-		int pos;
-		if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
-		else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-
-		for(int j=tgt;j<(int)str.size();j++){
-		if(str[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
-		if(str[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
-		if(str[j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;}
-		if(str[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
-		}
-		int combo=sum_e(f_field);
-		int si=(int)str.size()-(int)top.size()-1;
-		return (10000*combo)-si;
-
+for(int j=tgt;j<(int)str.size();j++){
+if(str[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
+if(str[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
+if(str[j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;}
+if(str[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
+}
+int combo=sum_e(f_field);
+int si=(int)str.size()-(int)top.size()-1;
+return (10000*combo)-si;
 }
 
 struct hash_chain{
@@ -640,7 +637,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash) {
 		//cout<<"pos="<<cand.pos+1<<endl;
 	}
 	cand.path_length=min(cand.path_length,MLEN);
-if((c_hash(field)^zoblish_field2[(i*COL)+j])==targethash){cand.path_length=predict;}
+	if((c_hash(field)^zoblish_field2[(i*COL)+j])==targethash){cand.path_length=predict;}
 	pus[cand.path_length].push_front(cand);
 	//cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	//cout<<"path_length="<<cand.path_length<<endl;
@@ -742,7 +739,7 @@ if((c_hash(field)^zoblish_field2[(i*COL)+j])==targethash){cand.path_length=predi
 	//cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
-if((c_hash(f_field)^zoblish_field2[cand.pos])==targethash){cand.path_length=predict;}
+	if((c_hash(f_field)^zoblish_field2[cand.pos])==targethash){cand.path_length=predict;}
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());	
 	ff[(4 * k) + j] = cand;
@@ -829,7 +826,8 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	string true_path;
 	int true_path_length;
 */
-  int p_maxcombo[DROP+1] = {0};
+	
+	int p_maxcombo[DROP+1] = {0};
 
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -842,17 +840,17 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
-    p_maxcombo[i]=drop[i]/3;
+		p_maxcombo[i]=drop[i]/3;
 	}
-  F_T board[ROW][COL];
-  memcpy(board,field,sizeof(board));
-  sc ccc;
-  ll hhh;
-  int init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
-  Action tmp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
-  stop=tmp.score;
-  
-  double beta=(double)(stop*120-init_score);
+	F_T board[ROW][COL];
+	memcpy(board,field,sizeof(board));
+	sc ccc;
+	ll hhh;
+	int init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
+	Action tmp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+	stop=tmp.score;
+	
+	double beta=(double)(stop*120-init_score);
 
 	double start = omp_get_wtime();
 
@@ -869,21 +867,21 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
-  ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
-  int mvalue=-10000;
-  double opt_a=0;
-  for(double a=1.05;a<=1.2;a+=0.015){
-  int predict;
-  if(beta<0.001){predict=0;}
-  else{predict=(int)ceil(log(beta)/log(a));}
-  int ev=calc_ev(BEAM_SEARCH2(field,TRN,predict,targethash),field);
-  if(ev>mvalue){mvalue=ev;opt_a=a;}
-  printf("mvalue=%d\n",mvalue);
-  }
-  cand.pos=(i*COL)+j;
-  cand.prev=-1;
-  memcpy(cand.field,field,sizeof(board));
-  cand.true_path=to_string(j)+to_string(i+5)+",";
+	ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
+	int mvalue=-10000;
+	double opt_a=0;
+	for(double a=1.05;a<=1.2;a+=0.015){
+	int predict;
+	if(beta<0.001){predict=0;}
+	else{predict=(int)ceil(log(beta)/log(a));}
+	int ev=calc_ev(BEAM_SEARCH2(field,TRN,predict,targethash),field);
+	if(ev>mvalue){mvalue=ev;opt_a=a;}
+	printf("mvalue=%d\n",mvalue);
+	}
+	cand.pos=(i*COL)+j;
+	cand.prev=-1;
+	memcpy(cand.field,field,sizeof(board));
+	cand.true_path=to_string(j)+to_string(i+5)+",";
 	cand.path_length=(int)ceil(log(beta)/log(opt_a));
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -897,8 +895,8 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	double delta_t = omp_get_wtime()-start;
 
 	double variance=0;
-  
-  avg/=(double)(ROW*COL);
+	
+	avg/=(double)(ROW*COL);
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -956,21 +954,21 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	ll targethash=c_hash(f_field)^zoblish_field2[cand.pos];
-  int mvalue=-10000;
-  double opt_a=0;
-  memcpy(board,f_field,sizeof(f_field));
-  init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
-  beta=(double)(stop*120-init_score);
-  for(double a=1.05;a<=1.2;a+=0.015){
-  int predict;
-  if(beta<0.001){predict=0;}
-  else{predict=(int)ceil(log(beta)/log(a));}
-  int ev=calc_ev(BEAM_SEARCH2(f_field,TRN,predict,targethash),f_field);
-  if(ev>mvalue){mvalue=ev;opt_a=a;}
-  }
-  cand.path_length=(int)ceil(log(beta)/log(opt_a));
-  memcpy(cand.field,f_field,sizeof(f_field));
-  printf("path_length=%d\n",cand.path_length);	
+	int mvalue=-10000;
+	double opt_a=0;
+	memcpy(board,f_field,sizeof(f_field));
+	init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
+	beta=(double)(stop*120-init_score);
+	for(double a=1.05;a<=1.2;a+=0.015){
+	int predict;
+	if(beta<0.001){predict=0;}
+	else{predict=(int)ceil(log(beta)/log(a));}
+	int ev=calc_ev(BEAM_SEARCH2(f_field,TRN,predict,targethash),f_field);
+	if(ev>mvalue){mvalue=ev;opt_a=a;}
+	}
+	cand.path_length=(int)ceil(log(beta)/log(opt_a));
+	memcpy(cand.field,f_field,sizeof(f_field));
+	printf("path_length=%d\n",cand.path_length);	
 	ff[(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
