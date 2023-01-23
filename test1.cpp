@@ -77,7 +77,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 280000//MAX2800000
+#define BEAM_WIDTH 10000//MAX2800000
 #define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
@@ -863,26 +863,40 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	double avg=0;
 
 	double path_length_array[ROW][COL];
+	
+	int mvalue=-10000;
+	bool improve;
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
-	int mvalue=-10000;
 	double opt_a=0;
+	int pl;
 	for(double a=1.05;a<=1.2;a+=0.015){
 	int predict;
 	if(beta<0.001){predict=0;}
 	else{predict=(int)ceil(log(beta)/log(a));}
-	int ev=calc_ev(BEAM_SEARCH2(field,TRN,predict,targethash),field);
-	if(ev>mvalue){mvalue=ev;opt_a=a;}
+	improve=false;
+	string str=BEAM_SEARCH2(field,TRN,predict,targethash);
+	int ev=calc_ev(str,field);
+	if(ev>mvalue){mvalue=ev;opt_a=a;improve=true;}
+	else{
+	if(str[2]==','){pl=min(pl,(int)str.size()-3);}
+	else{pl=min(pl,(int)str.size()-4);}
+	}
 	printf("mvalue=%d\n",mvalue);
 	}
 	cand.pos=(i*COL)+j;
 	cand.prev=-1;
 	memcpy(cand.field,field,sizeof(board));
 	cand.true_path=to_string(j)+to_string(i+5)+",";
+	if(improve){
 	cand.path_length=(int)ceil(log(beta)/log(opt_a));
+	}
+	else{
+	cand.path_length=pl;
+	}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
@@ -954,19 +968,30 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	ll targethash=c_hash(f_field)^zoblish_field2[cand.pos];
-	int mvalue=-10000;
 	double opt_a=0;
 	memcpy(board,f_field,sizeof(f_field));
 	init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
 	beta=(double)(stop*120-init_score);
+	int pl;
 	for(double a=1.05;a<=1.2;a+=0.015){
 	int predict;
 	if(beta<0.001){predict=0;}
 	else{predict=(int)ceil(log(beta)/log(a));}
-	int ev=calc_ev(BEAM_SEARCH2(f_field,TRN,predict,targethash),f_field);
-	if(ev>mvalue){mvalue=ev;opt_a=a;}
+	improve=false;
+	string str=BEAM_SEARCH2(f_field,TRN,predict,targethash);
+	int ev=calc_ev(str,f_field);
+	if(ev>mvalue){mvalue=ev;opt_a=a;improve=true;}
+	else{
+	if(str[2]==','){pl=min(pl,(int)str.size()-3);}
+	else{pl=min(pl,(int)str.size()-4);}
 	}
+	}
+	if(improve){
 	cand.path_length=(int)ceil(log(beta)/log(opt_a));
+	}
+	else{
+	cand.path_length=pl;
+	}
 	memcpy(cand.field,f_field,sizeof(f_field));
 	printf("path_length=%d\n",cand.path_length);	
 	ff[(4 * k) + j] = cand;
