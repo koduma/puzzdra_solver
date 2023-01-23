@@ -872,7 +872,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	node2 cand,cand2;
 	ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
 	double opt_a=0;
-	int pl;
+	int pl=TRN;
 	for(double a=1.05;a<=1.2;a+=0.015){
 	int predict;
 	if(beta<0.001){predict=0;}
@@ -972,7 +972,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	memcpy(board,f_field,sizeof(f_field));
 	init_score=sum_e2(board,&ccc,&hhh,p_maxcombo);
 	beta=(double)(stop*120-init_score);
-	int pl;
+	int pl=TRN;
 	for(double a=1.05;a<=1.2;a+=0.015){
 	int predict;
 	if(beta<0.001){predict=0;}
