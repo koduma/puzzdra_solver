@@ -772,7 +772,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash,in
 	sum+=ff[j].path_length;	
 	}
 	}
-	if(congrats){*sum_pl=sum;return tp;}	
+	*sum_pl=sum*300;	
+	if(congrats){*sum_pl=i;return tp;}	
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
