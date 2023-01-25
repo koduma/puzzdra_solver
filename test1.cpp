@@ -78,7 +78,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 10000//MAX2800000
-#define BEAM_WIDTH2 3//MAX30
+#define BEAM_WIDTH2 1//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -551,8 +551,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	return bestAction;
 }
-string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash); //ルート探索関数
-string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash) {
+string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash,int* sum_pl); //ルート探索関数
+string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash,int* sum_pl) {
 
 /*
 	T_T first_te;
@@ -759,15 +759,20 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash) {
 	//printf("depth2=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
 	deque<int>vec[1001];
+	bool congrats=false;
+	string tp="";
+	int sum=0;	
 	for(int j=0;j<4*ks;j++){
 	if(ff[j].path_length!=-1){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
-	if(combo>=stop){return ff[j].true_path;}
+	if(combo>=stop){tp=ff[j].true_path;congrats=true;}
 	vec[ff[j].path_length].push_front(j);
+	sum+=ff[j].path_length;	
 	}
 	}
+	if(congrats){*sum_pl=sum;return tp;}	
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
@@ -857,7 +862,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 
 	double path_length_array[ROW][COL];
 	
-	int mvalue=-10000;
+	int mvalue=-1000000;
 	bool improve;
 
 	for (int i = 0; i < ROW; i++) {
@@ -866,10 +871,11 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
 	int predict;
 	int pl=TRN;
-  improve=false;  
+	improve=false;  
 	for(int a=0;a<=130;a+=130){
-	string str=BEAM_SEARCH2(field,TRN,a,targethash);
-	int ev=calc_ev(str,field);
+	int ev;	
+	string str=BEAM_SEARCH2(field,TRN,a,targethash,&ev);
+	ev=-ev;	
 	if(ev>mvalue){mvalue=ev;predict=a;improve=true;}
 	else{
 	if(str[2]==','){pl=min(pl,(int)str.size()-3);}
@@ -960,10 +966,11 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	ll targethash=c_hash(f_field)^zoblish_field2[cand.pos];
 	int predict;
 	int pl=TRN;
-  improve=false;  
+	improve=false;  
 	for(int a=0;a<=130;a+=130){
-	string str=BEAM_SEARCH2(f_field,TRN,a,targethash);
-	int ev=calc_ev(str,f_field);
+	int ev;	
+	string str=BEAM_SEARCH2(f_field,TRN,a,targethash,&ev);
+	ev=-ev;
 	if(ev>mvalue){mvalue=ev;predict=a;improve=true;}
 	else{
 	if(str[2]==','){pl=min(pl,(int)str.size()-3);}
