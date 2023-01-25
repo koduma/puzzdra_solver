@@ -772,8 +772,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN,int predict,ll targethash,in
 	sum+=ff[j].path_length;	
 	}
 	}
-	*sum_pl=sum*300;	
-	if(congrats){*sum_pl=sum;return tp;}	
+	*sum_pl=(sum+1)*300;	
+	if(congrats){*sum_pl=(sum+1)*(i+1);return tp;}	
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
@@ -863,11 +863,11 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 
 	double path_length_array[ROW][COL];
 	
-	int mvalue=-1000000;
 	bool improve;
 
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+	int mvalue=-1000000;	
 	node2 cand,cand2;
 	ll targethash=c_hash(field)^zoblish_field2[(i*COL)+j];
 	int predict;
@@ -882,7 +882,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	if(str[2]==','){pl=min(pl,(int)str.size()-3);}
 	else{pl=min(pl,(int)str.size()-4);}
 	}
-	printf("mvalue=%d\n",mvalue);
+	printf("ev=%d,mvalue=%d\n",ev,mvalue);
 	}
 	cand.pos=(i*COL)+j;
 	cand.prev=-1;
@@ -953,6 +953,7 @@ string BEAM_SEARCH3(F_T field[ROW][COL],int MAX_TRN) {
 	int y=cand.pos/COL;
 	if (0 <= x + dx[j] && x + dx[j] < COL &&0 <= y + dy[j] && y + dy[j] < ROW) {
 	if (cand.prev + j != 3) {
+	int mvalue=-1000000;	
 	F_T f_field[ROW][COL];
 	memcpy(f_field,cand.field,sizeof(f_field));
 	int nx=x + dx[j];
