@@ -442,7 +442,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		start = omp_get_wtime();
 		dque.clear();
 		//deque<int>vec[5001];
-    priority_queue <pair<int,int> > vec;
+		priority_queue <pair<int,int> > vec;
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
