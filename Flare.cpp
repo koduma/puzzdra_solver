@@ -444,7 +444,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		deque<int>vec[5001];
+		//deque<int>vec[5001];
+		priority_queue <pair<int,int> > vec;
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
@@ -491,7 +492,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);
+			if ((int)vec.size() >= BW[depth] && vec.top().first <= -sco) {continue;}
+			vec.push(make_pair(-sco,j));
+			if ((int)vec.size() > BW[depth]){ vec.pop();}  
 			ks2++;
 			}
 		}
@@ -499,18 +503,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
-		int possible_score=5000;
 		for (int j = 0; push_node < BW[depth] ;j++) {
-			if(possible_score<0){break;}
-			if((int)vec[possible_score].size()==0){
-			possible_score--;
-			continue;
-			}
-			int v=vec[possible_score][0];
+			if(vec.empty()){break;}            
+			int v=vec.top().second;vec.pop();
 			node temp = fff[v];
-			//swap(vec[possible_score][0], vec[possible_score].back());
-			//vec[possible_score].pop_back();
-			vec[possible_score].pop_front();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
