@@ -1,37 +1,27 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
-
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Flare.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
-
 //run
 ./Flare
-
 //input
 */
 #pragma warning(disable:4710)
@@ -114,7 +104,6 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
@@ -125,7 +114,6 @@ int MSB64bit(ll v) {
    int out =63-__builtin_clzll(v);
    return out;
 }
-
 int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
 //if(depth>200){printf("akan\n");}
 if((*v)[cur]){return TRN;}
@@ -138,11 +126,8 @@ else{pl=min(pl,dfs(it->second,depth+1,v));}
 }
 return pl;
 }
-
 ll check_hash(F_T board[ROW][COL]){
-
 ll hash=0ll;
-
 for (int row = 0; row < ROW; row++) {
 for (int col = 0; col < COL; col++) {
 F_T num = board[row][col];
@@ -151,8 +136,6 @@ hash ^= zoblish_field[row][col][(int)num];
 }
 return hash;		
 }
-
-
 struct hash_chain{
 	
 	F_T field[ROW][COL];
@@ -181,7 +164,6 @@ struct hash_chain{
 		
 	}
 };
-
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -284,7 +266,6 @@ int adder(F_T field[ROW][COL]){
     }
     }
     }
-
     return ret;
 }
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL]); //ルート探索関数
@@ -444,8 +425,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
 		dque.clear();
-		//deque<int>vec[5001];
-		priority_queue <pair<int,int> > vec;
+		deque<int>vec[5001];
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < 4 * ks; j++) {
@@ -492,10 +472,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);
-			if ((int)vec.size() >= BW[depth] && vec.top().first <= -sco) {continue;}
-			vec.push(make_pair(-sco,j));
-			if ((int)vec.size() > BW[depth]){ vec.pop();}  
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
 			ks2++;
 			}
 		}
@@ -503,10 +480,18 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
+		int possible_score=5000;
 		for (int j = 0; push_node < BW[depth] ;j++) {
-			if(vec.empty()){break;}            
-			int v=vec.top().second;vec.pop();
+			if(possible_score<0){break;}
+			if((int)vec[possible_score].size()==0){
+			possible_score--;
+			continue;
+			}
+			int v=vec[possible_score][0];
 			node temp = fff[v];
+			//swap(vec[possible_score][0], vec[possible_score].back());
+			//vec[possible_score].pop_back();
+			vec[possible_score].pop_front();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
 				bestAction.score = maxValue;
