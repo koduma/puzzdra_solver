@@ -1400,13 +1400,13 @@ int main() {
 		string route="";
 		printf("push_data\n");
 		while(1){
-		printf("route=");
-		cin>>route;
-		push_data(f_field,route);
 		string esc;
 		printf("break?(y/n)=");
 		cin>>esc;
 		if(esc=="y"){break;}
+		printf("route=");
+		cin>>route;
+		push_data(f_field,route);	
 		}
 		double start = omp_get_wtime();
 		bestans=BEAM_SEARCH2(f_field,TRN);
