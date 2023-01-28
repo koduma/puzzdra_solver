@@ -634,12 +634,12 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 		    }
 		    visited.emplace(stoull(parent),stoull(child));
 	    }
-    myf.close();
-    ifstream myf2("data"+lt+".txt");
-    while(getline(myf2,ls)){
-      push_data(field,ls);
-    }
-    myf2.close();
+	myf.close();
+	ifstream myf2("data"+lt+".txt");
+	while(getline(myf2,ls)){
+	push_data(field,ls);
+	}
+	myf2.close();
 	}
 	
 	int ALPHA=1;
