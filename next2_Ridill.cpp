@@ -729,7 +729,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int kosu=0;
 	string line;
 	string t_path[BEAM_WIDTH2];
-	ifstream myfile ("input.txt");
+	ifstream myfile ("input"+lt+".txt");
 
 	while(getline(myfile,line)){
 
@@ -844,7 +844,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int ks = (int)dque.size();
 	pro_league.clear();	
 	
-	ofstream file("input.txt");
+	ofstream file("input"+lt+".txt");
 
 	for (int k = 0; k < ks; k++) {
 	string mystring=dque[k].true_path+'\n';
