@@ -278,11 +278,11 @@ int adder(F_T field[ROW][COL]){
     return ret;
 }
 void push_data(F_T f_field[ROW][COL],string path){
+	
+	F_T field[ROW][COL];
+	memcpy(field,f_field,sizeof(field));
 
-  F_T field[ROW][COL];
-  memcpy(field,f_field,sizeof(field));
-  
-  int tgt=0;
+	int tgt=0;
 	string top="";
 	while(1){
 
@@ -294,21 +294,19 @@ void push_data(F_T f_field[ROW][COL],string path){
 	int pos;
 	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-  
-  vector<ll>hc;
-  
-  hc.push_back(c_hash(field)^zoblish_field2[pos]);
-  
-  for(int j=tgt;j<(int)path.size();j++){
+	
+	vector<ll>hc;
+	hc.push_back(c_hash(field)^zoblish_field2[pos]);
+	for(int j=tgt;j<(int)path.size();j++){
 	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
 	if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
 	if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
 	if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
-  hc.push_back(c_hash(field)^zoblish_field2[pos]);  
+	hc.push_back(c_hash(field)^zoblish_field2[pos]);  
 	}
-  hc.push_back((ll)1);
-  
-  if((int)hc.size()>0){
+	hc.push_back((ll)1);
+	
+	if((int)hc.size()>0){
 	for(int r=0;r<(int)hc.size()-1;r++){
 	ll cur=hc[r];
 	ll nexthash=hc[r+1];
@@ -320,9 +318,8 @@ void push_data(F_T f_field[ROW][COL],string path){
 	if(!find){
 	visited.emplace(cur,nexthash);
 	}
-  }
-  }  
-  
+	}
+	}  
 }
 
 
@@ -1399,23 +1396,17 @@ int main() {
 		printf("\n");
 		show_field(f_field);//盤面表示
 		printf("\n");
-    
-    string route="";
-    
-    printf("push_data\n");
-    
-    while(1){      
-      
-    printf("route=");
-    cin>>route;
-    push_data(f_field,route);
-      
-    string esc;
-    printf("break?(y/n)=");
-    cin>>esc;
-    if(esc=="y"){break;}      
-    }  
-      
+		string route="";
+		printf("push_data\n");
+		while(1){
+		printf("route=");
+		cin>>route;
+		push_data(f_field,route);
+		string esc;
+		printf("break?(y/n)=");
+		cin>>esc;
+		if(esc=="y"){break;}
+		}
 		double start = omp_get_wtime();
 		bestans=BEAM_SEARCH2(f_field,TRN);
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
