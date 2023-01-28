@@ -299,9 +299,10 @@ void push_data(F_T f_field[ROW][COL],string path){
 	hc.push_back(c_hash(field)^zoblish_field2[pos]);
 	for(int j=tgt;j<(int)path.size();j++){
 	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
-	if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
-	if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
-	if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
+	else if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
+	else if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
+	else if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
+	else{continue;}	
 	hc.push_back(c_hash(field)^zoblish_field2[pos]);  
 	}
 	hc.push_back((ll)1);
