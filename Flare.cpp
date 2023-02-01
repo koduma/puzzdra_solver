@@ -697,6 +697,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
 	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
 	}
+	hashchain.push_back((ll)1);	
 	if((int)hashchain.size()>0){
         for(int p2=0;p2<(int)hashchain.size()-1;p2++){
         ll cur=hashchain[p2];
@@ -709,7 +710,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
         if(!find){
 	visited.emplace(cur,nexthash);
         }
-	if(p2==(int)hashchain.size()-2){visited.emplace(nexthash,(ll)1);}
         }
 	}
 	//return bestAction;
