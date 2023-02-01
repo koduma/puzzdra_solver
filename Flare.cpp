@@ -657,9 +657,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}//for(int j=0;
 	}//for(int k=0;
-	if(depth==DEPTH){//koko
-	printf("depth=%d/%d\n",i+1,MAX_TRN);
-	}
 	dque.clear();
 	deque<int>vec[1001];
 	bool congrats=false;
@@ -727,13 +724,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
-	if(depth==DEPTH&&push_node==0){
-	printf("predict=%d\n",possible_score);
-	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
-	//swap(vec[possible_score][0], vec[possible_score].back());
-	//vec[possible_score].pop_back();
 	vec[possible_score].pop_front();
 	F_T g_field[ROW][COL];
 	memcpy(g_field,temp.field,sizeof(g_field));
