@@ -77,13 +77,12 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 10000//MAX2800000
-#define BEAM_WIDTH2 3//MAX30
+#define BEAM_WIDTH 100000//MAX2800000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define DEPTH 2
+#define DEPTH 3
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -117,7 +116,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={BEAM_WIDTH,100,1};
+int BW[DEPTH+1]={BEAM_WIDTH,100,3,1};
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -125,7 +124,6 @@ int MSB64bit(ll v) {
    return out;
 }
 int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-//if(depth>200){printf("akan\n");}
 if((*v)[cur]){return TRN;}
 (*v)[cur]=true;
 auto p = visited.equal_range(cur);
@@ -541,10 +539,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	deque<node2>pus[TRN+1];
 	double avg=0;
 	double path_length_array[ROW][COL];
-	  
+	
 	if(depth==DEPTH){
 		
-	printf("\n-----search_start_1/2-----\n");
+	printf("\n-----search_start-----\n");
+        
+	Action retAction;
+	int retpl=TRN;    
 		
 	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
 	
@@ -552,7 +553,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-//if(i*COL+j!=22){continue;}
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
 	customer.first_te=(T_T)YX(i,j);
@@ -581,7 +581,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -589,6 +588,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cout<<"combo="<<tmpp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
+	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}    
 	}
 	}
       
@@ -602,22 +602,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
-	printf("\n-----search_start_2/2-----\n");
-	int cnt=0;
-	for(int i=0;i<TRN;i++){
-	if((int)pus[i].size()==0){continue;}
-	while(1){
-	if((int)pus[i].size()==0){break;}
-	node2 cand=pus[i][0];
-	pus[i].pop_front();
-	if(cnt<BW[depth]){
-	dque.push_back(cand);
-	cnt++;
-	}
-	else{break;}
-	}
-	}
-	}
+	return retAction;
+	}	  
 	else{
 	dque.push_back(customer);
 	}
