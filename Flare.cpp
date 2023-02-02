@@ -77,7 +77,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 30000//MAX2800000
+#define BEAM_WIDTH 100000//MAX2800000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -116,7 +116,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={BEAM_WIDTH,1000,1};
+int BW[DEPTH+1]={BEAM_WIDTH,300,1};
 
 int counter=0;
 
