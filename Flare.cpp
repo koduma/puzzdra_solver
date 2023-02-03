@@ -77,7 +77,7 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 100000//MAX2800000
+#define BEAM_WIDTH 10000//MAX2800000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -116,7 +116,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={BEAM_WIDTH,300,1};
+int BW[DEPTH+1]={BEAM_WIDTH,3000,1};
 
 int counter=0;
 
@@ -646,7 +646,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
-	if(tmp.score!=stop){counter++;cout<<"error_counter="<<counter<<endl;cand.path_length=TRN;}
+	if(tmp.score!=stop){cand.path_length=TRN;}
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
@@ -727,6 +727,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
+	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
 	vec[possible_score].pop_front();
