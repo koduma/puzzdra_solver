@@ -538,7 +538,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	double start = omp_get_wtime();
 	vector<node2>dque;
-	deque<node2>pus[TRN+1];
+	vector<int>pro_league;
 	double avg=0;
 	double path_length_array[ROW][COL];
 	
@@ -568,7 +568,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.calc_hash();
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,TRN,-1,(i*COL)+j,stop,customer,root_field);
+	int lim=TRN;
+	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}	
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,lim,-1,(i*COL)+j,stop,customer,root_field);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -584,14 +586,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
 	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	cout<<tmpp.path<<endl;
 	if(stop!=tmpp.score){cand.path_length=TRN;}
-	pus[cand.path_length].push_front(cand);
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmpp.score<<"/"<<stop<<endl;
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
-	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}    
+	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());    
 	}
 	}
       
@@ -617,6 +621,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
+	pro_league.clear();
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
@@ -637,7 +642,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
-	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,TRN,cand.prev,cand.pos,stop,cand,root_field);
+	int lim=TRN;
+	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,lim,cand.prev,cand.pos,stop,cand,root_field);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -648,6 +655,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	if(tmp.score!=stop){cand.path_length=TRN;}	
 	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+i+1);
+	pro_league.push_back(cand.path_length);
+	sort(pro_league.begin(),pro_league.end());
 	ff[depth-1][(4 * k) + j] = cand;
 	}//if(cand.prev
 	else {
