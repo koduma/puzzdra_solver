@@ -982,6 +982,27 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
 	}
 	ev += oti;
+		
+	int penalty=0;
+
+	for(int i=1;i<=DROP;i++){
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
+	}
+
+	int alone=0;
+	
+	bool find=false;
+
+	for(int x=0;x<COL;x++){
+	if(field[ROW-1][x] == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}	
+	}
+
+	ev-=penalty*alone;
+	
 	*hash=ha;
 	return ev;
 }
@@ -1080,6 +1101,29 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
+	
+	int penalty=0;
+
+	ll board=occBB;
+
+	for(int i=1;i<=DROP;i++){
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
+	}
+
+	int alone=0;
+	
+	bool find=false;
+
+	for(int x=0;x<COL;x++){
+	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}
+	}
+
+	ev-=penalty*alone;
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
