@@ -614,7 +614,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
-	if(cand.path_length!=TRN){
+	if(cand.path_length<=lim){
 	avg+=(double)cand.path_length;
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());	
