@@ -524,6 +524,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
     
   }
   else{
+	string lt="";
+	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
@@ -553,9 +555,40 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	
 	stop=tmpp.score;
 		
+	int kosu=0;
+	string line;
+	string t_path[2];
+	ifstream myfile ("Flare_input.txt");
+
+	while(getline(myfile,line)){
+
+	t_path[kosu]=line;
+	kosu++;
+
+	}
+	myfile.close();
+	
+	int suru=-1;
+	if(kosu==2){	
+	string sss="";
+	for(int i=0;i<(int)t_path[0].size();i++){
+	if(t_path[0][i]=='\n'){break;}
+	sss+=t_path[0][i];	
+	}
+	
+	suru=stoi(sss);
+	sss="";
+		
+	for(int i=0;i<(int)t_path[1].size();i++){
+	if(t_path[1][i]=='\n'){break;}
+	sss+=t_path[1][i];	
+	}
+	cout<<sss<<endl;	
+	}	
+		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-//if((i*COL)+j!=23){continue;}		
+	if((i*COL)+j<=suru){continue;}		
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
 	customer.first_te=(T_T)YX(i,j);
@@ -596,6 +629,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());    
+	ofstream file("Flare_input.txt");		
+	string mystring=to_string((i*COL)+j)+'\n';
+	file << mystring;	
+	mystring=retAction.path+'\n';
+	file << mystring;	
+	file.close();	
 	}
 	}
       
