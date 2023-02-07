@@ -631,13 +631,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmpp.score<<"/"<<stop<<endl;
-	avg+=(double)cand.path_length;
-	path_length_array[i][j]=(double)cand.path_length;
 	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}
 	if(cand.path_length<=lim){
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
-	}	
+	avg+=(double)cand.path_length;	
+	}
+	path_length_array[i][j]=(double)cand.path_length;	
 	ofstream file("Flare_input.txt");		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
@@ -649,10 +649,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
       
 	double delta_t = omp_get_wtime()-start;
 	double variance=0;
-	avg/=(double)(ROW*COL);
+	avg/=(double)(pro_league.size());
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
+	if(path_length_array[i][j]<=149.0){	
 	variance+=pow(fabs(path_length_array[i][j]-avg),3.0);
+	}	
 	}
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
