@@ -589,7 +589,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(comma){suru2++;}	
 	}
 	cout<<sss<<endl;	
-	}	
+	}
+	
+	pro_league.push_back(suru2);	
 		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
@@ -607,7 +609,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
 	int lim=TRN;
-	if((int)pro_league.size()>=BW[depth]){lim=min(suru2,pro_league[BW[depth]-1]);}	
+	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}	
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,lim,-1,(i*COL)+j,stop,customer,root_field);
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
