@@ -634,8 +634,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;
 	path_length_array[i][j]=(double)cand.path_length;
 	if(retpl>cand.path_length){retpl=cand.path_length;retAction=tmpp;}
+	if(cand.path_length<=lim){
 	pro_league.push_back(cand.path_length);
-	sort(pro_league.begin(),pro_league.end());    
+	sort(pro_league.begin(),pro_league.end());
+	}	
 	ofstream file("Flare_input.txt");		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
