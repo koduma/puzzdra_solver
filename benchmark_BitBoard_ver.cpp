@@ -572,13 +572,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
 
-		ll erased_dropBB=(dropBB[i])^(linked[i]);
+		ll erased_dropBB=dropBB[i];
 
 		if(erased_dropBB==0ll){continue;}
 
 		int c=__builtin_popcountll(erased_dropBB);
 
 		if(c<3){continue;}
+			
+		erased_dropBB^=linked[i];
+		c=__builtin_popcountll(erased_dropBB);
+		if(c<2){continue;}	
 
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
