@@ -557,7 +557,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		
 	F_T tmp_field[ROW][COL];
 	memcpy(tmp_field,root_field,sizeof(tmp_field));
-	if(sum_e(tmp_field)>=stop){return "05,";}	
+	if(sum_e(tmp_field)>=stop){retAction.path="05,";return retAction;}	
 		
 	int kosu=0;
 	string line;
