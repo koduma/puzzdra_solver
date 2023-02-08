@@ -618,10 +618,6 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	
-	F_T tmp_field[ROW][COL];
-	memcpy(tmp_field,field,sizeof(tmp_field));
-	if(sum_e(tmp_field)>=stop){return "05,";}
-	
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode!=0){
@@ -682,12 +678,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
+	if(i==0&&j==0){MLEN=TRN;}	
 	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
+	memcpy(f_field,field,sizeof(f_field));
+	if(sum_e(f_field)>=stop){return "05,";}	
 	memcpy(cand.field,field,sizeof(f_field));
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
