@@ -617,6 +617,11 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
+	
+	F_T tmp_field[ROW][COL];
+	memcpy(tmp_field,field,sizeof(tmp_field));
+	if(sum_e(tmp_field)>=stop){return "05,";}
+	
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode!=0){
