@@ -922,9 +922,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(bestAction.path[p2]==','){look=true;continue;}
 	if(!look){continue;}
 	if (bestAction.path[p2]=='3') { swap(g_field[point/COL][point%COL],g_field[(point-1)/COL][(point-1)%COL]);point--; } //"LEFT"); }
-	if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
-	if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
-	if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
+	else if (bestAction.path[p2]=='6') { swap(g_field[point/COL][point%COL],g_field[(point-COL)/COL][(point-COL)%COL]);point-=COL;  } //"UP"); }
+	else if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
+	else if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
+	else{continue;}	
 	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
 	}
 	hashchain.push_back((ll)1);	
