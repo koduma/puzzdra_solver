@@ -685,6 +685,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}	
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,lim,-1,(i*COL)+j,stop,customer,root_field,jump);
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
