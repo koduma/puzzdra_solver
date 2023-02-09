@@ -279,6 +279,51 @@ int adder(F_T field[ROW][COL]){
     }
     return ret;
 }
+void push_data(F_T f_field[ROW][COL],string path){
+	
+	F_T field[ROW][COL];
+	memcpy(field,f_field,sizeof(field));
+
+	int tgt=0;
+	string top="";
+	while(1){
+
+	if(path[tgt]==','){tgt++;break;}
+	top+=path[tgt];
+	tgt++;
+
+	}
+	int pos;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+	
+	vector<ll>hc;
+	hc.push_back(check_hash(field)^zoblish_field2[pos]);
+	for(int j=tgt;j<(int)path.size();j++){
+	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
+	else if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
+	else if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
+	else if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
+	else{continue;}	
+	hc.push_back(check_hash(field)^zoblish_field2[pos]);  
+	}
+	hc.push_back((ll)1);
+	
+	if((int)hc.size()>0){
+	for(int r=0;r<(int)hc.size()-1;r++){
+	ll cur=hc[r];
+	ll nexthash=hc[r+1];
+	bool find=false;
+	auto p = visited.equal_range(cur);
+	for (auto it = p.first; it != p.second; ++it) {
+	if(it->second==nexthash){find=true;break;}
+	}
+	if(!find){
+	visited.emplace(cur,nexthash);
+	}
+	}
+	}  
+}
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump) {
@@ -526,7 +571,29 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
   }
   else{
 	string lt="";
-	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}  
+	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}
+	if(read_file_mode!=0&&depth==DEPTH){
+	    ifstream myf ("Flare_visited"+lt+".txt");
+	    string ls;
+	    while(getline(myf,ls)){
+		    string parent="";
+		    string child="";
+		    bool comma=false;
+		    for(int i=0;i<(int)ls.size();i++){
+			    if(ls[i]=='\n'){break;}
+			    if(ls[i]==','){comma=true;continue;}
+			    if(comma){child+=ls[i];}
+			    else{parent+=ls[i];}
+		    }
+		    visited.emplace(stoull(parent),stoull(child));
+	    }
+	myf.close();
+	ifstream myf2("Flare_data"+lt+".txt");
+	while(getline(myf2,ls)){
+	push_data(field,ls);
+	}
+	myf2.close();
+	}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
@@ -666,6 +733,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	return retAction;
 	}
 	else if(depth==DEPTH-1&&read_file_mode==1&&jump){
@@ -746,7 +819,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
-	pro_league.clear();
+	pro_league.clear();	
 	if(depth==DEPTH-1){	
 	ofstream file("Flare_depth"+lt+".txt");
 	for (int k = 0; k < ks; k++) {
@@ -754,6 +827,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	file << mystring;
 	}
 	file.close();
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	}	
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
