@@ -667,10 +667,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	return retAction;
 	}
 	else if(depth==DEPTH-1&&read_file_mode==1){
-		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
-	
-	stop=tmpp.score;
 
 	int kosu=0;
 	string line;
