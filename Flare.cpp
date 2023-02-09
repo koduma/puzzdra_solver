@@ -590,7 +590,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	myf.close();
 	ifstream myf2("Flare_data"+lt+".txt");
 	while(getline(myf2,ls)){
-	push_data(field,ls);
+	push_data(root_field,ls);
 	}
 	myf2.close();
 	}  
