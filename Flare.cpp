@@ -119,6 +119,7 @@ ll zoblish_field2[ROW*COL];
 int BW[DEPTH+1]={BEAM_WIDTH,1000,1};
 
 int counter=0;
+int read_file_mode;
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -542,7 +543,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	vector<node2>dque;
 	vector<int>pro_league;
 	double avg=0;
-	double path_length_array[ROW][COL];
+	double path_length_array[ROW][COL];  
 	
 	if(depth==DEPTH){
 		
@@ -664,7 +665,79 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
 	return retAction;
-	}	  
+	}
+	else if(depth==DEPTH-1&&read_file_mode==1){
+		
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field);
+	
+	stop=tmpp.score;
+
+	int kosu=0;
+	string line;
+	string t_path[BW[depth]];
+	ifstream myfile ("Flare_depth"+lt+".txt");
+
+	while(getline(myfile,line)){
+
+	t_path[kosu]=line;
+	kosu++;
+
+	}
+	myfile.close();
+
+	for(int i=0;i<kosu;i++){
+	
+	node2 nnn;
+	
+	nnn.true_path.clear();
+
+	F_T board[ROW][COL];
+	memcpy(board,root_field,sizeof(board));
+
+	int tgt=0;
+	string top="";
+	while(1){
+	nnn.true_path.push_back(t_path[i][tgt]);
+	if(t_path[i][tgt]==','){tgt++;break;}
+	top+=t_path[i][tgt];
+	tgt++;
+
+	}
+	int pos;
+	sc pre_v;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+
+	nnn.first_te=(T_T)YX(pos/COL,pos%COL);
+
+	for(int j=0;j<=TRN/21;j++){
+	nnn.movei[j]=0ll;
+	}
+	int basyo=0;
+
+	for(int j=tgt;j<(int)t_path[i].size();j++){
+	if(t_path[i][j]=='3'){swap(board[pos/COL][pos%COL],board[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
+	else if(t_path[i][j]=='6'){swap(board[pos/COL][pos%COL],board[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
+	else if(t_path[i][j]=='1'){swap(board[pos/COL][pos%COL],board[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
+	else if(t_path[i][j]=='4'){swap(board[pos/COL][pos%COL],board[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
+	else{continue;}
+	nnn.true_path.push_back(t_path[i][j]);
+	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
+	basyo++;
+	}
+	nnn.prev=pre_v;
+	nnn.pos=pos;
+	memcpy(nnn.field,board,sizeof(board));
+	nnn.calc_path();
+	nnn.calc_hash();
+	//nnn.true_path=t_path[i];
+	nnn.true_path_length=nnn.path_length;
+	dque.push_back(nnn);
+	if(i==0){
+	printf("path_length=%d\n",nnn.path_length);
+	}
+	}
+	}
 	else{
 	dque.push_back(customer);
 	}
@@ -676,6 +749,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
 	pro_league.clear();
+	if(depth==DEPTH-1){	
+	ofstream file("Flare_depth"+lt+".txt");
+	for (int k = 0; k < ks; k++) {
+	string mystring=dque[k].true_path+'\n';
+	file << mystring;
+	}
+	file.close();
+	}	
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
@@ -1337,6 +1418,13 @@ int main() {
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
+		read_file_mode=0;
+		string suru;
+		printf("readfile?(y/n)=");
+		cin>>suru;
+		if(suru=="y"){
+		read_file_mode=1;
+		}
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		printf("date=");
 		cin>>date;
