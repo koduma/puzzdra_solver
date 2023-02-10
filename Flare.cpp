@@ -235,7 +235,7 @@ struct hash_chain{
 	movei[i]=0ll;	
 	}
 	for(int i=0;i<(int)path.size();i++){
-	if(path==','){comma=true;continue;}	
+	if(path[i]==','){comma=true;continue;}	
 	if(comma){
 	int j=0;	
 	if(path[i]=='3'){j=0;}
@@ -972,7 +972,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	F_T abc[ROW][COL];
 	memcpy(hc.field,root_field,sizeof(abc));
 	hc.first_te=ff[depth-1][j].first_te;
-	hc.path=beshAction.path;
+	hc.path=bestAction.path;
 	hc.ptom();	
 	hc.calc_hashchain();	
 		
