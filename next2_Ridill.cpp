@@ -134,8 +134,10 @@ v[cur]=true;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
-if((it->second)==(ll)1){pl=min(pl,depth);break;}
-else{pl=min(pl,dfs(it->second,depth+1,v));}
+if((it->second)==(ll)1){return depth;}
+}	
+for (auto it = p.first; it != p.second; ++it) {
+pl=min(pl,dfs(it->second,depth+1,v));
 }
 return pl;
 }
