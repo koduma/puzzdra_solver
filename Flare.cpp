@@ -77,12 +77,12 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 100000//MAX2800000
+#define BEAM_WIDTH 10000//MAX2800000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define DEPTH 2
+#define DEPTH 3
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -116,7 +116,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={BEAM_WIDTH,1000,1};
+int BW[DEPTH+1]={BEAM_WIDTH,1,1,1};
 
 int counter=0;
 int read_file_mode;
@@ -126,9 +126,9 @@ int MSB64bit(ll v) {
    int out =63-__builtin_clzll(v);
    return out;
 }
-int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-if((*v)[cur]){return TRN;}
-(*v)[cur]=true;
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>v){
+if(v[cur]){return TRN;}
+v[cur]=true;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -227,7 +227,7 @@ struct node2 {
 	}
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
-	return dfs(cur,0,&v);	
+	return dfs(cur,0,v);	
 	}
 }ff[DEPTH][DIR*BEAM_WIDTH];
 struct Action {//最終的に探索された手
@@ -1570,7 +1570,7 @@ int main() {
 		printf("\n}\n");
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
 	cin>>i;
 	cin>>j;
 	cin>>k;
