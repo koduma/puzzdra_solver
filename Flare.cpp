@@ -1167,7 +1167,10 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-		cmb2*=4;
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
+		
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -1294,7 +1297,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-		cmb2*=4;
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
