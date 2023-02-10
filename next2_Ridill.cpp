@@ -1611,7 +1611,7 @@ int main() {
 
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f,p4=%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
+	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
 	
 	ofstream fi("visited"+layout+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
