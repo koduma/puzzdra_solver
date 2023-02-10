@@ -149,34 +149,6 @@ hash ^= zoblish_field[row][col][(int)num];
 }
 return hash;		
 }
-struct hash_chain{
-	
-	F_T field[ROW][COL];
-	T_T first_te;
-	ll movei[(TRN/21)+1];
-	vector<ll>hashchain;
-	
-	void calc_hashchain(){
-		
-	int pos=XX(first_te)+YY(first_te)*COL;
-		
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	
-	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
-	if (movei[i] == 0ll) { break; }
-	for(int k=0;k<21;k++){
-	int dir = (int)(7ll&(movei[i]>>(3*k)));
-	if (dir==0){break;}
-	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
-	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL;  } //"UP"); }
-	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL;  } //"DOWN"); }
-	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++;  } //"RIGHT"); }
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	}
-	}
-		
-	}
-};
 struct node {//どういう手かの構造体
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	ll hash;//盤面のハッシュ値
@@ -191,12 +163,16 @@ struct node {//どういう手かの構造体
 	node() {//初期化
 		this->score = 0;
 		this->prev = -1;
+		this->prev_score=-1;
 		//memset(this->movei, STP, sizeof(this->movei));
 	}
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
 }fff[NODE_SIZE];
+
+map<ll,struct node> mapobj;
+
 struct node2 {
 	F_T field[ROW][COL];
 	T_T first_te;
@@ -243,6 +219,91 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
+struct hash_chain{
+	F_T field[ROW][COL];
+	T_T first_te;
+	ll movei[(TRN/21)+1];
+	vector<ll>hashchain;
+	node n;
+	string path;
+	
+	void ptom(){
+	
+	int st=0;
+	bool comma=false;
+	for(int i=0;i<=TRN/21;i++){
+	movei[i]=0ll;	
+	}
+	for(int i=0;i<(int)path.size();i++){
+	if(path==','){comma=true;continue;}	
+	if(comma){
+	int j=0;	
+	if(path[i]=='3'){j=0;}
+	else if(path[i]=='6'){j=1;}
+	else if(path[i]=='1'){j=2;}
+	else if(path[i]=='4'){j=3;}
+	else{continue;}	
+	movei[st/21] |= (((ll)(j+1))<<((3*st)%63));
+	st++;	
+	}	
+	}	
+		
+	}
+	
+	void calc_hashchain(){
+	/*
+	ll movei[(TRN/21)+1];//スワイプ移動座標
+	ll hash;//盤面のハッシュ値
+	int score;//評価値
+	int prev_score;//1手前の評価値
+	T_T first_te;
+	uc improving;//評価値改善回数
+	sc combo;//コンボ数
+	sc nowC;//今どのx座標にいるか
+	sc nowR;//今どのy座標にいるか
+	sc prev;//1手前は上下左右のどっちを選んだか
+	*/    
+    
+	int pos=XX(first_te)+YY(first_te)*COL;
+	for(int i=0;i<=TRN/21;i++){
+	n.movei[i]=0ll;
+	}
+	n.hash=check_hash(field);
+	n.score=0;
+	n.prev_score=0;
+	n.first_te=first_te;
+	n.improving=0;
+	n.combo=0;
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+        
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	int pl=0;
+        
+	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
+	if (movei[i] == 0ll) { break; }
+	for(int k=0;k<21;k++){
+	int dir = (int)(7ll&(movei[i]>>(3*k)));
+	if (dir==0){break;}
+	if (dir==1) { swap(field[pos/COL][pos%COL],field[(pos-1)/COL][(pos-1)%COL]);pos--; } //"LEFT"); }
+	if (dir==2) { swap(field[pos/COL][pos%COL],field[(pos-COL)/COL][(pos-COL)%COL]);pos-=COL; } //"UP"); }
+	if (dir==3) { swap(field[pos/COL][pos%COL],field[(pos+COL)/COL][(pos+COL)%COL]);pos+=COL; } //"DOWN"); }
+	if (dir==4) { swap(field[pos/COL][pos%COL],field[(pos+1)/COL][(pos+1)%COL]);pos++; } //"RIGHT"); }
+	n.movei[pl/21] |= (((ll)(dir))<<((3*pl)%63)); 
+	n.hash=check_hash(field);
+	n.nowC=pos%COL;
+	n.nowR=pos/COL;
+	n.prev=dir-1;
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
+	pl++;
+	}
+	}
+	}
+};
+
 string actiontoS(Action act){
 	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
@@ -906,6 +967,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ll movei[(TRN/21)+1];
 	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
 	bestAction.path=ff[depth-1][j].true_path;
+		
+	hash_chain hc;
+	F_T abc[ROW][COL];
+	memcpy(hc.field,root_field,sizeof(abc));
+	hc.first_te=ff[depth-1][j].first_te;
+	hc.path=beshAction.path;
+	hc.ptom();	
+	hc.calc_hashchain();	
+		
+		
 	memcpy(g_field,root_field,sizeof(g_field));
 	int tgt=0;
 	string tp="";
@@ -917,8 +988,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int point;
 	if((int)tp.size()==2){int x=tp[0]-'0';int y=(tp[1]-'0')-5;point=(y*COL)+x;}
 	else{int x=tp[0]-'0';int y=5;point=(y*COL)+x;}
-	vector<ll>hashchain;
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+	vector<ll>hcs;
+	hcs.push_back(check_hash(g_field)^zoblish_field2[point]);
 	bool look=false;
 	for(int p2=0;p2<(int)bestAction.path.size();p2++){
 	if(bestAction.path[p2]==','){look=true;continue;}
@@ -928,13 +999,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
 	else if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
 	else{continue;}	
-	hashchain.push_back(check_hash(g_field)^zoblish_field2[point]);
+	hcs.push_back(check_hash(g_field)^zoblish_field2[point]);
 	}
-	hashchain.push_back((ll)1);	
-	if((int)hashchain.size()>0){
-        for(int p2=0;p2<(int)hashchain.size()-1;p2++){
-        ll cur=hashchain[p2];
-        ll nexthash=hashchain[p2+1];
+	hcs.push_back((ll)1);	
+	if((int)hcs.size()>0){
+        for(int p2=0;p2<(int)hcs.size()-1;p2++){
+        ll cur=hcs[p2];
+        ll nexthash=hcs[p2+1];
         bool find=false;
         auto p = visited.equal_range(cur);
         for (auto it = p.first; it != p.second; ++it) {
