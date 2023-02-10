@@ -128,9 +128,9 @@ int MSB64bit(ll v) {
    return out;
 }
 
-int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-if((*v)[cur]){return TRN;}
-(*v)[cur]=true;
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>v){
+if(v[cur]){return TRN;}
+v[cur]=true;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
@@ -215,7 +215,7 @@ struct node2 {
 	
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
-	return dfs(cur,0,&v);	
+	return dfs(cur,0,v);	
 	}
 
 }ff[DIR*BEAM_WIDTH2];
@@ -1558,7 +1558,7 @@ int main() {
 
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
 	
 	ofstream fi("visited"+layout+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
