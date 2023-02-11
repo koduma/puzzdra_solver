@@ -271,7 +271,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
         
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	int pl=0;
@@ -290,7 +290,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=dir-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	pl++;
 	}
