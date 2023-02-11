@@ -175,7 +175,7 @@ struct node {//どういう手かの構造体
 	}
 }fff[NODE_SIZE];
 
-map<ll,struct node> mapobj;
+multimap<ll,struct node> mapobj;
 
 struct node2 {
 
