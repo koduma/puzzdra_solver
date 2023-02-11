@@ -277,7 +277,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=-1;
-	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
         
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	int pl=0;
@@ -296,7 +296,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=dir-1;
-	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	pl++;
 	}
@@ -387,9 +387,9 @@ void push_data(F_T f_field[ROW][COL],string path){
 	}
 	}  
 }
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump); //ルート探索関数
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump) {
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte) {
   
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
@@ -682,7 +682,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	Action retAction;
 	int retpl=TRN;    
 		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field,jump);
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field,jump,0);
 	
 	stop=tmpp.score;
 		
@@ -747,7 +747,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}	
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,lim,-1,(i*COL)+j,stop,customer,root_field,jump);
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,lim,-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te);
 	ofstream fi("Flare_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
@@ -925,7 +925,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,lim,cand.prev,cand.pos,stop,cand,root_field,jump);
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,lim,cand.prev,cand.pos,stop,cand,root_field,jump,fte);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -971,7 +971,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	hash_chain hc;
 	F_T abc[ROW][COL];
 	memcpy(hc.field,root_field,sizeof(abc));
-	hc.first_te=ff[depth-1][j].first_te;
+	hc.first_te=fte;
 	hc.path=bestAction.path;
 	hc.ptom();	
 	hc.calc_hashchain();	
@@ -1604,7 +1604,7 @@ int main() {
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
 		node2 customer;
-		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false);
+		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false,0);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
