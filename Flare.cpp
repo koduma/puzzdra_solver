@@ -389,7 +389,7 @@ void push_data(F_T f_field[ROW][COL],string path){
 }
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte),int sumpl {
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl) {
   
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
