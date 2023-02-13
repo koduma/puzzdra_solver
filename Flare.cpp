@@ -693,7 +693,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int kosu=0;
 	string line;
 	string t_path[2];
-	ifstream myfile ("Flare_input.txt");
+	ifstream myfile ("Flare_input"+lt+".txt");
 
 	while(getline(myfile,line)){
 
@@ -781,7 +781,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;	
 	}
 	path_length_array[i][j]=(double)cand.path_length;	
-	ofstream file("Flare_input.txt");		
+	ofstream file("Flare_input"+lt+".txt");		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
 	mystring=retAction.path+'\n';
