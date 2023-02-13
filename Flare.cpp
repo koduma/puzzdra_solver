@@ -935,7 +935,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	if(tmp.score!=stop){cand.path_length=TRN;}	
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+(DEPTH-depth)+i+1);
 	if(cand.path_length<=lim){	
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
