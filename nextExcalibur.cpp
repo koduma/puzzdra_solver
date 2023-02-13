@@ -82,7 +82,7 @@ using namespace std;
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define NODE_SIZE MAX(500,4*BEAM_WIDTH)
+#define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -425,17 +425,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						//#pragma omp critical
 											//{ pque.push(cand); }
-						fff[(4 * k) + j] = cand;
+						fff[(DIR * k) + j] = cand;
 						//part4 += omp_get_wtime() - st;
 					}
 					else {
 						cand.combo = -1;
-						fff[(4 * k) + j] = cand;
+						fff[(DIR * k) + j] = cand;
 					}
 				}
 				else {
 					cand.combo = -1;
-					fff[(4 * k) + j] = cand;
+					fff[(DIR * k) + j] = cand;
 				}
 			}
 		}
@@ -446,7 +446,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		deque<int>vec[5001];
 		int ks2 = 0;
 		bool congrats=false;
-		for (int j = 0; j < 4 * ks; j++) {
+		for (int j = 0; j < DIR * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
@@ -720,16 +720,16 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
 	}	
-	ff[(4 * k) + j] = cand;
+	ff[(DIR * k) + j] = cand;
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	ff[(DIR * k) + j] = cand;
 	}
 	}//if(0<=x+dx[j]
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	ff[(DIR * k) + j] = cand;
 	}
 	}//for(int j=0;
 	}//for(int k=0;
@@ -737,7 +737,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
 	deque<int>vec[1001];
-	for(int j=0;j<4*ks;j++){
+	for(int j=0;j<DIR*ks;j++){
 	if(ff[j].path_length!=-1){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
