@@ -606,7 +606,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		}		
 		part2+=omp_get_wtime() - start;
 		if(congrats){return bestAction;}
-		eof=BW[depth];
+		eof=DIR*ks;
 	}
 	return bestAction;
     
