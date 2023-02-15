@@ -455,6 +455,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
+	ca.combo=cmb;
 	if((int)cmb>=stop){
 	Action accept;
 	accept.first_te=ca.first_te;
@@ -489,6 +490,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 #pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
 			node temp = ggg[ggg_list[k]];
+			if(temp.combo!=-1){
 			F_T temp_field[ROW][COL];
 			ll temp_dropBB[DROP+1]={0};
 			memcpy(temp_field, f_field, sizeof(temp_field));
@@ -542,6 +544,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 					fff[(DIR * k) + j] = cand;
 				}
 			}
+		}
 		}
 		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
@@ -602,11 +605,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 #pragma omp parallel for
 		for(int j=0;j<DIR*ks;j++){
 		ggg[j]=fff[j];
+		}
+#pragma omp parallel for
+		for(int j=0;j<ks2;j++){
 		ggg_list[j]=vec[j].second;	
 		}		
 		part2+=omp_get_wtime() - start;
 		if(congrats){return bestAction;}
-		eof=DIR*ks;
+		eof=min(ks2,BW[depth]);
 	}
 	return bestAction;
     
