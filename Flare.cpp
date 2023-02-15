@@ -118,6 +118,7 @@ ll zoblish_field2[ROW*COL];
 
 int BW[DEPTH+1]={BEAM_WIDTH,1,1,1};
 
+int eof;
 int counter=0;
 int read_file_mode;
 
@@ -169,7 +170,9 @@ struct node {//どういう手かの構造体
 	bool operator < (const node& n)const {//スコアが高い方が優先される
 		return score < n.score;
 	}
-}fff[NODE_SIZE];
+}fff[NODE_SIZE],ggg[NODE_SIZE];
+
+int ggg_list[NODE_SIZE];
 
 multimap<ll,struct node> mapobj;
 
@@ -406,10 +409,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		p_maxcombo[i]=drop[i]/3;
 	}
 	MAXCOMBO += (double)stop;
-	vector<node>dque;
 	double start, st;
-	//1手目を全通り探索する
-	dque.clear();
 	if(maxi==0){
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -428,7 +428,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 			cand.improving=0;
 			cand.hash=ha;
-			dque.push_back(cand);
+			ggg[(i*COL)+j]=cand;
+			ggg_list[(i*COL)+j]=(i*COL)+j;
+			eof=(i*COL)+j+1;
 		}
 	}// L, U,D,R //
 	}
@@ -464,14 +466,15 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	accept.path=to_string(XX(accept.first_te))+to_string(YY(accept.first_te)+5)+",";
 	return accept;
 	}
-	dque.push_back(ca);
+	ggg[0]=ca;
+	ggg_list[0]=0;
+	eof=1;
 	}
 	int dx[DIR] = { -1, 0,0,1 },
 		dy[DIR] = { 0,-1,1,0 };
 	Action bestAction;//最善手
 	int maxValue = 0;//最高スコア
 	bestAction.maxcombo = stop;
-	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
 	ll rootBB[DROP+1]={0};
 	for(int row=0;row<ROW;row++){
 	for(int col=0;col<COL;col++){
@@ -481,11 +484,11 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
-		int ks = (int)dque.size();
+		int ks = eof;
 		start = omp_get_wtime();
 #pragma omp parallel for
 		for (int k = 0; k < ks; k++) {
-			node temp = dque[k];//que.front(); que.pop();
+			node temp = ggg[ggg_list[k]];
 			F_T temp_field[ROW][COL];
 			ll temp_dropBB[DROP+1]={0};
 			memcpy(temp_field, f_field, sizeof(temp_field));
@@ -543,8 +546,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		//printf("depth=%d/%d\n",i+1,MAX_TRN);
 		part1 += omp_get_wtime() - start;
 		start = omp_get_wtime();
-		dque.clear();
-		deque<int>vec[5001];
+		vector<pair<int,int> >vec;
 		int ks2 = 0;
 		bool congrats=false;
 		for (int j = 0; j < DIR * ks; j++) {
@@ -591,43 +593,23 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
+			int sco=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);	
+			vec.push_back(make_pair(-sco,j));	
 			ks2++;
 			}
 		}
+		sort(vec.begin(),vec.end());
+#pragma omp parallel for
+		for(int j=0;j<BW[depth];j++){
+		ggg_list[j]=vec[j].second;	
+		}
+#pragma omp parallel for
+		for(int j=0;j<DIR*ks;j++){
+		ggg[j]=fff[j];	
+		}		
 		part2+=omp_get_wtime() - start;
 		if(congrats){return bestAction;}
-		start = omp_get_wtime();
-		int push_node=0;
-		int possible_score=5000;
-		for (int j = 0; push_node < BW[depth] ;j++) {
-			if(possible_score<0){break;}
-			if((int)vec[possible_score].size()==0){
-			possible_score--;
-			continue;
-			}
-			int v=vec[possible_score][0];
-			node temp = fff[v];
-			//swap(vec[possible_score][0], vec[possible_score].back());
-			//vec[possible_score].pop_back();
-			vec[possible_score].pop_front();
-			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
-				maxValue = temp.combo;
-				bestAction.score = maxValue;
-				bestAction.first_te = temp.first_te;
-				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
-				bestAction.path=actiontoS(bestAction);
-			}
-			if (i < MAX_TRN - 1) {
-			int pos=(temp.nowR*COL)+temp.nowC;
-			if(!checkNodeList[pos][temp.hash]){
-				checkNodeList[pos][temp.hash]=true;
-				dque.push_back(temp);
-				push_node++;
-				}
-			}
-		}
-		part3 += omp_get_wtime() - start;
+		eof=BW[depth];
 	}
 	return bestAction;
     
@@ -1649,7 +1631,7 @@ int main() {
 		printf("\n}\n");
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
+	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, t_sum-(part1+part2));
 	cin>>i;
 	cin>>j;
 	cin>>k;
