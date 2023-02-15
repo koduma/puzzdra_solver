@@ -600,12 +600,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		}
 		sort(vec.begin(),vec.end());
 #pragma omp parallel for
-		for(int j=0;j<BW[depth];j++){
-		ggg_list[j]=vec[j].second;	
-		}
-#pragma omp parallel for
 		for(int j=0;j<DIR*ks;j++){
-		ggg[j]=fff[j];	
+		ggg[j]=fff[j];
+		ggg_list[j]=vec[j].second;	
 		}		
 		part2+=omp_get_wtime() - start;
 		if(congrats){return bestAction;}
