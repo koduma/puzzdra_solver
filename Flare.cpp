@@ -620,7 +620,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
   else{
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}
-	if(read_file_mode!=0&&depth==DEPTH){
+	if(read_file_mode==1&&depth==DEPTH){
 	    ifstream myf ("Flare_visited"+lt+".txt");
 	    string ls;
 	    while(getline(myf,ls)){
@@ -690,7 +690,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	
 	int suru=-1;
 	int suru2=TRN;	
-	if(kosu==2){	
+	if(kosu==2&&read_file_mode==1){	
 	string sss="";
 	for(int i=0;i<(int)t_path[0].size();i++){
 	if(t_path[0][i]=='\n'){break;}
