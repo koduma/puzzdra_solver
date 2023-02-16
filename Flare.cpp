@@ -688,7 +688,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	myfile.close();
 	
-	int suru=-1;
+	int suru=-2;
 	int suru2=TRN;	
 	if(kosu==2&&read_file_mode==1){	
 	string sss="";
