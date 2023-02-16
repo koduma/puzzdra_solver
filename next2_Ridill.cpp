@@ -622,7 +622,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
-	if(read_file_mode!=0){
+	if(read_file_mode==1){
 	    ifstream myf ("visited"+lt+".txt");
 	    string ls;
 	    while(getline(myf,ls)){
