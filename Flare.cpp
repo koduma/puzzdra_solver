@@ -450,6 +450,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ca.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
 	ca.improving=0;
 	ca.hash=ha;
+	ca.combo=cmb;
 	if((int)cmb>=stop){
 	Action accept;
 	accept.first_te=ca.first_te;
