@@ -77,7 +77,8 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 10000//MAX2800000
+#define BEAM_WIDTH 10000//MAX280000
+#define BEAM_WIDTH2 1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -207,7 +208,7 @@ struct node2 {
 	emilib::HashMap<ll, bool>v;
 	return dfs(cur,0,v);	
 	}
-}ff[DEPTH][DIR*BEAM_WIDTH];
+}ff[DEPTH][DIR*BEAM_WIDTH2];
 struct Action {//最終的に探索された手
 	T_T first_te;
 	int score;//コンボ数
