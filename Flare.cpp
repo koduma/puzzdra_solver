@@ -834,7 +834,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	tgt++;
 	}
 	int pos;
-	sc pre_v;
+	sc pre_v=-1;
 	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
 	nnn.first_te=(T_T)YX(pos/COL,pos%COL);
