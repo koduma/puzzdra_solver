@@ -763,7 +763,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	}
 	int pos;
-	sc pre_v;
+	sc pre_v=-1;
 	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
 
