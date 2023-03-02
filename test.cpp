@@ -909,13 +909,13 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		int cnt_drop[DROP+1]={0};
 		int right[DROP+1];
 		int left[DROP+1];
-    int top[DROP+1];
-    int bottom[DROP+1];
+		int top[DROP+1];
+		int bottom[DROP+1];
 		for(int i=0;i<=DROP;i++){
-      right[i]=-1;
-      left[i]=COL;
-      top[i]=ROW;
-      bottom[i]=-1;    
+		right[i]=-1;
+		left[i]=COL;
+		top[i]=ROW;
+		bottom[i]=-1;    
 		}
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
@@ -961,7 +961,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
                                 else{
 					right[(int)field[row][col]]=max(right[(int)field[row][col]],col);
 					left[(int)field[row][col]]=min(left[(int)field[row][col]],col);
-          bottom[(int)field[row][col]]=max(bottom[(int)field[row][col]],row);
+					bottom[(int)field[row][col]]=max(bottom[(int)field[row][col]],row);
 					top[(int)field[row][col]]=min(top[(int)field[row][col]],row);                         
                                 }
 			}
@@ -1107,14 +1107,14 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		erased_dropBB^=linked[i];
 		c=__builtin_popcountll(erased_dropBB);
 		if(c<2){continue;}
-      
-    int top=ROW;
-    int bottom=-1;
-    
-    for(int row=0;row<ROW;row++){
-    int bp=__builtin_popcountll(file_bb2[row]&erased_dropBB);  
-    if(bp>0){top=min(top,row);bottom=max(bottom,row);}
-    }  
+		
+		int top=ROW;
+		int bottom=-1;
+		
+		for(int row=0;row<ROW;row++){
+		int bp=__builtin_popcountll(file_bb2[row]&erased_dropBB);
+		if(bp>0){top=min(top,row);bottom=max(bottom,row);}
+		}  
 
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
@@ -1340,11 +1340,11 @@ int main() {
 	}
 	po-=8;
 	}
-  
-  po=9+(8*(COL-1))+ROW-1;
- 
-  for(int i=0;i<ROW;i++){
-	for(int j=0;j<COL;j++){
+	
+	po=9+(8*(COL-1))+ROW-1;
+	
+	for(i=0;i<ROW;i++){
+	for(j=0;j<COL;j++){
 	file_bb2[i] |= (1ll << (po-(8*j)));
 	}
 	po--;
