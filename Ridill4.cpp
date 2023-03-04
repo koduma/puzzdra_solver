@@ -1521,8 +1521,8 @@ int main() {
 	}
 	po-=8;
 	}
-  
-  po=9+(8*(COL-1))+ROW-1;
+	
+	po=9+(8*(COL-1))+ROW-1;
 	
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
