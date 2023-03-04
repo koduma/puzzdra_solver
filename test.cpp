@@ -966,15 +966,15 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
                                 }
 			}
 		}
+		
+		cmb2+=cmb2;
+		cmb2+=cmb2;
+		
 		for(int i=1;i<=DROP;i++){
 		if(right[i]!=-1&&left[i]!=COL&&cnt_drop[i]>=3&&p_maxcombo[i]!=d_maxcombo[i]){
 		cmb2-=(right[i]-left[i])*(bottom[i]-top[i]);
 		}
 		}
-
-		//cmb2*=4;
-		cmb2+=cmb2;
-		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
@@ -1090,7 +1090,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
+		
+		cmb2+=cmb2;
+		cmb2+=cmb2;
 
 		for(int i=1;i<=DROP;i++){
 
@@ -1133,10 +1135,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-
-		//cmb2*=4;
-		cmb2+=cmb2;
-		cmb2+=cmb2;
 
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
