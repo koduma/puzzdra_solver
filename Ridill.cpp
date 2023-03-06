@@ -33,7 +33,6 @@ MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Ridill.cpp loguru.cpp -o Ridill -
 ./Ridill
 
 //input
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -83,7 +82,7 @@ using namespace std;
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-#define NODE_SIZE MAX(500,4*BEAM_WIDTH)
+#define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -128,14 +127,16 @@ int MSB64bit(ll v) {
    return out;
 }
 
-int dfs(ll cur,int depth,emilib::HashMap<ll, bool>*v){
-if((*v)[cur]){return TRN;}
-(*v)[cur]=true;
+int dfs(ll cur,int depth,emilib::HashMap<ll, bool>v){
+if(v[cur]){return TRN;}
+v[cur]=true;
 auto p = visited.equal_range(cur);
 int pl=TRN;
 for (auto it = p.first; it != p.second; ++it) {
-if((it->second)==(ll)1){pl=min(pl,depth);break;}
-else{pl=min(pl,dfs(it->second,depth+1,v));}
+if((it->second)==(ll)1){return depth;}
+}	
+for (auto it = p.first; it != p.second; ++it) {
+pl=min(pl,dfs(it->second,depth+1,v));
 }
 return pl;
 }
@@ -173,7 +174,7 @@ struct node {//どういう手かの構造体
 	}
 }fff[NODE_SIZE];
 
-map<ll,struct node> mapobj;
+multimap<ll,struct node> mapobj;
 
 struct node2 {
 
@@ -215,7 +216,7 @@ struct node2 {
 	
 	int calc_pl(ll cur){
 	emilib::HashMap<ll, bool>v;
-	return dfs(cur,0,&v);	
+	return dfs(cur,0,v);	
 	}
 
 }ff[DIR*BEAM_WIDTH2];
@@ -269,7 +270,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
         
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	int pl=0;
@@ -288,7 +289,7 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=dir-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	//mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
 	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	pl++;
 	}
@@ -319,6 +320,53 @@ int adder(F_T field[ROW][COL]){
     }
 
     return ret;
+}
+
+
+void push_data(F_T f_field[ROW][COL],string path){
+	
+	F_T field[ROW][COL];
+	memcpy(field,f_field,sizeof(field));
+
+	int tgt=0;
+	string top="";
+	while(1){
+
+	if(path[tgt]==','){tgt++;break;}
+	top+=path[tgt];
+	tgt++;
+
+	}
+	int pos;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+	
+	vector<ll>hc;
+	hc.push_back(c_hash(field)^zoblish_field2[pos]);
+	for(int j=tgt;j<(int)path.size();j++){
+	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
+	else if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
+	else if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
+	else if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
+	else{continue;}	
+	hc.push_back(c_hash(field)^zoblish_field2[pos]);  
+	}
+	hc.push_back((ll)1);
+	
+	if((int)hc.size()>0){
+	for(int r=0;r<(int)hc.size()-1;r++){
+	ll cur=hc[r];
+	ll nexthash=hc[r+1];
+	bool find=false;
+	auto p = visited.equal_range(cur);
+	for (auto it = p.first; it != p.second; ++it) {
+	if(it->second==nexthash){find=true;break;}
+	}
+	if(!find){
+	visited.emplace(cur,nexthash);
+	}
+	}
+	}  
 }
 
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
@@ -467,17 +515,17 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						//st = omp_get_wtime();
 						//#pragma omp critical
 											//{ pque.push(cand); }
-						fff[(4 * k) + j] = cand;
+						fff[(DIR * k) + j] = cand;
 						//part4 += omp_get_wtime() - st;
 					}
 					else {
 						cand.combo = -1;
-						fff[(4 * k) + j] = cand;
+						fff[(DIR * k) + j] = cand;
 					}
 				}
 				else {
 					cand.combo = -1;
-					fff[(4 * k) + j] = cand;
+					fff[(DIR * k) + j] = cand;
 				}
 			}
 		}
@@ -488,7 +536,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 		deque<int>vec[5001];
 		int ks2 = 0;
 		bool congrats=false;
-		for (int j = 0; j < 4 * ks; j++) {
+		for (int j = 0; j < DIR * ks; j++) {
 			if (fff[j].combo != -1) {
 			if (fff[j].combo >= stop) {
 				maxValue = fff[j].combo;
@@ -570,9 +618,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
+	
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
-	if(read_file_mode!=0){
+	if(read_file_mode==1){
 	    ifstream myf ("visited"+lt+".txt");
 	    string ls;
 	    while(getline(myf,ls)){
@@ -587,7 +636,12 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 		    }
 		    visited.emplace(stoull(parent),stoull(child));
 	    }
-	    myf.close();
+	myf.close();
+	ifstream myf2("data"+lt+".txt");
+	while(getline(myf2,ls)){
+	push_data(field,ls);
+	}
+	myf2.close();
 	}
 	
 	int ALPHA=1;
@@ -625,12 +679,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	for (int j = 0; j < COL; j++) {
 	node2 cand,cand2;
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
+	if(i==0&&j==0){MLEN=TRN;}	
 	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
 	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
+	memcpy(f_field,field,sizeof(f_field));
+	if(sum_e(f_field)>=stop){return "05,";}	
 	memcpy(cand.field,field,sizeof(f_field));
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -658,7 +715,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
-	if(cand.path_length!=TRN){
+	if(cand.path_length<=lim){
 	avg+=(double)cand.path_length;
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());	
@@ -677,7 +734,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int kosu=0;
 	string line;
 	string t_path[BEAM_WIDTH2];
-	ifstream myfile ("input.txt");
+	ifstream myfile ("input"+lt+".txt");
 
 	while(getline(myfile,line)){
 
@@ -792,7 +849,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int ks = (int)dque.size();
 	pro_league.clear();	
 	
-	ofstream file("input.txt");
+	ofstream file("input"+lt+".txt");
 
 	for (int k = 0; k < ks; k++) {
 	string mystring=dque[k].true_path+'\n';
@@ -850,18 +907,20 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	//cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
+	if(cand.path_length<=lim){	
 	pro_league.push_back(cand.path_length);
-	sort(pro_league.begin(),pro_league.end());	
-	ff[(4 * k) + j] = cand;
+	sort(pro_league.begin(),pro_league.end());
+	}	
+	ff[(DIR * k) + j] = cand;
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	ff[(DIR * k) + j] = cand;
 	}
 	}//if(0<=x+dx[j]
 	else {
 	cand.path_length = -1;
-	ff[(4 * k) + j] = cand;
+	ff[(DIR * k) + j] = cand;
 	}
 	}//for(int j=0;
 	}//for(int k=0;
@@ -869,7 +928,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	printf("depth=%d/%d\n",i+1,MAX_TRN);
 	dque.clear();
 	deque<int>vec[1001];
-	for(int j=0;j<4*ks;j++){
+	for(int j=0;j<DIR*ks;j++){
 	if(ff[j].path_length!=-1){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
@@ -1143,6 +1202,27 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 
 	}
 	ev += oti;
+	
+	int penalty=0;
+
+	for(int i=1;i<=DROP;i++){
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
+	}
+
+	int alone=0;
+	
+	bool find=false;
+
+	for(int x=0;x<COL;x++){
+	if(field[ROW-1][x] == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}	
+	}
+
+	ev-=penalty*alone;	
+	
 	*hash=ha;
 	return ev;
 }
@@ -1202,13 +1282,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
 
-		ll erased_dropBB=(dropBB[i])^(linked[i]);
+		ll erased_dropBB=dropBB[i];
 
 		if(erased_dropBB==0ll){continue;}
 
 		int c=__builtin_popcountll(erased_dropBB);
 
 		if(c<3){continue;}
+			
+		erased_dropBB^=linked[i];
+		c=__builtin_popcountll(erased_dropBB);
+		if(c<2){continue;}	
 
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
@@ -1268,6 +1352,30 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
+	
+	int penalty=0;
+
+	ll board=occBB;
+
+	for(int i=1;i<=DROP;i++){
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
+	}
+
+	int alone=0;
+	
+	bool find=false;
+
+	for(int x=0;x<COL;x++){
+	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}
+	}
+
+	ev-=penalty*alone;
+	
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -1345,7 +1453,6 @@ int main() {
 
 
 	/*
-
 	testcase
 	
 	layout=367254402726710107527213362754
@@ -1353,34 +1460,24 @@ int main() {
 	
 	layout=047631151072370164261053045210
 	:path_length=50,10combo
-
 	layout=242242100331023100110324132543
 	:path_length=26,9combo
-
 	layout=201053210251533425501353123221
 	:path_length=26,9combo
-
 	layout=015315151020442313510540210411
 	:path_length=27,9combo
-
 	layout=432015152244350331552132312515
 	:path_length=31,9combo
-
 	layout=323243441332042002331313014300
 	:path_length=19,8combo
-
 	layout=225530333313140355004550251403
 	:path_length=24,9combo
-
 	layout=224234425402054400304510125043
 	:path_length=30,8combo
-
 	layout=053241405407470557104053134522
 	:path_length=41,10combo
-
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
-
 	*/
 
 	int i, j, k;
@@ -1504,7 +1601,7 @@ int main() {
 
 	}//i
 	printf("TotalDuration:%fSec\n", t_sum);
-	printf("p1:%f,p2:%f,p3:%f\n", part1, part2, part3);
+	printf("p1:%f,p2:%f,p3:%f,p4:%f\n", part1, part2, part3,t_sum-(part1+part2+part3));
 	
 	ofstream fi("visited"+layout+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
