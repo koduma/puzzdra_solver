@@ -682,7 +682,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if(i==0&&j==0){MLEN=TRN;}	
 	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
-	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim,MLEN-1)),-1,(i*COL)+j,stop);
+	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim-1,MLEN-1)),-1,(i*COL)+j,stop);
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
@@ -715,7 +715,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
 	cout<<"path_length="<<cand.path_length<<endl;
 	cout<<"combo="<<tmp.score<<"/"<<stop<<endl;
-	if(cand.path_length<=lim){
+	if(cand.path_length<lim){
 	avg+=(double)cand.path_length;
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());	
@@ -763,7 +763,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	}
 	int pos;
-	sc pre_v;
+	sc pre_v=-1;
 	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
 	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
 
@@ -887,7 +887,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=TRN;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
-	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim,MLEN-1)),cand.prev,cand.pos,stop);
+	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -907,7 +907,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	//cout<<"pos="<<cand.pos+1<<endl;
 	}	
 	cand.path_length=min(cand.path_length,MLEN);
-	if(cand.path_length<=lim){	
+	if(cand.path_length<lim){	
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
 	}	
