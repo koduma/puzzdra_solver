@@ -112,7 +112,6 @@ ll around(ll bitboard);
 int table[64];
 ll fill_64[64];
 ll file_bb[COL];
-ll file_bb2[ROW];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
@@ -739,7 +738,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int lim=TRN;
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if((i*COL)+j==suru+1){jump=true;}
-	else{jump=false;}	
+	else{jump=false;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
 	ofstream fi("Flare_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
@@ -1247,17 +1246,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
-		
-		for(int row=0;row<ROW;row++){
-		int x_bonus[DROP+1]={0};
-		for(int col=0;col<COL;col++){
-		x_bonus[field[row][col]]++;
-		}
-		for(int i=1;i<=DROP;i++){
-		if(x_bonus[i]>=3){cmb2+=5;}
-		}
-		}
-		
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1381,15 +1369,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-		
-		for(int row=0;row<ROW;row++){
-		ll bp=file_bb2[row];
-		for(int i=1;i<=DROP;i++){
-		int xb=__builtin_popcountll(bp&dropBB[i]);
-		if(xb>=3){cmb2+=5;}
-		}
-		}
-		
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1563,15 +1542,6 @@ int main() {
 	}
 	po-=8;
 	}
-	
-	po=9+(8*(COL-1))+ROW-1;
-	for(i=0;i<ROW;i++){
-	for(j=0;j<COL;j++){
-	file_bb2[i] |= (1ll << (po-(8*j)));
-	}
-	po--;
-	}
-	
 	string bestans="";
 	string layout="";
 	string date="";
