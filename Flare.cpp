@@ -1157,6 +1157,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -1195,7 +1196,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
+
 		F_T erase_x[COL]={0};
+
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (delflag[row][col]>0) {
@@ -1205,6 +1208,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 						if (c == 3) { cmb2 += 30; }
 						else { cmb2 += 20; }
 						d_maxcombo[(int)field[row][col]]++;
+					}
+					else if(c==2){
+					cmb2+=5;
 					}
 					field[row][col]=0;
 					erase_x[col]=1;
@@ -1220,10 +1226,11 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
+
 		//cmb2*=4;
 		cmb2+=cmb2;
 		cmb2+=cmb2;
-		
+
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -1237,15 +1244,18 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
+
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
 		for(int row=0;row<ROW;row++){
 		y_bonus[field[row][col]]++;
 		}
 		for(int i=1;i<=DROP;i++){
-		if(y_bonus[i]>=3){cmb2+=20;}
+		if(y_bonus[i]==2){cmb2+=5;}  
+		else if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1259,16 +1269,20 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
+
 	}
 	ev += oti;
-		
+	
 	int penalty=0;
+
 	for(int i=1;i<=DROP;i++){
 	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
+
 	int alone=0;
 	
 	bool find=false;
+
 	for(int x=0;x<COL;x++){
 	if(field[ROW-1][x] == 0){
 	if(!find){alone++;}
@@ -1276,8 +1290,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	}
 	else{find=false;}	
 	}
+
 	ev-=penalty*alone;
-	
+  
 	*hash=ha;
 	return ev;
 }
@@ -1286,20 +1301,30 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	*combo = 0;
 	int oti = 0;
 	ll occBB=0;
+
 	for(int i=1;i<=DROP;i++){
 	occBB|=dropBB[i];
 	}
+
 	int po=9+(8*(COL-1))+ROW-1;
+
 	int d_maxcombo[DROP+1]={0};
+
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
+
 		ll linked[DROP+1]={0};
+
 		for(int i=1;i<=DROP;i++){
+
 		ll vert = (dropBB[i]) & (dropBB[i] << 1) & (dropBB[i] << 2);
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
+
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
+
 		}
+
 		for(int i=1;i<=DROP;i++){
 		long long tmp_linked=(long long)linked[i];
 		while(1){
@@ -1319,17 +1344,29 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		else {cmb2+=20;}
 		d_maxcombo[i]++;
 		}
+		else if(c==2){
+		cmb2+=5;
+		}  
 		}
 		}
+
+
 		for(int i=1;i<=DROP;i++){
+
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
+
 		ll erased_dropBB=dropBB[i];
+
 		if(erased_dropBB==0ll){continue;}
+
 		int c=__builtin_popcountll(erased_dropBB);
+
 		if(c<3){continue;}
+			
 		erased_dropBB^=linked[i];
 		c=__builtin_popcountll(erased_dropBB);
 		if(c<2){continue;}	
+
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
 		ll exist=(ll)t;
@@ -1342,13 +1379,16 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
 		}
+
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
+
 		//cmb2*=4;
 		cmb2+=cmb2;
 		cmb2+=cmb2;
+
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
@@ -1362,19 +1402,24 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
+
 		for(int col=0;col<COL;col++){
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
 		int yb=__builtin_popcountll(bp&dropBB[i]);
-		if(yb>=3){cmb2+=20;}
+		if(yb==2){cmb2+=5;}  
+		else if(yb>=3){cmb2+=20;}
 		}
 		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
+
 		ll mask=calc_mask(occBB);
+
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]=fallBB(dropBB[i],occBB,mask);
 		}
@@ -1383,13 +1428,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	ev += oti;
 	
 	int penalty=0;
+
 	ll board=occBB;
+
 	for(int i=1;i<=DROP;i++){
 	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
+
 	int alone=0;
 	
 	bool find=false;
+
 	for(int x=0;x<COL;x++){
 	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
 	if(!find){alone++;}
@@ -1397,8 +1446,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 	else{find=false;}
 	}
+
 	ev-=penalty*alone;
-	
+  
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
