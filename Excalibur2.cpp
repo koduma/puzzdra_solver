@@ -120,7 +120,6 @@ ll fallBB(ll p,ll rest,ll mask);
 
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
-ll file_bb2[ROW];
 
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
@@ -1333,14 +1332,6 @@ int main() {
 	file_bb[i] |= (1ll << (po-j));
 	}
 	po-=8;
-	}
-	
-	po=9+(8*(COL-1))+ROW-1;
-	for(i=0;i<ROW;i++){
-	for(j=0;j<COL;j++){
-	file_bb2[i] |= (1ll << (po-(8*j)));
-	}
-	po--;
 	}
 
 	string bestans="";
