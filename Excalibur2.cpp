@@ -1,27 +1,38 @@
 /*
 Windows10,Windows11,Linux,MacOS
+
 Linux導入手続き
+
 //メモリ容量確認
 free -h
+
 //g++インストール
 sudo apt install -y g++
+
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
+
 //Excalibur.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Excalibur.cpp
+
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
+
 //ビーム幅調整
 vi Excalibur.cpp
+
 //コンパイル
+
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl
+
 //run
 ./Excalibur
+
 //input
 */
 #pragma warning(disable:4710)
@@ -940,9 +951,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 						else { cmb2 += 20; }
 						d_maxcombo[(int)field[row][col]]++;
 					}
-          else if(c==2){
-          cmb2+=5;
-          }
+					else if(c==2){
+					cmb2+=5;
+					}
 					field[row][col]=0;
 					erase_x[col]=1;
 				}
@@ -982,19 +993,19 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		y_bonus[field[row][col]]++;
 		}
 		for(int i=1;i<=DROP;i++){
-    if(y_bonus[i]==2){cmb2+=5;}  
+		if(y_bonus[i]==2){cmb2+=5;}  
 		else if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
-    
-    for(int row=0;row<ROW;row++){
+		
+		for(int row=0;row<ROW;row++){
 		int x_bonus[DROP+1]={0};
 		for(int col=0;col<COL;col++){
 		x_bonus[field[row][col]]++;
 		}
 		for(int i=1;i<=DROP;i++){
 		if(x_bonus[i]>=3){cmb2+=5;}
-    else if(x_bonus[i]==2){cmb2+=2;}  
+		else if(x_bonus[i]==2){cmb2+=2;}  
 		}
 		}
 
@@ -1086,9 +1097,9 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		else {cmb2+=20;}
 		d_maxcombo[i]++;
 		}
-    else if(c==2){
-    cmb2+=5;
-    }  
+		else if(c==2){
+		cmb2+=5;
+		}  
 		}
 		}
 
@@ -1149,17 +1160,17 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
 		int yb=__builtin_popcountll(bp&dropBB[i]);
-    if(yb==2){cmb2+=5;}  
+		if(yb==2){cmb2+=5;}  
 		else if(yb>=3){cmb2+=20;}
 		}
 		}
-    
-    for(int row=0;row<ROW;row++){
+		
+		for(int row=0;row<ROW;row++){
 		ll bp=file_bb2[row];
 		for(int i=1;i<=DROP;i++){
 		int xb=__builtin_popcountll(bp&dropBB[i]);
 		if(xb>=3){cmb2+=5;}
-    else if(xb==2){cmb2+=2;}  
+		else if(xb==2){cmb2+=2;}  
 		}
 		}
 
@@ -1343,8 +1354,8 @@ int main() {
 	}
 	po-=8;
 	}
-  
-  po=9+(8*(COL-1))+ROW-1;
+	
+	po=9+(8*(COL-1))+ROW-1;
 	for(i=0;i<ROW;i++){
 	for(j=0;j<COL;j++){
 	file_bb2[i] |= (1ll << (po-(8*j)));
