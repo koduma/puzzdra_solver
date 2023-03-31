@@ -935,6 +935,12 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 					delflag[row+1][col]=1;
 					delflag[row+2][col]=1;
 				}
+				if(row<=ROW-2 && num==field[row+1][col] && num > 0){
+				cmb2+=5;
+				}
+				if(col<=COL-2 && num==field[row][col+1] && num > 0){
+				cmb2+=5;
+				}
 			}
 		}
 
