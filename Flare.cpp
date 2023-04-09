@@ -1068,7 +1068,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 			}
 			int v=0;
 			for(int k=0;k<DEPTH;k++){
-			if(!visited2[k][check_hash(f_field)]){v++;}
+			if(visited2[k][check_hash(f_field)]){v++;}
 			}
 			cand.prev_score=v;
 			cand.improving=0;
