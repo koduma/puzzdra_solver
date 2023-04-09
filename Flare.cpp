@@ -83,7 +83,7 @@ using namespace std;
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
-#define DEPTH 3
+#define DEPTH 2
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -117,7 +117,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
-int BW[DEPTH+1]={BEAM_WIDTH,1,1,1};
+int BW[DEPTH+1]={BEAM_WIDTH,1,1};
 emilib::HashMap<ll, bool> mismatch[DEPTH];
 
 int counter=0;
