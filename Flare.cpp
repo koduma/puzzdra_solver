@@ -1038,7 +1038,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(bestAction.moving, temp.movei, sizeof(movei));
 	bestAction.path=temp.true_path;
 	}
-	if (i < MAX_TRN - 1) {
+	if (i < TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
 	dque.push_back(temp);
