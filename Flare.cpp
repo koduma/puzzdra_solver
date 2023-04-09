@@ -1,27 +1,37 @@
 /*
 Windows10,Windows11,Linux,MacOS
+
 Linux導入手続き
+
 //メモリ容量確認
 free -h
+
 //g++インストール
 sudo apt install -y g++
+
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
+
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
+
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
+
 //ビーム幅調整
 vi Flare.cpp
+
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
+
 //run
 ./Flare
+
 //input
 */
 #pragma warning(disable:4710)
@@ -1791,7 +1801,7 @@ int main() {
 		double start = omp_get_wtime();
 		node2 customer;
 		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false,0,0);
-		act=BULB(f_field,act.score);
+		//act=BULB(f_field,act.score);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
