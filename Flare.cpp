@@ -1128,7 +1128,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 						for(int a=0;a<DEPTH;a++){
 						if(visited2[a][cand.hash]){v++;}
 						}
-						cand.score=-v;
+						cand.score=v;
 						cand.combo = sum_e(field);
 						cand.prev = j;
 						fff[(DIR * k) + j] = cand;
@@ -1190,7 +1190,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec.push_back(make_pair(fff[j].score,j));
+			vec.push_back(make_pair(-fff[j].score,j));
 			ks2++;
 			}
 		}
