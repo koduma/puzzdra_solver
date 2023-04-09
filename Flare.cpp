@@ -1006,12 +1006,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}
 	if(congrats){
-	for(int m=0;m<ROW*COL;m++){
-	for( auto n = checkNodeList[m].begin(); n != checkNodeList[m].end() ; ++n ) {	
-	mismatch[depth-1][n->first]=n->second;
+	for(int m=0;m<ROW*COL;m++){	
+	mismatch[depth-1].insert(checkNodeList[m].begin(), checkNodeList[m].end());
 	}
-	}
-	}	
 	return bestAction;
 	}
 	int push_node=0;
