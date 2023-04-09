@@ -1066,12 +1066,11 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 			for (int trn = 0; trn <= TRN/21; trn++) {
 				cand.movei[trn] = 0ll;
 			}
-			int v=-1;
+			int v=0;
 			for(int k=0;k<DEPTH;k++){
 			if(!visited2[k][check_hash(f_field)]){v++;}
 			}
-			if(v==-1){cand.prev_score=TRN;}
-			else{cand.prev_score=v+1;}
+			cand.prev_score=v;
 			cand.improving=0;
 			dque.push_back(cand);
 		}
@@ -1125,12 +1124,11 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 						cand.nowC += dx[j];
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
-						int v=-1;
+						int v=0;
 						for(int a=0;a<DEPTH;a++){
-						if(!visited2[a][cand.hash]){v++;}
+						if(visited2[a][cand.hash]){v++;}
 						}
-						if(v==-1){cand.score=TRN;}
-						else{cand.score=v+1;}
+						cand.score=-v;
 						cand.combo = sum_e(field);
 						cand.prev = j;
 						fff[(DIR * k) + j] = cand;
