@@ -1129,7 +1129,8 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 						for(int a=0;a<DEPTH;a++){
 						if(visited2[a][cand.hash]){v++;}
 						}
-						cand.score=v;
+						cand.score=v*10000;
+						cand.score+=rnd(1,100);
 						cand.combo = sum_e(field);
 						cand.prev = j;
 						fff[(DIR * k) + j] = cand;
