@@ -1,37 +1,27 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
-
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Flare.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Flare.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
-
 //run
 ./Flare
-
 //input
 */
 #pragma warning(disable:4710)
@@ -1038,7 +1028,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(bestAction.moving, temp.movei, sizeof(movei));
 	bestAction.path=temp.true_path;
 	}
-	if (i < TRN - 1) {
+	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
 	dque.push_back(temp);
@@ -1210,7 +1200,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 				bestAction.path=actiontoS(bestAction);
 			}
-			if (i < MAX_TRN - 1) {
+			if (i < TRN - 1) {
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
