@@ -1070,6 +1070,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 			for(int k=0;k<DEPTH;k++){
 			if(visited2[k][check_hash(f_field)]){v++;}
 			}
+			cand.hash=check_hash(f_field);
 			cand.prev_score=v;
 			cand.improving=0;
 			dque.push_back(cand);
@@ -1799,7 +1800,7 @@ int main() {
 		double start = omp_get_wtime();
 		node2 customer;
 		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false,0,0);
-		//act=BULB(f_field,act.score);
+		act=BULB(f_field,act.score);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
