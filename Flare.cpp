@@ -118,6 +118,7 @@ multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
 int BW[DEPTH+1]={BEAM_WIDTH,1,1,1};
+emilib::HashMap<ll, bool> mismatch[DEPTH];
 
 int counter=0;
 int read_file_mode;
@@ -1004,7 +1005,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
-	if(congrats){return bestAction;}
+	if(congrats){
+	for(int m=0;m<ROW*COL;m++){	
+	mismatch[depth-1].insert(checkNodeList[m].begin(), checkNodeList[m].end());
+	}
+	return bestAction;
+	}
 	int push_node=0;
 	int possible_score=0;
 	for (int j = 0; push_node < BW[depth] ;j++) {
@@ -1041,6 +1047,177 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
   
   }
     
+}
+Action BULB(F_T f_field[ROW][COL],int stop){
+	int po=9+(8*(COL-1))+ROW-1;
+	vector<node>dque;
+	dque.clear();
+	for (int i = 0; i < ROW; i++) {
+		for (int j = 0; j < COL; j++) {
+			node cand;
+			cand.nowR = i;//y座標
+			cand.nowC = j;//x座標
+			cand.prev = -1;//1手前はない
+			cand.first_te = (T_T)YX(i, j);//1手目のyx座標
+			for (int trn = 0; trn <= TRN/21; trn++) {
+				cand.movei[trn] = 0ll;
+			}
+			int v=-1;
+			for(int k=0;k<DEPTH;k++){
+			if(!mismatch[k][check_hash(f_field)]){v++;}
+			}
+			if(v==-1){cand.prev_score=TRN;}
+			else{cand.prev_score=v+1;}
+			cand.improving=0;
+			dque.push_back(cand);
+		}
+	}// L, U,D,R //
+		
+	int dx[DIR] = { -1, 0,0,1 },
+		dy[DIR] = { 0,-1,1,0 };
+	Action bestAction;
+	int maxValue = 0;
+	bestAction.maxcombo = stop;
+	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
+	ll rootBB[DROP+1]={0};
+	for(int row=0;row<ROW;row++){
+	for(int col=0;col<COL;col++){
+	int pos=po-((8*col)+row);
+	rootBB[f_field[row][col]]|=(1ll << (pos));
+	}
+	}
+	//2手目以降をビームサーチで探索
+	for (int i = 0; i < TRN; i++) {
+		int ks = (int)dque.size();
+		for (int k = 0; k < ks; k++) {
+			node temp = dque[k];
+			F_T temp_field[ROW][COL];
+			ll temp_dropBB[DROP+1]={0};
+			memcpy(temp_field, f_field, sizeof(temp_field));
+			memcpy(temp_dropBB,rootBB,sizeof(rootBB));
+			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
+			for (int j = 0; j < DIR; j++) {
+				node cand = temp;
+				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
+					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
+					if (cand.prev + j != 3) {
+						int ny=cand.nowR + dy[j];
+						int nx=cand.nowC + dx[j];
+						F_T field[ROW][COL];
+						ll dropBB[DROP+1]={0};
+						memcpy(field,temp_field,sizeof(temp_field));
+						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
+						F_T tmp=field[cand.nowR][cand.nowC];
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
+						int pre_drop=(int)tmp;
+						int pre_pos=po-((8*cand.nowC)+cand.nowR);
+						int next_drop=(int)field[ny][nx];
+						int next_pos=po-((8*nx)+ny);
+						dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
+						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
+						field[cand.nowR][cand.nowC]=field[ny][nx];
+						field[ny][nx]=tmp;
+						cand.nowC += dx[j];
+						cand.nowR += dy[j];
+						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
+						int v=-1;
+						for(int a=0;a<DEPTH;a++){
+						if(!mismatch[a][cand.hash]){v++;}
+						}
+						if(v==-1){cand.score=TRN;}
+						else{cand.score=v+1;}
+						cand.combo = sum_e(field);
+						cand.prev = j;
+						fff[(DIR * k) + j] = cand;
+					}
+					else {
+						cand.combo = -1;
+						fff[(DIR * k) + j] = cand;
+					}
+				}
+				else {
+					cand.combo = -1;
+					fff[(DIR * k) + j] = cand;
+				}
+			}
+		}
+		dque.clear();
+		vector<pair<int,int> >vec;
+		int ks2 = 0;
+		bool congrats=false;
+		for (int j = 0; j < DIR * ks; j++) {
+			if (fff[j].combo != -1) {
+			if (fff[j].combo >= stop) {
+				maxValue = fff[j].combo;
+				bestAction.score = maxValue;
+				bestAction.first_te = fff[j].first_te;
+				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
+				bestAction.path=actiontoS(bestAction);
+				hash_chain hc;
+				F_T abc[ROW][COL];
+				memcpy(hc.field,f_field,sizeof(abc));
+				hc.first_te=fff[j].first_te;
+				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
+				hc.calc_hashchain();
+				if((int)hc.hashchain.size()>0){
+				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
+				ll cur=hc.hashchain[r];
+				ll nexthash=hc.hashchain[r+1];
+				bool find=false;
+				auto p = visited.equal_range(cur);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==nexthash){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(cur,nexthash);
+				}
+				if(r==(int)hc.hashchain.size()-2){
+				find=false;
+				p=visited.equal_range(nexthash);
+				for (auto it = p.first; it != p.second; ++it) {
+				if(it->second==(ll)1){find=true;break;}
+				}
+				if(!find){
+				visited.emplace(nexthash,(ll)1);
+				}
+				}
+				}
+				}
+				congrats=true;
+			}
+			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
+			fff[j].prev_score=fff[j].score;
+			vec.push_back(make_pair(fff[j].score,j));
+			ks2++;
+			}
+		}
+		sort(vec.begin(),vec.end());
+		if(congrats){return bestAction;}
+		int push_node=0;
+		for (int j = 0; push_node < BW[0] ;j++) {
+			if(j>=(int)vec.size()){break;}
+			int v=vec[j].second;
+			node temp = fff[v];
+			if (maxValue < temp.combo) {
+				maxValue = temp.combo;
+				bestAction.score = maxValue;
+				bestAction.first_te = temp.first_te;
+				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
+				bestAction.path=actiontoS(bestAction);
+			}
+			if (i < MAX_TRN - 1) {
+			int pos=(temp.nowR*COL)+temp.nowC;
+			if(!checkNodeList[pos][temp.hash]){
+				checkNodeList[pos][temp.hash]=true;
+				dque.push_back(temp);
+				push_node++;
+				}
+			}
+		}
+	}
+	return bestAction;
+
 }
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
@@ -1620,6 +1797,7 @@ int main() {
 		double start = omp_get_wtime();
 		node2 customer;
 		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false,0,0);
+		act=BULB(f_field,act.score);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
