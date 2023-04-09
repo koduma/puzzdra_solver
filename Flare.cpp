@@ -118,7 +118,7 @@ multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 
 int BW[DEPTH+1]={BEAM_WIDTH,1,1};
-emilib::HashMap<ll, bool> mismatch[DEPTH];
+emilib::HashMap<ll, bool> visited2[DEPTH];
 
 int counter=0;
 int read_file_mode;
@@ -1010,7 +1010,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for( auto n = checkNodeList[m].begin(); n != checkNodeList[m].end(); ++n ) {
 	ll key=n->first;
 	bool value=n->second;
-	mismatch[depth-1][key]=value;	
+	visited2[depth-1][key]=value;	
 	}
 	}
 	return bestAction;
@@ -1068,7 +1068,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 			}
 			int v=-1;
 			for(int k=0;k<DEPTH;k++){
-			if(!mismatch[k][check_hash(f_field)]){v++;}
+			if(!visited2[k][check_hash(f_field)]){v++;}
 			}
 			if(v==-1){cand.prev_score=TRN;}
 			else{cand.prev_score=v+1;}
@@ -1127,7 +1127,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						int v=-1;
 						for(int a=0;a<DEPTH;a++){
-						if(!mismatch[a][cand.hash]){v++;}
+						if(!visited2[a][cand.hash]){v++;}
 						}
 						if(v==-1){cand.score=TRN;}
 						else{cand.score=v+1;}
