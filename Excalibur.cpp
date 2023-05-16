@@ -33,6 +33,7 @@ MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excal
 ./Excalibur
 
 //input
+
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
