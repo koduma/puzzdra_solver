@@ -1479,6 +1479,18 @@ int main() {
 	layout=030303232323434343535353131313
 	:path_length=44,平積みonly,10combo
 	*/
+	
+	time_t t = time(NULL);
+	struct tm *local = localtime(&t);
+	printf("%04d/", local->tm_year + 1900);
+	printf("%02d/", local->tm_mon + 1);
+	printf("%02d", local->tm_mday);
+
+	printf(" ");
+
+	printf("%02d:", local->tm_hour);
+	printf("%02d:", local->tm_min);
+	printf("%02d\n", local->tm_sec);
 
 	int i, j, k;
 	for(i=0;i<ROW;++i){
