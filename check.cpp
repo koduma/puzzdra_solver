@@ -685,14 +685,14 @@ return p;
 
 int calc_pl(Action tmp){
 int path_length=0;
-		for (int j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
-			if (tmp.moving[j] == 0ll) { break; }
-			for(int k=0;k<21;k++){
-			int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
-			if (dir==0){break;}
-			path_length++;
-			}
-		}
+for (int j = 0; j <= TRN/21; j++) {//y座標は下にいくほど大きくなる
+if (tmp.moving[j] == 0ll) { break; }
+for(int k=0;k<21;k++){
+int dir = (int)(7ll&(tmp.moving[j]>>(3*k)));
+if (dir==0){break;}
+path_length++;
+}
+}
 
 return path_length;
 
