@@ -1,6 +1,6 @@
 /*
 
-g++ -O2 -std=c++11 -fopenmp -mbmi2 check.cpp -o check
+g++ -O2 -std=c++11 -fopenmp -mbmi2 Stone.cpp -o Stone
 
 検証用プログラム
 
