@@ -13,8 +13,8 @@ sudo apt install -y g++
 sudo apt-get update
 sudo apt-get install -y wget
 
-//Haste.cppをダウンロード
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Haste.cpp
+//FlareII.cppをダウンロード
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/FlareII.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
@@ -22,15 +22,15 @@ wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_sol
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
-vi Haste.cpp
+vi FlareII.cpp
 
 //コンパイル
-Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Haste.cpp loguru.cpp -o Haste -mcmodel=large -ldl
-Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Haste.cpp loguru.cpp -o Haste -mcmodel=large
-MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Haste.cpp loguru.cpp -o Haste -ldl
+Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread FlareII.cpp loguru.cpp -o FlareII -mcmodel=large -ldl
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread FlareII.cpp loguru.cpp -o FlareII -mcmodel=large
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread FlareII.cpp loguru.cpp -o FlareII -ldl
 
 //run
-./Haste
+./FlareII
 
 //input
 */
