@@ -13,8 +13,8 @@ sudo apt install -y g++
 sudo apt-get update
 sudo apt-get install -y wget
 
-//Flare.cppをダウンロード
-wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Flare.cpp
+//Burst.cppをダウンロード
+wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Burst.cpp
 
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
@@ -22,15 +22,15 @@ wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_sol
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
 
 //ビーム幅調整
-vi Flare.cpp
+vi Burst.cpp
 
 //コンパイル
-Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large -ldl
-Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -mcmodel=large
-MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Flare.cpp loguru.cpp -o Flare -ldl
+Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large -ldl
+Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large
+MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -ldl
 
 //run
-./Flare
+./Burst
 
 //input
 */
