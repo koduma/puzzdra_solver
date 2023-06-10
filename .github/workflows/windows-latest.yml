@@ -21,4 +21,4 @@ jobs:
       with:
         install: make mingw-w64-x86_64-toolchain
     - name: compile(MinGW-w64)
-      run:  g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large
+      run:  g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -march=native
