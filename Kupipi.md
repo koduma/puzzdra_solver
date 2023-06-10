@@ -45,8 +45,8 @@ https://user-images.githubusercontent.com/47982907/147241543-7e7523d8-798a-4771-
 
 | OS | Version | Compile Command |
 | --- | --- | --- |
-|  Any | benchmark.cpp | g++ -O2 -std=c++11 -fopenmp benchmark.cpp -o benchmark  |
-|  Any | benchmark_BitBoard_ver.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 benchmark_BitBoard_ver.cpp -o benchmark_BitBoard_ver |
+|  Any | Fire.cpp | g++ -O2 -std=c++11 -fopenmp Fire.cpp -o Fire  |
+|  Any | FireII.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 FireII.cpp -o FireII |
 |  Linux | Excalibur.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large -ldl  |
 |  Windows | Excalibur.cpp | g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -mcmodel=large  |
 |  MacOS | Excalibur.cpp | g++ -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl -march=native  |
