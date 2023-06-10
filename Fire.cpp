@@ -1,16 +1,7 @@
 /*
-puzzdra_solver
 
-パズドラのルート解析プログラムです
+g++ -O2 -std=c++11 -fopenmp Fire.cpp -o Fire
 
-コンパイラはg++を推奨します
-
-なるべく少ない時間でなるべく大きいコンボを出したいです
-
-printf("TotalDuration:%fSec\n", t_sum);
-printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
-
-これらが改善されればpull request受け付けます
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
