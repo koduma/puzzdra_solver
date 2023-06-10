@@ -1,6 +1,6 @@
 /*
 
-g++ -O2 -std=c++11 -fopenmp -mbmi2 Stone.cpp -o Stone
+g++ -O2 -std=c++11 -fopenmp -mbmi2 Dia.cpp -o Dia
 
 検証用プログラム
 
