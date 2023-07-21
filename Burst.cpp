@@ -1722,6 +1722,18 @@ p = _pdep_u64(p, mask);
 return p;
 }
 int main() {
+
+	time_t t = time(NULL);
+	struct tm *local = localtime(&t);
+	printf("\n%04d/", local->tm_year + 1900);
+	printf("%02d/", local->tm_mon + 1);
+	printf("%02d", local->tm_mday);
+
+	printf(" ");
+
+	printf("%02d:", local->tm_hour);
+	printf("%02d:", local->tm_min);
+	printf("%02d\n\n", local->tm_sec);
 	
 	int i, j, k;
 	for(i=0;i<ROW;++i){
