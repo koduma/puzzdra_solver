@@ -613,7 +613,15 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){return bestAction;}
+		if(congrats){
+		ofstream fi("visited"+lt+".txt");
+		for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		fi<<mystr;
+		}
+		fi.close();	
+		return bestAction;
+		}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -886,15 +894,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	string mystring=dque[k].true_path+'\n';
 	file << mystring;
 	}
-	file.close();
-		
-	ofstream fi("visited"+lt+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-		fi<<mystr;
-	}
-	fi.close();
-		
+	file.close();		
 	for (int k = 0; k < ks; k++) {
 
 	node2 temp = dque[k];
