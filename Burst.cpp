@@ -150,7 +150,7 @@ ll zoblish_field2[ROW*COL];
 
 int BW[DEPTH+1]={BEAM_WIDTH,1,1};
 emilib::HashMap<ll, bool> visited2[DEPTH];
-
+string lt;
 int counter=0;
 int read_file_mode;
 int MSB64bit(ll v) {
@@ -668,7 +668,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
     
   }
   else{
-	string lt="";
+	lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode==1&&depth==DEPTH){
 	    ifstream myf ("Flare_visited"+lt+".txt");
