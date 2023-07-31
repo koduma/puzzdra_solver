@@ -1,37 +1,27 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
-
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Burst.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Burst.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Burst.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -ldl
-
 //run
 ./Burst
-
 //input
 	
 layout=367254402726710107527213362754
@@ -63,7 +53,6 @@ layout=224234425402054400304510125043
 	
 layout=053241405407470557104053134522
 :path_length=41,10combo
-
 */
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
@@ -108,13 +97,13 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 10000//MAX2800000
-#define BEAM_WIDTH2 1000//MAX1000
+#define BEAM_WIDTH 30000//MAX2800000
+#define BEAM_WIDTH2 3000//MAX1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
-#define DEPTH 2
+#define DEPTH 3
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -147,10 +136,8 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
-
-int BW[DEPTH+1]={BEAM_WIDTH,1,1};
+int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
 emilib::HashMap<ll, bool> visited2[DEPTH];
-string lt;
 int counter=0;
 int read_file_mode;
 int MSB64bit(ll v) {
@@ -623,15 +610,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){
-		ofstream fi("Flare_visited"+lt+".txt");
-		for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-		fi<<mystr;
-		}
-		fi.close();
-		return bestAction;
-		}
+		if(congrats){return bestAction;}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -668,7 +647,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
     
   }
   else{
-	lt="";
+	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode==1&&depth==DEPTH){
 	    ifstream myf ("Flare_visited"+lt+".txt");
@@ -780,6 +759,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -828,6 +813,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	return retAction;
 	}
 	else if(depth==DEPTH-1&&read_file_mode==1&&jump){
@@ -906,6 +897,12 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	file << mystring;
 	}
 	file.close();
+	ofstream fi("Flare_visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	}	
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
@@ -1242,7 +1239,6 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 		}
 	}
 	return bestAction;
-
 }
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
@@ -1359,7 +1355,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	ll ha=0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
-
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
@@ -1398,9 +1393,7 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 				}
 			}
 		}
-
 		F_T erase_x[COL]={0};
-
 		for (int row = 0; row < ROW; row++) {
 			for (int col = 0; col < COL; col++) {
 				if (delflag[row][col]>0) {
@@ -1425,11 +1418,9 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		cmb2-=right[i]-left[i];
 		}
 		}
-
 		//cmb2*=4;
 		cmb2+=cmb2;
 		cmb2+=cmb2;
-
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		for(int col=s;col<=s+2;col++){
@@ -1443,7 +1434,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		}
-
 		for(int col=0;col<COL;col++){
 		int y_bonus[DROP+1]={0};
 		for(int row=0;row<ROW;row++){
@@ -1453,7 +1443,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		if(y_bonus[i]>=3){cmb2+=20;}
 		}
 		}
-
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -1467,20 +1456,16 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 		}
 		}
 		if (flag & EVAL_SET){set(field, 0);}//落ちコン発生
-
 	}
 	ev += oti;
 	
 	int penalty=0;
-
 	for(int i=1;i<=DROP;i++){
 	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
-
 	int alone=0;
 	
 	bool find=false;
-
 	for(int x=0;x<COL;x++){
 	if(field[ROW-1][x] == 0){
 	if(!find){alone++;}
@@ -1488,7 +1473,6 @@ int evaluate2(F_T field[ROW][COL], int flag, sc* combo, ll* hash,int p_maxcombo[
 	}
 	else{find=false;}	
 	}
-
 	ev-=penalty*alone;
   
 	*hash=ha;
@@ -1499,30 +1483,20 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	*combo = 0;
 	int oti = 0;
 	ll occBB=0;
-
 	for(int i=1;i<=DROP;i++){
 	occBB|=dropBB[i];
 	}
-
 	int po=9+(8*(COL-1))+ROW-1;
-
 	int d_maxcombo[DROP+1]={0};
-
 	while (1) {
 		int cmb = 0;
 		int cmb2 = 0;
-
 		ll linked[DROP+1]={0};
-
 		for(int i=1;i<=DROP;i++){
-
 		ll vert = (dropBB[i]) & (dropBB[i] << 1) & (dropBB[i] << 2);
 		ll hori = (dropBB[i]) & (dropBB[i] << 8) & (dropBB[i] << 16);
-
 		linked[i]=vert | (vert >> 1) | (vert >> 2) | hori | (hori >> 8) | (hori >> 16);
-
 		}
-
 		for(int i=1;i<=DROP;i++){
 		long long tmp_linked=(long long)linked[i];
 		while(1){
@@ -1544,24 +1518,16 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
-
 		for(int i=1;i<=DROP;i++){
-
 		if(p_maxcombo[i]==d_maxcombo[i]){continue;}
-
 		ll erased_dropBB=dropBB[i];
-
 		if(erased_dropBB==0ll){continue;}
-
 		int c=__builtin_popcountll(erased_dropBB);
-
 		if(c<3){continue;}
 			
 		erased_dropBB^=linked[i];
 		c=__builtin_popcountll(erased_dropBB);
 		if(c<2){continue;}	
-
 		long long tmp_drop=(long long)erased_dropBB;
 		long long t=tmp_drop&(-tmp_drop);
 		ll exist=(ll)t;
@@ -1574,16 +1540,13 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		MSB=(po-MSB)/8;
 		cmb2-=LSB-MSB;
 		}
-
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]^=linked[i];
 		occBB^=linked[i];
 		}
-
 		//cmb2*=4;
 		cmb2+=cmb2;
 		cmb2+=cmb2;
-
 		for(int s=0;s<=COL-3;s++){
 		int same_num[DROP+1]={0};
 		ll bp=0ll;
@@ -1597,7 +1560,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		}
 		}
 		}
-
 		for(int col=0;col<COL;col++){
 		ll bp=file_bb[col];
 		for(int i=1;i<=DROP;i++){
@@ -1605,15 +1567,12 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		if(yb>=3){cmb2+=20;}
 		}
 		}
-
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
 		if (cmb == 0 || 0 == (flag & EVAL_COMBO)) { break; }
 		oti++;
-
 		ll mask=calc_mask(occBB);
-
 		for(int i=1;i<=DROP;i++){
 		dropBB[i]=fallBB(dropBB[i],occBB,mask);
 		}
@@ -1622,17 +1581,13 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	ev += oti;
 	
 	int penalty=0;
-
 	ll board=occBB;
-
 	for(int i=1;i<=DROP;i++){
 	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
 	}
-
 	int alone=0;
 	
 	bool find=false;
-
 	for(int x=0;x<COL;x++){
 	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
 	if(!find){alone++;}
@@ -1640,7 +1595,6 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 	}
 	else{find=false;}
 	}
-
 	ev-=penalty*alone;
   
 	return ev;
@@ -1724,7 +1678,7 @@ int main() {
 	printf("%02d:", local->tm_hour);
 	printf("%02d:", local->tm_min);
 	printf("%02d\n\n", local->tm_sec);
-	
+
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
