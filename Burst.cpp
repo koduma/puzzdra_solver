@@ -623,7 +623,15 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){return bestAction;}
+		if(congrats){
+        ofstream fi("Flare_visited"+lt+".txt");
+        for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+        string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+        fi<<mystr;
+        }
+        fi.close();	
+        return bestAction;
+        }
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
@@ -772,12 +780,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
-	ofstream fi("Flare_visited"+lt+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-	fi<<mystr;
-	}
-	fi.close();	
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -826,12 +828,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
-	ofstream fi("Flare_visited"+lt+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-	fi<<mystr;
-	}
-	fi.close();	
 	return retAction;
 	}
 	else if(depth==DEPTH-1&&read_file_mode==1&&jump){
@@ -910,12 +906,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	file << mystring;
 	}
 	file.close();
-	ofstream fi("Flare_visited"+lt+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-	fi<<mystr;
-	}
-	fi.close();	
 	}	
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
