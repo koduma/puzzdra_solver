@@ -624,14 +624,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		}
 		part2+=omp_get_wtime() - start;
 		if(congrats){
-        ofstream fi("Flare_visited"+lt+".txt");
-        for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-        string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-        fi<<mystr;
-        }
-        fi.close();	
-        return bestAction;
-        }
+		ofstream fi("Flare_visited"+lt+".txt");
+		for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+		fi<<mystr;
+		}
+		fi.close();
+		return bestAction;
+		}
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
