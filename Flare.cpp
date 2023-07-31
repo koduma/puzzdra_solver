@@ -613,13 +613,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 		}
 		part2+=omp_get_wtime() - start;
-		if(congrats){
-		ofstream fi("visited"+lt+".txt");
-		for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-		string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-		fi<<mystr;
-		}
-		fi.close();	
+		if(congrats){	
 		return bestAction;
 		}
 		start = omp_get_wtime();
@@ -886,7 +880,14 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
-	pro_league.clear();	
+	pro_league.clear();
+
+	ofstream fi("visited"+lt+".txt");
+	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
+	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
+	fi<<mystr;
+	}
+	fi.close();	
 	
 	ofstream file("input"+lt+".txt");
 
