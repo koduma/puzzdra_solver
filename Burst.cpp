@@ -1,33 +1,25 @@
 /*
 Windows10,Windows11,Linux,MacOS
-
 Linux導入手続き
 //メモリ容量確認
 free -h
-
 //g++インストール
 sudo apt install -y g++
-
 //wgetインストール
 sudo apt-get update
 sudo apt-get install -y wget
-
 //Burst.cppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/Burst.cpp
-
 //hash_map.hpp,loguru.cpp,loguru.hppをダウンロード
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/hash_map.hpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.cpp
 wget --no-check-certificate https://raw.githubusercontent.com/koduma/puzzdra_solver/master/loguru.hpp
-
 //ビーム幅調整
 vi Burst.cpp
-
 //コンパイル
 Linux:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large -ldl
 Windows10,Windows11:g++ -O2 -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -mcmodel=large
 MacOS:g++ -std=c++11 -fopenmp -mbmi2 -lpthread Burst.cpp loguru.cpp -o Burst -ldl
-
 //run
 ./Burst
 //input
@@ -105,13 +97,13 @@ using namespace std;
 #define COL 6//横//MAX7
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
-#define BEAM_WIDTH 30000//MAX2800000
-#define BEAM_WIDTH2 3000//MAX1000
+#define BEAM_WIDTH 10000//MAX2800000
+#define BEAM_WIDTH2 1000//MAX1000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
-#define DEPTH 3
+#define DEPTH 2
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -144,8 +136,7 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
-ll zoblish_field3[DEPTH];
-int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
+int BW[DEPTH+1]={BEAM_WIDTH,1,1};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
@@ -252,7 +243,6 @@ struct hash_chain{
 	vector<ll>hashchain;
 	node n;
 	string path;
-	int depth;
 	
 	void ptom(){
 	
@@ -304,9 +294,9 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos]^zoblish_field3[depth],n));
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
         
-	hashchain.push_back(n.hash^zoblish_field2[pos]^zoblish_field3[depth]);
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	int pl=0;
         
 	for (int i = 0; i <= TRN/21; i++) {//y座標は下にいくほど大きくなる
@@ -323,8 +313,8 @@ struct hash_chain{
 	n.nowC=pos%COL;
 	n.nowR=pos/COL;
 	n.prev=dir-1;
-	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos]^zoblish_field3[depth],n));
-	hashchain.push_back(n.hash^zoblish_field2[pos]^zoblish_field3[depth]);
+	mapobj.insert(pair<ll,struct node>(n.hash^zoblish_field2[pos],n));
+	hashchain.push_back(n.hash^zoblish_field2[pos]);
 	pl++;
 	}
 	}
@@ -368,7 +358,7 @@ int adder(F_T field[ROW][COL]){
     }
     return ret;
 }
-void push_data(F_T f_field[ROW][COL],string path,int depth){
+void push_data(F_T f_field[ROW][COL],string path){
 	
 	F_T field[ROW][COL];
 	memcpy(field,f_field,sizeof(field));
@@ -384,14 +374,14 @@ void push_data(F_T f_field[ROW][COL],string path,int depth){
 	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
 	
 	vector<ll>hc;
-	hc.push_back(check_hash(field)^zoblish_field2[pos]^zoblish_field3[depth]);
+	hc.push_back(check_hash(field)^zoblish_field2[pos]);
 	for(int j=tgt;j<(int)path.size();j++){
 	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
 	else if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
 	else if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
 	else if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
 	else{continue;}	
-	hc.push_back(check_hash(field)^zoblish_field2[pos]^zoblish_field3[depth]);  
+	hc.push_back(check_hash(field)^zoblish_field2[pos]);  
 	}
 	hc.push_back((ll)1);
 	
@@ -580,7 +570,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				bestAction.path=actiontoS(bestAction);
 				hash_chain hc;
-				hc.depth=0;
 				F_T abc[ROW][COL];
 				memcpy(hc.field,f_field,sizeof(abc));
 				hc.first_te=fff[j].first_te;
@@ -678,7 +667,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	myf.close();
 	ifstream myf2("Flare_data"+lt+".txt");
 	while(getline(myf2,ls)){
-	push_data(root_field,ls,depth);
+	push_data(root_field,ls);
 	}
 	myf2.close();
 	}  
@@ -769,13 +758,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);	
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
 	ofstream fi("Flare_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
 	}
-	fi.close();
+	fi.close();	
 	node2 cand;
 	memcpy(cand.field,f_field,sizeof(g_field));
 	cand.first_te = tmpp.first_te;
@@ -790,7 +779,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.true_path_length=0;
 	if(i+5==10){cand.path_length=(int)tmpp.path.length()-4;}
 	else{cand.path_length=(int)tmpp.path.length()-3;}
-	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]^zoblish_field3[depth]));
+	printf("beam=%d,visited=%d\n",cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]));
 	cout<<tmpp.path<<endl;
 	if(stop!=tmpp.score){cand.path_length=TRN;}
 	cout<<"pos="<<cand.pos+1<<"/"<<ROW*COL<<endl;
@@ -937,13 +926,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	Action tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);		
-	ofstream fi("Flare_visited"+lt+".txt");
-	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
-	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
-	fi<<mystr;
-	}
-	fi.close();
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -953,7 +936,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.path[3]==','){cand.path_length=(int)tmp.path.length()-4;}
 	else if(tmp.path[2]==','){cand.path_length=(int)tmp.path.length()-3;}
 	if(tmp.score!=stop){cand.path_length=TRN;}	
-	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos]^zoblish_field3[depth])+sumpl+i+1);
+	cand.path_length=min(cand.path_length,cand.calc_pl(cand.hash^zoblish_field2[cand.pos])+sumpl+i+1);
 	if(cand.path_length<lim){	
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
@@ -993,7 +976,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	hc.path=bestAction.path;
 	hc.ptom();	
 	hc.calc_hashchain();	
-	hc.depth=depth;	
+		
 		
 	memcpy(g_field,root_field,sizeof(g_field));
 	int tgt=0;
@@ -1007,7 +990,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((int)tp.size()==2){int x=tp[0]-'0';int y=(tp[1]-'0')-5;point=(y*COL)+x;}
 	else{int x=tp[0]-'0';int y=5;point=(y*COL)+x;}
 	vector<ll>hcs;
-	hcs.push_back(check_hash(g_field)^zoblish_field2[point]^zoblish_field3[depth]);
+	hcs.push_back(check_hash(g_field)^zoblish_field2[point]);
 	bool look=false;
 	for(int p2=0;p2<(int)bestAction.path.size();p2++){
 	if(bestAction.path[p2]==','){look=true;continue;}
@@ -1017,7 +1000,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else if (bestAction.path[p2]=='1') { swap(g_field[point/COL][point%COL],g_field[(point+COL)/COL][(point+COL)%COL]);point+=COL;  } //"DOWN"); }
 	else if (bestAction.path[p2]=='4') { swap(g_field[point/COL][point%COL],g_field[(point+1)/COL][(point+1)%COL]);point++;  } //"RIGHT"); }
 	else{continue;}	
-	hcs.push_back(check_hash(g_field)^zoblish_field2[point]^zoblish_field3[depth]);
+	hcs.push_back(check_hash(g_field)^zoblish_field2[point]);
 	}
 	hcs.push_back((ll)1);	
 	if((int)hcs.size()>0){
@@ -1194,7 +1177,6 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 				memcpy(bestAction.moving, fff[j].movei, sizeof(fff[j].movei));
 				bestAction.path=actiontoS(bestAction);
 				hash_chain hc;
-				hc.depth=DEPTH-1;
 				F_T abc[ROW][COL];
 				memcpy(hc.field,f_field,sizeof(abc));
 				hc.first_te=fff[j].first_te;
@@ -1708,10 +1690,6 @@ int main() {
 	
 	for(i=0;i<ROW*COL;i++){
 	zoblish_field2[i]=xor128();
-	}
-
-	for(i=0;i<DEPTH;i++){
-	zoblish_field3[i]=xor128();
 	}
 	
 	int po=9+(8*(COL-1))+ROW-1;
