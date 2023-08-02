@@ -943,13 +943,15 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	else{
 	tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);	
-	}	
+	}
+	if(read_file_mode==0){	
 	ofstream fi("Flare_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
 	}
-	fi.close();	
+	fi.close();
+	}
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
