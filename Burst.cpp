@@ -288,7 +288,8 @@ struct hash_chain{
 	sc combo;//コンボ数
 	sc nowC;//今どのx座標にいるか
 	sc nowR;//今どのy座標にいるか
-	sc prev;//1手前は上下左右のどっちを選んだか    
+	sc prev;//1手前は上下左右のどっちを選んだか
+	*/    
     
 	int pos=XX(first_te)+YY(first_te)*COL;
 	for(int i=0;i<=TRN/21;i++){
@@ -327,31 +328,7 @@ struct hash_chain{
 	pl++;
 	}
 	}
- 	*/
-
-	int tgt=0;
-	string top="";
-	while(1){
-	if(path[tgt]==','){tgt++;break;}
-	top+=path[tgt];
-	tgt++;
 	}
-	int pos;
-	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
-	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-		
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);
-	for(int j=tgt;j<(int)path.size();j++){
-	if(path[j]=='3'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)-1]);pos--;}
-	else if(path[j]=='6'){swap(field[pos/COL][pos%COL],field[(pos/COL)-1][pos%COL]);pos-=COL;}
-	else if(path[j]=='1'){swap(field[pos/COL][pos%COL],field[(pos/COL)+1][pos%COL]);pos+=COL;}
-	else if(path[j]=='4'){swap(field[pos/COL][pos%COL],field[pos/COL][(pos%COL)+1]);pos++;}
-	else{continue;}	
-	hashchain.push_back(check_hash(field)^zoblish_field2[pos]);  
-	}	
-		
-	}
-		
 };
 string actiontoS(Action act){
 	string path=to_string(XX(act.first_te))+to_string(YY(act.first_te)+5)+",";
@@ -606,8 +583,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				F_T abc[ROW][COL];
 				memcpy(hc.field,f_field,sizeof(abc));
 				hc.first_te=fff[j].first_te;
-				//memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
-				hc.path=bestAction.path;
+				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.calc_hashchain();
 				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
@@ -930,14 +906,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	string mystring=dque[k].true_path+'\n';
 	file << mystring;
 	}
-	file.close();	
-	}
+	file.close();
 	ofstream fi("Flare_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
 	}
 	fi.close();	
+	}	
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
 	for (int j = 0; j < DIR; j++) {
@@ -960,13 +936,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	Action tmp;
-	if(read_file_mode==1){
-	if(cand.calc_pl(cand.hash^zoblish_field2[cand.pos])==TRN){	
-	tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
-	}
-	}
-	else{tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);}
+	Action tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -1007,14 +977,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	bestAction.first_te = ff[depth-1][j].first_te;
 	ll movei[(TRN/21)+1];
 	memcpy(bestAction.moving, ff[depth-1][j].movei, sizeof(movei));
-	bestAction.path=ff[depth-1][j].true_path;		
+	bestAction.path=ff[depth-1][j].true_path;	
 	hash_chain hc;
 	F_T abc[ROW][COL];
 	memcpy(hc.field,root_field,sizeof(abc));
 	hc.first_te=fte;
 	hc.path=bestAction.path;
-	hc.ptom();
-	hc.calc_hashchain();
+	hc.ptom();	
+	hc.calc_hashchain();			
 	memcpy(g_field,root_field,sizeof(g_field));
 	int tgt=0;
 	string tp="";
@@ -1218,7 +1188,6 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 				memcpy(hc.field,f_field,sizeof(abc));
 				hc.first_te=fff[j].first_te;
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
-				hc.path=bestAction.path;
 				hc.calc_hashchain();
 				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
@@ -1704,19 +1673,15 @@ p = _pdep_u64(p, mask);
 return p;
 }
 int main() {
-
 	time_t t = time(NULL);
 	struct tm *local = localtime(&t);
 	printf("\n%04d/", local->tm_year + 1900);
 	printf("%02d/", local->tm_mon + 1);
 	printf("%02d", local->tm_mday);
-
 	printf(" ");
-
 	printf("%02d:", local->tm_hour);
 	printf("%02d:", local->tm_min);
 	printf("%02d\n\n", local->tm_sec);
-
 	int i, j, k;
 	for(i=0;i<ROW;++i){
 	for(j=0;j<COL;++j){
