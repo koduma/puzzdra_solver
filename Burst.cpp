@@ -254,7 +254,7 @@ struct hash_chain{
 	vector<ll>hashchain;
 	node n;
 	string path;
-    int depth;
+	int depth;
 	
 	void ptom(){
 	
@@ -610,6 +610,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 				hc.first_te=fff[j].first_te;
 				//memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.path=bestAction.path;
+				hc.depth=depth;
 				hc.calc_hashchain();
 				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
@@ -703,7 +704,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	myf.close();
 	ifstream myf2("Flare_data"+lt+".txt");
 	while(getline(myf2,ls)){
-	push_data(root_field,ls);
+	push_data(root_field,ls,depth);
 	}
 	myf2.close();
 	}  
@@ -964,19 +965,19 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	Action tmp;
 	if(read_file_mode==1){
-    int pls=cand.calc_pl(cand.hash^zoblish_field2[cand.pos]^zoblish_field3[depth]);
+	int pls=cand.calc_pl(cand.hash^zoblish_field2[cand.pos]^zoblish_field3[depth]);
 	if(pls==TRN){	
 	tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	}
-    else{
-    cand.path_length=pls+sumpl+i+1;
-    if(cand.path_length<lim){	
+	else{
+	cand.path_length=pls+sumpl+i+1;
+	if(cand.path_length<lim){	
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
-    ff[depth-1][(DIR*k)+j]=cand;
-    continue;    
+	ff[depth-1][(DIR*k)+j]=cand;
+	continue;    
 	}
-    }    
+	}    
 	}
 	else{tmp=BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);}
 	cand.first_te = tmp.first_te;
@@ -1026,6 +1027,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	hc.first_te=fte;
 	hc.path=bestAction.path;
 	hc.ptom();
+	hc.depth=depth;	
 	hc.calc_hashchain();
 	memcpy(g_field,root_field,sizeof(g_field));
 	int tgt=0;
@@ -1231,6 +1233,7 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 				hc.first_te=fff[j].first_te;
 				memcpy(hc.movei, fff[j].movei, sizeof(fff[j].movei));
 				hc.path=bestAction.path;
+				hc.depth=DEPTH-1;
 				hc.calc_hashchain();
 				if((int)hc.hashchain.size()>0){
 				for(int r=0;r<(int)hc.hashchain.size()-1;r++){
