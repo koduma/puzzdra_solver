@@ -660,7 +660,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)root_field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode==1&&depth==DEPTH){
-	    ifstream myf ("Flare_visited"+lt+".txt");
+	    ifstream myf ("Burst_visited"+lt+".txt");
 	    string ls;
 	    while(getline(myf,ls)){
 		    string parent="";
@@ -675,7 +675,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		    visited.emplace(stoull(parent),stoull(child));
 	    }
 	myf.close();
-	ifstream myf2("Flare_data"+lt+".txt");
+	ifstream myf2("Burst_data"+lt+".txt");
 	while(getline(myf2,ls)){
 	push_data(root_field,ls);
 	}
@@ -717,7 +717,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int kosu=0;
 	string line;
 	string t_path[2];
-	ifstream myfile ("Flare_input"+lt+".txt");
+	ifstream myfile ("Burst_input"+lt+".txt");
 	while(getline(myfile,line)){
 	t_path[kosu]=line;
 	kosu++;
@@ -769,7 +769,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
-	ofstream fi("Flare_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
@@ -802,7 +802,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;	
 	}
 	path_length_array[i][j]=(double)cand.path_length;
-	ofstream file("Flare_input"+lt+".txt");		
+	ofstream file("Burst_input"+lt+".txt");		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
 	mystring=retAction.path+'\n';
@@ -823,7 +823,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
-	ofstream fi("Flare_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
@@ -835,7 +835,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int kosu=0;
 	string line;
 	string t_path[BW[depth]];
-	ifstream myfile ("Flare_depth"+lt+".txt");
+	ifstream myfile ("Burst_depth"+lt+".txt");
 	while(getline(myfile,line)){
 	t_path[kosu]=line;
 	kosu++;
@@ -901,13 +901,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int ks = (int)dque.size();
 	pro_league.clear();	
 	if(depth==DEPTH-1){	
-	ofstream file("Flare_depth"+lt+".txt");
+	ofstream file("Burst_depth"+lt+".txt");
 	for (int k = 0; k < ks; k++) {
 	string mystring=dque[k].true_path+'\n';
 	file << mystring;
 	}
 	file.close();
-	ofstream fi("Flare_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
