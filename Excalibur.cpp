@@ -147,7 +147,7 @@ ll fill_64[64];
 ll file_bb[COL];
 ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
-
+int shot=0;
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
@@ -313,7 +313,7 @@ int adder(F_T field[ROW][COL]){
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
-
+	shot++;if(shot%1000==0){cout<<"shot="<<(shot)<<endl;}
 	int po=9+(8*(COL-1))+ROW-1;
 
 	int p_maxcombo[DROP+1] = {0};
