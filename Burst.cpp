@@ -139,6 +139,7 @@ ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]);//評価関数
 ll around(ll bitboard);
+int shot=0;
 int table[64];
 ll fill_64[64];
 ll file_bb[COL];
@@ -413,7 +414,7 @@ void push_data(F_T f_field[ROW][COL],string path){
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl) {
-  
+  shot++;if(shot%1000==0){cout<<"shot="<<(shot)<<endl;}
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
 	int p_maxcombo[DROP+1] = {0};
