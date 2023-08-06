@@ -138,6 +138,7 @@ int sum_e2(F_T field[ROW][COL], sc* combo, ll* hash,int p_maxcombo[DROP+1]);//�
 ll xor128();//xorshift整数乱数
 ll zoblish_field[ROW][COL][DROP+1];
 int read_file_mode;
+int shot=0;
 
 ll sqBB[64];
 int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]);//落とし減点評価関数
@@ -403,7 +404,7 @@ void push_data(F_T f_field[ROW][COL],string path){
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
-
+	shot++;if(shot%1000==0){cout<<"shot="<<(shot)<<endl;}
 	int po=9+(8*(COL-1))+ROW-1;
 
 	int p_maxcombo[DROP+1] = {0};
