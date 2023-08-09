@@ -796,7 +796,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if((i*COL)+j==suru+1){jump=true;}
 	else{jump=false;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
-	ofstream fi("Burst_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt",ios::app);
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
@@ -829,7 +829,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;	
 	}
 	path_length_array[i][j]=(double)cand.path_length;
-	ofstream file("Burst_input"+lt+".txt");		
+	ofstream file("Burst_input"+lt+".txt",ios::app);		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
 	mystring=retAction.path+'\n';
@@ -850,7 +850,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(variance<0.0001){printf("\ndifficulty=INF\n");}
 	else{printf("\ndifficulty=%f\n",delta_t*(10000.0/variance)*(10000.0/variance));}
-	ofstream fi("Burst_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt",ios::app);
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
@@ -927,19 +927,19 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
 	pro_league.clear();	
-	ofstream file("Burst_depth"+lt+".txt");
+	ofstream file("Burst_depth"+lt+".txt",ios::app);
 	for (int k = 0; k < ks; k++) {
 	string mystring=dque[k].true_path+'\n';
 	file << mystring;
 	}
 	file.close();
-	ofstream fi("Burst_visited"+lt+".txt");
+	ofstream fi("Burst_visited"+lt+".txt",ios::app);
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
 	fi<<mystr;
 	}
 	fi.close();
-	ofstream fiv("ActionMap"+lt+".txt");
+	ofstream fiv("ActionMap"+lt+".txt",ios:app);
 	for(auto itr = mapobj2.begin(); itr != mapobj2.end(); ++itr) {
 	Action a=mapobj2[itr->first];
 	string mystr=to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
