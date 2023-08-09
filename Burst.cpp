@@ -939,7 +939,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	fi<<mystr;
 	}
 	fi.close();
-	ofstream fiv("ActionMap"+lt+".txt",ios:app);
+	ofstream fiv("ActionMap"+lt+".txt",ios::app);
 	for(auto itr = mapobj2.begin(); itr != mapobj2.end(); ++itr) {
 	Action a=mapobj2[itr->first];
 	string mystr=to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
