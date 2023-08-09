@@ -682,7 +682,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	push_data(root_field,ls);
 	}
 	myf2.close();
-	ifstream myf5("ActionMap.txt");
+	ifstream myf5("ActionMap"+lt+".txt");
 	Action a;
 	ll hash;
 	while(getline(myf5,ls)){
@@ -939,7 +939,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	fi<<mystr;
 	}
 	fi.close();
-	ofstream fiv("ActionMap.txt");
+	ofstream fiv("ActionMap"+lt+".txt");
 	for(auto itr = mapobj2.begin(); itr != mapobj2.end(); ++itr) {
 	Action a=mapobj2[itr->first];
 	string mystr=to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
