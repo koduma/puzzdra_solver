@@ -699,7 +699,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else if(c==3){a.score=stoi(st);}
 	else if(c==4){a.maxcombo=stoi(st);}
 	else if(c==5){a.path=st;}
-	else if(c>=6){a.moving[c-5]=stoull(st);}
+	else if(c>=6){a.moving[c-6]=stoull(st);}
 	st="";
 	c++;
 	continue;
