@@ -247,7 +247,7 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-unordered_map<ll,struct Action> mapobj2[DEPTH+1];
+map<ll,string> mapobj2[DEPTH+1];
 struct hash_chain{
 	F_T field[ROW][COL];
 	T_T first_te;
@@ -411,6 +411,39 @@ void push_data(F_T f_field[ROW][COL],string path){
 	}
 	}
 	}  
+}
+Action STOA(string str){
+	Action a;
+	ll hash;
+	int F;	
+	int c=0;
+	bool slash=false;
+	string st="";
+	for(int i=0;i<(int)str.size();i++){
+	if(str[i]=='\n'){break;}	
+	if(str[i]=='/'){
+	slash=true;
+	if(c==0){F=stoi(st);}	
+	else if(c==1){hash=stoull(st);}
+	else if(c==2){a.first_te=(T_T)(stoi(st));}
+	else if(c==3){a.score=stoi(st);}
+	else if(c==4){a.maxcombo=stoi(st);}
+	else if(c==5){a.path=st;}
+	else if(c>=6){a.moving[c-6]=stoull(st);}
+	st="";
+	c++;
+	continue;
+	}
+	st+=str[i];
+	}
+	return a;
+}
+string ATOS(Action a,int F,ll hash){
+	string str="";
+	str=to_string(F)+"/"+to_string(hash)+"/"+to_string((int)a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
+	for(int b=0;b<=(TRN/21);b++){str+="/"+to_string(a.moving[b]);}
+	str+='\n';
+	return str;
 }
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
@@ -707,7 +740,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	st+=ls[i];
 	}
 	}
-	mapobj2[F].insert(pair<ll,struct Action>(hash,a));
+	mapobj2[F][hash]=ls;
 	}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -943,11 +976,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	fi.close();
 	ofstream fiv("ActionMap"+lt+".txt",ios::app);
 	for(int F=0;F<=DEPTH;F++){	
-	for(auto itr = mapobj2[F].begin(); itr != mapobj2[F].end(); ++itr) {
-	Action a=mapobj2[F][itr->first];
-	string mystr=to_string(F)+"/"+to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
-	for(int b=0;b<=(TRN/21);b++){mystr+="/"+to_string(a.moving[b]);}
-	mystr+='\n';
+	for(auto itr = mapobj2[F].begin(); itr != mapobj2[F].end(); ++itr) {	
+	string mystr=mapobj2[F][itr->first];	
 	fiv<<mystr;
 	}
 	}	
@@ -973,7 +1003,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
-	Action tmp=mapobj2[depth][check_hash(g_field)^zoblish_field2[cand.pos]];
+	string str=mapobj2[depth][check_hash(g_field)^zoblish_field2[cand.pos]];	
+	Action tmp=STOA(str);
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if(tmp.score!=stop){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
@@ -993,7 +1024,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	sort(pro_league.begin(),pro_league.end());
 	}	
 	ff[depth-1][(DIR * k) + j] = cand;
-	mapobj2[depth].insert(pair<ll,struct Action>(cand.hash^zoblish_field2[cand.pos],tmp));
+	mapobj2[depth][cand.hash^zoblish_field2[cand.pos]]=ATOS(tmp,depth,cand.hash^zoblish_field2[cand.pos]);
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
