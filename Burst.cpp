@@ -247,7 +247,7 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-unordered_map<ll,struct Action> mapobj2;
+unordered_map<ll,struct Action> mapobj2[DEPTH+1];
 struct hash_chain{
 	F_T field[ROW][COL];
 	T_T first_te;
@@ -685,6 +685,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ifstream myf5("ActionMap"+lt+".txt");
 	Action a;
 	ll hash;
+	int F;	
 	while(getline(myf5,ls)){
 	int c=0;
 	bool slash=false;
@@ -692,12 +693,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for(int i=0;i<(int)ls.size();i++){
 	if(ls[i]=='/'){
 	slash=true;
-	if(c==0){hash=stoull(st);}
-	else if(c==1){a.first_te=(T_T)(stoi(st));}
-	else if(c==2){a.score=stoi(st);}
-	else if(c==3){a.maxcombo=stoi(st);}
-	else if(c==4){a.path=st;}
-	else if(c>=5){a.moving[c-5]=stoull(st);}
+	if(c==0){F=stoi(st);}	
+	else if(c==1){hash=stoull(st);}
+	else if(c==2){a.first_te=(T_T)(stoi(st));}
+	else if(c==3){a.score=stoi(st);}
+	else if(c==4){a.maxcombo=stoi(st);}
+	else if(c==5){a.path=st;}
+	else if(c>=6){a.moving[c-5]=stoull(st);}
 	st="";
 	c++;
 	continue;
@@ -705,7 +707,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	st+=ls[i];
 	}
 	}
-	mapobj2.insert(pair<ll,struct Action>(hash,a));
+	mapobj2[F].insert(pair<ll,struct Action>(hash,a));
 	}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -940,13 +942,15 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	fi.close();
 	ofstream fiv("ActionMap"+lt+".txt",ios::app);
-	for(auto itr = mapobj2.begin(); itr != mapobj2.end(); ++itr) {
-	Action a=mapobj2[itr->first];
-	string mystr=to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
+	for(int F=0;F<=DEPTH;F++){	
+	for(auto itr = mapobj2[F].begin(); itr != mapobj2[F].end(); ++itr) {
+	Action a=mapobj2[F][itr->first];
+	string mystr=to_string(F)+"/"+to_string(itr->first)+"/"+to_string(a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
 	for(int b=0;b<=(TRN/21);b++){mystr+="/"+to_string(a.moving[b]);}
 	mystr+='\n';
 	fiv<<mystr;
 	}
+	}	
 	fiv.close();
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
@@ -974,7 +978,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(cand.calc_pl(check_hash(g_field)^zoblish_field2[cand.pos])==TRN){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	}
-	else{tmp=mapobj2[cand.calc_pl(check_hash(g_field)^zoblish_field2[cand.pos])];}
+	else{tmp=mapobj2[depth][cand.calc_pl(check_hash(g_field)^zoblish_field2[cand.pos])];}
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -990,7 +994,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	sort(pro_league.begin(),pro_league.end());
 	}	
 	ff[depth-1][(DIR * k) + j] = cand;
-	mapobj2.insert(pair<ll,struct Action>(cand.hash^zoblish_field2[cand.pos],tmp));
+	mapobj2[depth].insert(pair<ll,struct Action>(cand.hash^zoblish_field2[cand.pos],tmp));
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
