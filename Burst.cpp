@@ -973,12 +973,11 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
-	Action tmp;
+	Action tmp=mapobj2[depth][check_hash(g_field)^zoblish_field2[cand.pos]];
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	if(cand.calc_pl(check_hash(g_field)^zoblish_field2[cand.pos])==TRN){
+	if(tmp.score!=stop){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	}
-	else{tmp=mapobj2[depth][cand.calc_pl(check_hash(g_field)^zoblish_field2[cand.pos])];}
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
