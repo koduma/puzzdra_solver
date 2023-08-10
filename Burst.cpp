@@ -831,7 +831,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;	
 	}
 	path_length_array[i][j]=(double)cand.path_length;
-	ofstream file("Burst_input"+lt+".txt",ios::app);		
+	ofstream file("Burst_input"+lt+".txt");		
 	string mystring=to_string((i*COL)+j)+'\n';
 	file << mystring;	
 	mystring=retAction.path+'\n';
@@ -929,7 +929,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
 	pro_league.clear();	
-	ofstream file("Burst_depth"+lt+".txt",ios::app);
+	ofstream file("Burst_depth"+lt+".txt");
 	for (int k = 0; k < ks; k++) {
 	string mystring=dque[k].true_path+'\n';
 	file << mystring;
