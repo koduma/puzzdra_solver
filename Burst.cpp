@@ -743,8 +743,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	st+=ls[i];
 	}
+	mapobj2[F][loop][hash]=ls;	
 	}
-	mapobj2[F][loop][hash]=ls;
 	}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
