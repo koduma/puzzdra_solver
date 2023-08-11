@@ -817,7 +817,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	if((i*COL)+j<=suru){continue;}
-	//if((i*COL)+j!=6){continue;}		
+	//if((i*COL)+j!=6){continue;}
+	//if((i*COL)+j!=23){continue;}	
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
 	customer.first_te=(T_T)YX(i,j);
