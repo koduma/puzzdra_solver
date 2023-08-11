@@ -974,7 +974,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	fi<<mystr;
 	}
 	fi.close();
-	ofstream fiv("ActionMap"+lt+".txt",ios::app);
+	ofstream fiv("ActionMap"+lt+".txt");
 	for(int F=0;F<=DEPTH;F++){	
 	for(auto itr = mapobj2[F].begin(); itr != mapobj2[F].end(); ++itr) {	
 	string mystr=mapobj2[F][itr->first];	
