@@ -1011,7 +1011,11 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
 	string str=mapobj2[depth][i][check_hash(g_field)^zoblish_field2[cand.pos]];	
-	Action tmp=STOA(str);
+	Action tmp;
+	tmp.maxcombo=0;
+	if(str!=""){	
+	tmp=STOA(str);
+	}	
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if(tmp.maxcombo!=stop){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
