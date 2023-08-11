@@ -247,7 +247,7 @@ struct Action {//最終的に探索された手
 		//memset(this->moving, STP, sizeof(this->moving));
 	}
 };
-map<ll,string> mapobj2[DEPTH+1];
+map<ll,string> mapobj2[DEPTH+1][TRN];
 struct hash_chain{
 	F_T field[ROW][COL];
 	T_T first_te;
@@ -415,21 +415,23 @@ void push_data(F_T f_field[ROW][COL],string path){
 Action STOA(string str){
 	Action a;
 	ll hash;
-	int F;	
+	int F;
+	int loop;
 	int c=0;
 	bool slash=false;
 	string st="";
 	for(int i=0;i<(int)str.size();i++){
 	if(str[i]=='\n'){break;}	
 	if(str[i]=='/'){
-	slash=true;
-	if(c==0){F=stoi(st);}	
-	else if(c==1){hash=stoull(st);}
-	else if(c==2){a.first_te=(T_T)(stoi(st));}
-	else if(c==3){a.score=stoi(st);}
-	else if(c==4){a.maxcombo=stoi(st);}
-	else if(c==5){a.path=st;}
-	else if(c>=6){a.moving[c-6]=stoull(st);}
+	slash=true;	
+	if(c==0){F=stoi(st);}
+	else if(c==1){loop=stoi(st);}	
+	else if(c==2){hash=stoull(st);}
+	else if(c==3){a.first_te=(T_T)(stoi(st));}
+	else if(c==4){a.score=stoi(st);}
+	else if(c==5){a.maxcombo=stoi(st);}
+	else if(c==6){a.path=st;}
+	else if(c>=7){a.moving[c-7]=stoull(st);}
 	st="";
 	c++;
 	continue;
@@ -438,9 +440,9 @@ Action STOA(string str){
 	}
 	return a;
 }
-string ATOS(Action a,int F,ll hash){
+string ATOS(Action a,int F,ll hash,int i){
 	string str="";
-	str=to_string(F)+"/"+to_string(hash)+"/"+to_string((int)a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
+	str=to_string(F)+"/"+to_string(i)+"/"+to_string(hash)+"/"+to_string((int)a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
 	for(int b=0;b<=(TRN/21);b++){str+="/"+to_string(a.moving[b]);}
 	str+='\n';
 	return str;
@@ -718,7 +720,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ifstream myf5("ActionMap"+lt+".txt");
 	Action a;
 	ll hash;
-	int F;	
+	int F;
+	int loop;	
 	while(getline(myf5,ls)){
 	int c=0;
 	bool slash=false;
@@ -726,13 +729,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for(int i=0;i<(int)ls.size();i++){
 	if(ls[i]=='/'){
 	slash=true;
-	if(c==0){F=stoi(st);}	
-	else if(c==1){hash=stoull(st);}
-	else if(c==2){a.first_te=(T_T)(stoi(st));}
-	else if(c==3){a.score=stoi(st);}
-	else if(c==4){a.maxcombo=stoi(st);}
-	else if(c==5){a.path=st;}
-	else if(c>=6){a.moving[c-6]=stoull(st);}
+	if(c==0){F=stoi(st);}
+	else if(c==1){loop=stoi(st);}	
+	else if(c==2){hash=stoull(st);}
+	else if(c==3){a.first_te=(T_T)(stoi(st));}
+	else if(c==4){a.score=stoi(st);}
+	else if(c==5){a.maxcombo=stoi(st);}
+	else if(c==6){a.path=st;}
+	else if(c>=7){a.moving[c-7]=stoull(st);}
 	st="";
 	c++;
 	continue;
@@ -740,7 +744,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	st+=ls[i];
 	}
 	}
-	mapobj2[F][hash]=ls;
+	mapobj2[F][loop][hash]=ls;
 	}  
 	stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -975,12 +979,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	fi.close();
 	ofstream fiv("ActionMap"+lt+".txt");
-	for(int F=0;F<=DEPTH;F++){	
-	for(auto itr = mapobj2[F].begin(); itr != mapobj2[F].end(); ++itr) {	
-	string mystr=mapobj2[F][itr->first];	
+	for(int F=0;F<=DEPTH;F++){
+	for(int loop=0;loop<TRN;loop++){	
+	for(auto itr = mapobj2[F][loop].begin(); itr != mapobj2[F][loop].end(); ++itr) {	
+	string mystr=mapobj2[F][loop][itr->first];	
 	fiv<<mystr;
 	}
-	}	
+	}
+	}
 	fiv.close();
 	for (int k = 0; k < ks; k++) {
 	node2 temp = dque[k];
@@ -1003,7 +1009,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
 	int lim=TRN;
-	string str=mapobj2[depth][check_hash(g_field)^zoblish_field2[cand.pos]];	
+	string str=mapobj2[depth][i][check_hash(g_field)^zoblish_field2[cand.pos]];	
 	Action tmp=STOA(str);
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if(tmp.maxcombo!=stop){
@@ -1024,7 +1030,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	sort(pro_league.begin(),pro_league.end());
 	}	
 	ff[depth-1][(DIR * k) + j] = cand;
-	mapobj2[depth][cand.hash^zoblish_field2[cand.pos]]=ATOS(tmp,depth,cand.hash^zoblish_field2[cand.pos]);
+	mapobj2[depth][i][cand.hash^zoblish_field2[cand.pos]]=ATOS(tmp,depth,cand.hash^zoblish_field2[cand.pos],i);
 	}//if(cand.prev
 	else {
 	cand.path_length = -1;
