@@ -1006,7 +1006,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	string str=mapobj2[depth][check_hash(g_field)^zoblish_field2[cand.pos]];	
 	Action tmp=STOA(str);
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	if(tmp.score!=stop){
+	if(tmp.maxcombo!=stop){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	}
 	cand.first_te = tmp.first_te;
@@ -1046,6 +1046,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if(combo>=stop){
+	bestAction.maxcombo=stop;	
 	bestAction.score = combo;
 	bestAction.first_te = ff[depth-1][j].first_te;
 	ll movei[(TRN/21)+1];
@@ -1129,6 +1130,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	memcpy(g_field,temp.field,sizeof(g_field));
 	int combo = sum_e(g_field);
 	if (maxValue < combo) {//コンボ数が増えたらその手を記憶する
+	bestAction.maxcombo=stop;	
 	maxValue = combo;
 	bestAction.score = combo;
 	bestAction.first_te = temp.first_te;
