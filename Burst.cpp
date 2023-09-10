@@ -1017,7 +1017,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	tmp=STOA(str);
 	}	
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	if(tmp.maxcombo!=stop){
+	if(tmp.maxcombo==0){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
 	}
 	cand.first_te = tmp.first_te;
