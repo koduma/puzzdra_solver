@@ -112,6 +112,7 @@ using namespace std;
 #define BEAM_WIDTH2 3//MAX30
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
+#define DELTA_P 150//分解能
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
 typedef char F_T;//盤面型
@@ -779,16 +780,16 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	int push_node=0;
 	int possible_score=0;
+	int ppp=TRN;	
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
 	if(possible_score>1000){break;}
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
 	}
+	if(push_node==0){ppp=possible_score;}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
-	//swap(vec[possible_score][0], vec[possible_score].back());
-	//vec[possible_score].pop_back();
 	vec[possible_score].pop_front();
 	F_T f_field[ROW][COL];
 	memcpy(f_field,temp.field,sizeof(f_field));
@@ -800,8 +801,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
+	if(possible_score<=ppp+DELTA_P){	
 	dque.push_back(temp);
 	push_node++;
+	}	
 	}
 	}
 	}
