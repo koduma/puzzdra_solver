@@ -148,6 +148,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
+int DELTA_P[DEPTH+1]={150,150,150,150}
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
@@ -1126,12 +1127,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	int push_node=0;
 	int possible_score=0;
+	int ppp=TRN;	
 	for (int j = 0; push_node < BW[depth] ;j++) {
 	if(possible_score>1000){break;}
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
 	}
+	if(push_node==0){ppp=possible_score;}	
 	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
@@ -1151,8 +1154,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
+	if(possible_score<=ppp+DELTA_P[depth]){	
 	dque.push_back(temp);
 	push_node++;
+	}	
 	}
 	}
 	}
