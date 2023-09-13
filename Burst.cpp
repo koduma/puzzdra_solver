@@ -724,11 +724,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int loop;	
 	while(getline(myf5,ls)){
 	int c=0;
-	bool slash=false;
 	string st="";
 	for(int i=0;i<(int)ls.size();i++){
 	if(ls[i]=='/'){
-	slash=true;
 	if(c==0){F=stoi(st);}
 	else if(c==1){loop=stoi(st);}	
 	else if(c==2){hash=stoull(st);}
@@ -1115,6 +1113,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
+	if(depth==DEPTH-1){printf("depth=%d/%d\n",i+1,MAX_TRN);}	
 	if(congrats){
 	for(int m=0;m<ROW*COL;m++){
 	for( auto n = checkNodeList[m].begin(); n != checkNodeList[m].end(); ++n ) {
