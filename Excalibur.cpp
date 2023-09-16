@@ -780,14 +780,14 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	int push_node=0;
 	int possible_score=0;
-	int ppp=TRN;	
+	int opt1=TRN;	
 	for (int j = 0; push_node < BEAM_WIDTH2 ;j++) {
 	if(possible_score>1000){break;}
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
 	}
-	if(push_node==0){ppp=possible_score;}	
+	if(push_node==0){opt1=possible_score;}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
 	vec[possible_score].pop_front();
@@ -801,7 +801,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
-	if(possible_score<=ppp+DELTA_P){	
+	if(possible_score<=opt1+DELTA_P){	
 	dque.push_back(temp);
 	push_node++;
 	}	
