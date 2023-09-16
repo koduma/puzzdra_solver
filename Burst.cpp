@@ -1127,14 +1127,14 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	int push_node=0;
 	int possible_score=0;
-	int ppp=TRN;	
+	int opt1=TRN;	
 	for (int j = 0; push_node < BW[depth] ;j++) {
 	if(possible_score>1000){break;}
 	if((int)vec[possible_score].size()==0){
 	possible_score++;
 	continue;
 	}
-	if(push_node==0){ppp=possible_score;}	
+	if(push_node==0){opt1=possible_score;}	
 	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
@@ -1154,7 +1154,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
-	if(possible_score<=ppp+DELTA_P[depth]){	
+	if(possible_score<=opt1+DELTA_P[depth]){	
 	dque.push_back(temp);
 	push_node++;
 	}	
