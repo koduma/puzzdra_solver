@@ -148,7 +148,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
-int DELTA_P[DEPTH+1]={40,40,40,40};
+int DELTA_P[DEPTH+1]={150,40,3,1};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
