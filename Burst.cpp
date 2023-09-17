@@ -148,7 +148,7 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
-int DELTA_P[DEPTH+1]={150,40,3,1};
+int DELTA_P[DEPTH+1]={-5000,40,3,1};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
@@ -659,16 +659,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
+		int opt1=TRN;
 		for (int j = 0; push_node < BW[depth] ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
 			possible_score--;
 			continue;
 			}
+			if(push_node==0){opt1=possible_score;}
 			int v=vec[possible_score][0];
 			node temp = fff[v];
-			//swap(vec[possible_score][0], vec[possible_score].back());
-			//vec[possible_score].pop_back();
 			vec[possible_score].pop_front();
 			if (maxValue < temp.combo) {//コンボ数が増えたらその手を記憶する
 				maxValue = temp.combo;
@@ -681,8 +681,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 			int pos=(temp.nowR*COL)+temp.nowC;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
+				if(possible_score>=opt1+DELTA_P[depth]){
 				dque.push_back(temp);
 				push_node++;
+				}	
 				}
 			}
 		}
