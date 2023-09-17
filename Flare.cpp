@@ -112,7 +112,7 @@ using namespace std;
 #define BEAM_WIDTH2 3000//MAX3000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
-#define DELTA_P 150//分解能
+#define DELTA_P 40//分解能
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,DIR*BEAM_WIDTH)
 typedef char F_T;//盤面型
