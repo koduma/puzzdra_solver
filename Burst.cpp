@@ -447,9 +447,9 @@ string ATOS(Action a,int F,ll hash,int i){
 	for(int b=0;b<=(TRN/21);b++){str+="/"+to_string(a.moving[b]);}
 	return str;
 }
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl); //ルート探索関数
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],T_T fte,int sumpl); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
-Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl) {
+Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],T_T fte,int sumpl) {
   shot++;if(shot%1000==0){cout<<"shot="<<(shot)<<endl;}
   if(depth==0){
 	int po=9+(8*(COL-1))+ROW-1;
@@ -769,52 +769,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	Action retAction;
 	int retpl=TRN;    
 		
-	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field,jump,0,0);
+	Action tmpp=BEAM_SEARCH(0,f_field,1,TRN,-1,0,stop,customer,root_field,0,0);
 	
 	stop=tmpp.score;
 		
 	F_T tmp_field[ROW][COL];
 	memcpy(tmp_field,root_field,sizeof(tmp_field));
-	if(sum_e(tmp_field)>=stop){retAction.path="05,";return retAction;}	
-		
-	int kosu=0;
-	string line;
-	string t_path[2];
-	ifstream myfile ("Burst_input"+lt+".txt");
-	while(getline(myfile,line)){
-	t_path[kosu]=line;
-	kosu++;
-	}
-	myfile.close();
-	
-	int suru=-2;
-	int suru2=TRN;	
-	if(kosu==2&&read_file_mode==1){	
-	string sss="";
-	for(int i=0;i<(int)t_path[0].size();i++){
-	if(t_path[0][i]=='\n'){break;}
-	sss+=t_path[0][i];	
-	}
-	
-	suru=stoi(sss);	
-	sss="";
-	bool comma=false;	
-	
-	suru2=0;	
-	for(int i=0;i<(int)t_path[1].size();i++){
-	if(t_path[1][i]=='\n'){break;}
-	sss+=t_path[1][i];
-	if(t_path[1][i]==','){comma=true;continue;}
-	if(comma){suru2++;}	
-	}
-	cout<<sss<<endl;	
-	}
-	
-	pro_league.push_back(suru2);	
+	if(sum_e(tmp_field)>=stop){retAction.path="05,";return retAction;}				
 		
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
-	if((i*COL)+j<=suru){continue;}
 	//if((i*COL)+j!=6){continue;}
 	//if((i*COL)+j!=23){continue;}	
 	F_T g_field[ROW][COL];
@@ -831,9 +795,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.true_path_length=0;
 	int lim=TRN;
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
-	if((i*COL)+j==suru+1){jump=true;}
-	else{jump=false;}
-	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,jump,customer.first_te,0);
+	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,customer.first_te,0);
 	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
@@ -867,12 +829,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	avg+=(double)cand.path_length;	
 	}
 	path_length_array[i][j]=(double)cand.path_length;
-	ofstream file("Burst_input"+lt+".txt");		
-	string mystring=to_string((i*COL)+j)+'\n';
-	file << mystring;	
-	mystring=retAction.path+'\n';
-	file << mystring;	
-	file.close();	
 	}
 	}
       
@@ -896,64 +852,6 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	fi.close();	
 	return retAction;
 	}
-	else if(depth==DEPTH-1&&read_file_mode==1&&jump){
-	int kosu=0;
-	string line;
-	string t_path[BW[depth]];
-	ifstream myfile ("Burst_depth"+lt+".txt");
-	while(getline(myfile,line)){
-	t_path[kosu]=line;
-	kosu++;
-	}
-	myfile.close();
-	for(int i=0;i<kosu;i++){
-	
-	node2 nnn;
-	
-	nnn.true_path.clear();
-	F_T board[ROW][COL];
-	memcpy(board,root_field,sizeof(board));
-	int tgt=0;
-	string top="";
-	while(1){
-	nnn.true_path.push_back(t_path[i][tgt]);
-	if(t_path[i][tgt]==','){tgt++;break;}
-	top+=t_path[i][tgt];
-	tgt++;
-	}
-	int pos;
-	sc pre_v=-1;
-	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
-	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-	nnn.first_te=(T_T)YX(pos/COL,pos%COL);
-	for(int j=0;j<=TRN/21;j++){
-	nnn.movei[j]=0ll;
-	}
-	int basyo=0;
-	for(int j=tgt;j<(int)t_path[i].size();j++){
-	if(t_path[i][j]=='3'){swap(board[pos/COL][pos%COL],board[pos/COL][(pos%COL)-1]);pos--;pre_v=0;}
-	else if(t_path[i][j]=='6'){swap(board[pos/COL][pos%COL],board[(pos/COL)-1][pos%COL]);pos-=COL;pre_v=1;}
-	else if(t_path[i][j]=='1'){swap(board[pos/COL][pos%COL],board[(pos/COL)+1][pos%COL]);pos+=COL;pre_v=2;}
-	else if(t_path[i][j]=='4'){swap(board[pos/COL][pos%COL],board[pos/COL][(pos%COL)+1]);pos++;pre_v=3;}
-	else{continue;}
-	nnn.true_path.push_back(t_path[i][j]);
-	nnn.movei[basyo/21] |= (((ll)(pre_v+1))<<((3*basyo)%63));
-	basyo++;
-	}
-	nnn.prev=pre_v;
-	nnn.pos=pos;
-	memcpy(nnn.field,board,sizeof(board));
-	nnn.calc_path();
-	nnn.calc_hash();
-	//nnn.true_path=t_path[i];
-	nnn.true_path_length=nnn.path_length;
-	dque.push_back(nnn);
-	if(i==0){
-	printf("path_length=%d\n",nnn.path_length);
-	sumpl+=nnn.path_length;	
-	}
-	}
-	}
 	else{
 	dque.push_back(customer);
 	}
@@ -964,13 +862,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	emilib::HashMap<ll, bool> checkNodeList[ROW*COL];
 	for (int i = 0; i < MAX_TRN; i++) {
 	int ks = (int)dque.size();
-	pro_league.clear();	
-	ofstream file("Burst_depth"+lt+".txt");
-	for (int k = 0; k < ks; k++) {
-	string mystring=dque[k].true_path+'\n';
-	file << mystring;
-	}
-	file.close();
+	pro_league.clear();
 	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
 	string mystr=to_string(itr->first)+','+to_string(itr->second)+'\n';
@@ -1020,7 +912,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if(tmp.maxcombo==0){
-	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
+	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,fte,sumpl+i+1);
 	}
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -1165,11 +1057,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}
 	}
-	}//for(int i=0;
+	}	
 	return bestAction;
-  
   }
-    
 }
 Action BULB(F_T f_field[ROW][COL],int stop){
 	int po=9+(8*(COL-1))+ROW-1;
