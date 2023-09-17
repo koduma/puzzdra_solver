@@ -108,7 +108,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 30000//MAX2800000
-#define BEAM_WIDTH2 3000//MAX3000
+#define BEAM_WIDTH2 1//MAX3000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -147,7 +147,7 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
-int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
+int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,1,1};
 int DELTA_P[DEPTH+1]={40,40,40,40};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
@@ -445,7 +445,6 @@ string ATOS(Action a,int F,ll hash,int i){
 	string str="";
 	str=to_string(F)+"/"+to_string(i)+"/"+to_string(hash)+"/"+to_string((int)a.first_te)+"/"+to_string(a.score)+"/"+to_string(a.maxcombo)+"/"+a.path;
 	for(int b=0;b<=(TRN/21);b++){str+="/"+to_string(a.moving[b]);}
-	str+='\n';
 	return str;
 }
 Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer,F_T root_field[ROW][COL],bool jump,T_T fte,int sumpl); //ルート探索関数
@@ -722,8 +721,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	Action a;
 	ll hash;
 	int F;
-	int loop;	
+	int loop;
+	int gyo=0;
 	while(getline(myf5,ls)){
+	gyo++;
 	int c=0;
 	string st="";
 	for(int i=0;i<(int)ls.size();i++){
@@ -742,7 +743,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	st+=ls[i];
 	}
-	mapobj2[F][loop][hash]=ls;	
+	mapobj2[F][loop][hash]=ls;
 	}
 	}  
 	stop=0;
@@ -816,7 +817,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	if((i*COL)+j<=suru){continue;}
-	//if((i*COL)+j!=6){continue;}
+	if((i*COL)+j!=6){continue;}
 	//if((i*COL)+j!=23){continue;}	
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
@@ -1012,9 +1013,13 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	string str=mapobj2[depth][i][check_hash(g_field)^zoblish_field2[cand.pos]];	
 	Action tmp;
 	tmp.maxcombo=0;
-	if(str!=""){	
+	if(str!=""){
+	bool ok=false;
+	for(int s=0;s<(int)str.size();s++){if(str[s]=='/'){ok=true;}if(ok){break;}}	
+	if(ok){
 	tmp=STOA(str);
-	}	
+	}
+	}
 	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
 	if(tmp.maxcombo==0){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,jump,fte,sumpl+i+1);
