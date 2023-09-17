@@ -108,7 +108,7 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define BEAM_WIDTH 30000//MAX2800000
-#define BEAM_WIDTH2 1//MAX3000
+#define BEAM_WIDTH2 3000//MAX3000
 #define PROBLEM 1//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
@@ -147,7 +147,7 @@ ll calc_mask(ll bitboard);
 ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
-int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,1,1};
+int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
 int DELTA_P[DEPTH+1]={40,40,40,40};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
@@ -722,9 +722,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	ll hash;
 	int F;
 	int loop;
-	int gyo=0;
 	while(getline(myf5,ls)){
-	gyo++;
 	int c=0;
 	string st="";
 	for(int i=0;i<(int)ls.size();i++){
@@ -817,7 +815,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for (int i = 0; i < ROW; i++) {
 	for (int j = 0; j < COL; j++) {
 	if((i*COL)+j<=suru){continue;}
-	if((i*COL)+j!=6){continue;}
+	//if((i*COL)+j!=6){continue;}
 	//if((i*COL)+j!=23){continue;}	
 	F_T g_field[ROW][COL];
 	memcpy(customer.field,f_field,sizeof(g_field));
