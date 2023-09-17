@@ -1738,7 +1738,7 @@ int main() {
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
 		node2 customer;
-		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,false,0,0);
+		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,0,0);
 		//act=BULB(f_field,act.score);
 		bestans=act.path;
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
