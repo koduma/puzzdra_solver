@@ -982,7 +982,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	for(int F=0;F<=DEPTH;F++){
 	for(int loop=0;loop<TRN;loop++){	
 	for(auto itr = mapobj2[F][loop].begin(); itr != mapobj2[F][loop].end(); ++itr) {	
-	string mystr=mapobj2[F][loop][itr->first];	
+	string mystr=mapobj2[F][loop][itr->first]+'\n';	
 	fiv<<mystr;
 	}
 	}
@@ -1134,6 +1134,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
+	if(depth==DEPTH-1){printf("predict=%d\n",i+1+possible_score);}	
 	if(push_node==0){opt1=possible_score;}	
 	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
 	int v=vec[possible_score][0];
