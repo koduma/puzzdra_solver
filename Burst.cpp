@@ -419,12 +419,10 @@ Action STOA(string str){
 	int F;
 	int loop;
 	int c=0;
-	bool slash=false;
 	string st="";
 	for(int i=0;i<(int)str.size();i++){
 	if(str[i]=='\n'){break;}	
-	if(str[i]=='/'){
-	slash=true;	
+	if(str[i]=='/'){	
 	if(c==0){F=stoi(st);}
 	else if(c==1){loop=stoi(st);}	
 	else if(c==2){hash=stoull(st);}
