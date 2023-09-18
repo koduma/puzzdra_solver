@@ -659,7 +659,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 		start = omp_get_wtime();
 		int push_node=0;
 		int possible_score=5000;
-		int opt1=TRN;
+		int opt1=0;
 		for (int j = 0; push_node < BW[depth] ;j++) {
 			if(possible_score<0){break;}
 			if((int)vec[possible_score].size()==0){
