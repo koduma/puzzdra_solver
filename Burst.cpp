@@ -741,7 +741,9 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	st+=ls[i];
 	}
+	if((int)ls.size()>=5){	
 	mapobj2[F][loop][hash]=ls;
+	}	
 	}
 	}  
 	stop=0;
