@@ -653,7 +653,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 }
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN); //ルート探索関数
 string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
-	
+	int LIM=TRN;
 	string lt="";
 	for(int i=0;i<ROW*COL;i++){lt+=((int)field[i/COL][i%COL]-1)+'0';}
 	if(read_file_mode==1){
@@ -919,8 +919,8 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
-	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}	
+	int lim=LIM;
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];LIM=lim;}	
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
