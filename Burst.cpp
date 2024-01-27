@@ -149,6 +149,7 @@ multimap<ll, ll> visited;
 ll zoblish_field2[ROW*COL];
 int BW[DEPTH+1]={BEAM_WIDTH,BEAM_WIDTH2,10,1};
 int DELTA_P[DEPTH+1]={-5000,40,3,1};
+int LIM[DEPTH+1]={TRN,TRN,TRN,TRN};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
@@ -904,7 +905,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	else{cand.true_path+=to_string(4);}
 	cand.prev = j;
 	memcpy(cand.field,g_field,sizeof(g_field));
-	int lim=TRN;
+	int lim=LIM[depth];
 	string str=mapobj2[depth][i][check_hash(g_field)^zoblish_field2[cand.pos]];	
 	Action tmp;
 	tmp.maxcombo=0;
@@ -915,7 +916,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	tmp=STOA(str);
 	}
 	}
-	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
+	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];LIM[depth]=lim;}
 	if(tmp.maxcombo==0){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,fte,sumpl+i+1);
 	}
