@@ -1014,7 +1014,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	vec[ff[depth-1][j].path_length].push_front(j);
 	}
 	}
-	if(depth==DEPTH-1){printf("depth=%d/%d\n",i+1,MAX_TRN);}	
+	if(depth==DEPTH){printf("depth=%d/%d\n",i+1,MAX_TRN);}	
 	if(congrats){
 	for(int m=0;m<ROW*COL;m++){
 	for( auto n = checkNodeList[m].begin(); n != checkNodeList[m].end(); ++n ) {
@@ -1034,7 +1034,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	possible_score++;
 	continue;
 	}
-	if(depth==DEPTH-1){printf("predict=%d\n",i+1+possible_score);}	
+	if(depth==DEPTH&&push_node==0){printf("predict=%d\n",i+1+possible_score);}	
 	if(push_node==0){opt1=possible_score;}	
 	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
 	int v=vec[possible_score][0];
