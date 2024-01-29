@@ -768,6 +768,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(depth==DEPTH){
 		
 	printf("\n-----search_start-----\n");
+
+	for(int i=0;i<=DEPTH;i++){LIM[i]=TRN;}	
         
 	Action retAction;
 	int retpl=TRN;    
