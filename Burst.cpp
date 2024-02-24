@@ -798,8 +798,8 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	customer.calc_hash();
 	customer.true_path=to_string(j)+to_string(i+5)+",";
 	customer.true_path_length=0;
-	int lim=TRN;
-	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];}
+	int lim=LIM[depth];
+	if((int)pro_league.size()>=BW[depth]){lim=pro_league[BW[depth]-1];LIM[depth]=lim-1;}
 	tmpp=BEAM_SEARCH(depth-1,f_field,1,max(0,lim-1),-1,(i*COL)+j,stop,customer,root_field,customer.first_te,0);
 	ofstream fi("Burst_visited"+lt+".txt");
 	for(auto itr = visited.begin(); itr != visited.end(); ++itr) {
