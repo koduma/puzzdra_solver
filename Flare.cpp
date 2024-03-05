@@ -982,12 +982,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	if(push_node==0){
 	printf("predict=%d\n",i+ALPHA+possible_score);
-	opt1=i+ALPHA+possible_score;	
+	opt1=possible_score;	
 	}
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
-	//swap(vec[possible_score][0], vec[possible_score].back());
-	//vec[possible_score].pop_back();
 	vec[possible_score].pop_front();
 	F_T f_field[ROW][COL];
 	memcpy(f_field,temp.field,sizeof(f_field));
@@ -999,7 +997,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
-	if(i+ALPHA+possible_score<=opt1+DELTA_P){	
+	if(possible_score<=opt1+DELTA_P){	
 	dque.push_back(temp);
 	push_node++;
 	}	
