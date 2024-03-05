@@ -788,7 +788,10 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	possible_score++;
 	continue;
 	}
-	if(push_node==0){opt1=possible_score;}	
+	if(push_node==0){
+	printf("predict=%d\n",i+1+possible_score);	
+	opt1=possible_score;
+	}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[v];
 	vec[possible_score].pop_front();
