@@ -1039,7 +1039,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	if(depth==DEPTH-1&&push_node==0){printf("predict=%d\n",i+1+possible_score);}	
 	if(push_node==0){opt1=possible_score;}	
-	if(possible_score==TRN&&push_node==0){counter++;cout<<"error_counter="<<counter<<endl;}	
+	if(possible_score==TRN&&push_node==0){counter++;if(counter%100==0){cout<<"error_counter="<<counter<<endl;}}	
 	int v=vec[possible_score][0];
 	node2 temp = ff[depth-1][v];
 	vec[possible_score].pop_front();
