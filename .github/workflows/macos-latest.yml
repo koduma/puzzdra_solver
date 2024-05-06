@@ -22,4 +22,4 @@ jobs:
           sudo ln -sf $(ls -d /usr/local/bin/* | grep "/g++-" | sort -r | head -n1) /usr/local/bin/g++
           g++ --version
     - name: compile
-      run: g++ -std=c++11 -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl -march=native
+      run: g++ -std=c++11 -fopenmp -mbmi2 -lpthread Excalibur.cpp loguru.cpp -o Excalibur -ldl -march=native
