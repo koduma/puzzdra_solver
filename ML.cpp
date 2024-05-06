@@ -1,6 +1,6 @@
 /*
 
-g++ -O2 -std=c++11 -fopenmp Fire.cpp -o Fire
+g++ -O2 -std=c++11 -fopenmp ML.cpp -o ML
 
 */
 #pragma warning(disable:4710)
@@ -239,12 +239,12 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-            int sc=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);    
-            vec.push_back(make_pair(-sc,j));    
+			int sc=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);
+			vec.push_back(make_pair(-sc,j));    
 			ks2++;
 			}
 		}
-        sort(vec.begin(),vec.end());
+		sort(vec.begin(),vec.end());
 		int push_node=0;
 		for (int j = 0; push_node < BEAM_WIDTH; j++) {
 			if((int)vec.size()<=j){break;}
@@ -478,13 +478,12 @@ int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 	*combo = 0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
-
-    vector<int>v[10];
-    for(int i=0;i<ROW*COL;i++){
+	vector<int>v[10];
+	for(int i=0;i<ROW*COL;i++){
         int a = (int)(field[i/COL][i%COL]);
         v[a].push_back(i);
-    }
-    for(int i=0;i<10;i++){sort(v[i].begin(),v[i].end());}
+	}
+	for(int i=0;i<10;i++){sort(v[i].begin(),v[i].end());}
 
 	while (1) {
 		int cmb = 0;
@@ -564,20 +563,18 @@ int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 
 	}
 	ev += oti;
-    if(!go){return ev;}
-    else{
-
-    ev=0;
-    for(int i=0;i<10;i++){
+	if(!go){return ev;}
+	else{
+	ev=0;
+	for(int i=0;i<10;i++){
         for(int j=0;j<(int)v[i].size();j+=3){
             if((int)v[i].size()<=j+2){break;}
             string s="";
             s=to_string(i)+","+to_string(v[i][j])+","+to_string(v[i][j+1])+","+to_string(v[i][j+2]);
             ev+=data[s];
-        }
-    }
-        
-    return ev;    
+	}
+	}
+        return ev;    
     }
 }
 int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
@@ -643,27 +640,27 @@ void memo(F_T field[ROW][COL]){
     
 }
 void counting(F_T field[ROW][COL],string route){
-		F_T f_field[ROW][COL];
-        for(int i=0;i<ROW*COL;i++){f_field[i/COL][i%COL]=field[i/COL][i%COL];}
-		int tgt=0;
-		string top="";
-		while(1){
-		if(route[tgt]==','){tgt++;break;}
-		top+=route[tgt];
-		tgt++;
-		}
-		int pos;
-		if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
-		else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
-		int tesuu=(int)route.size()-tgt;
-		int cnt=0;
-		for(int j=tgt;j<(int)route.size();j++){
-		memo(f_field);
-		cnt++;
-		if(route[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
-		if(route[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
-		if(route[j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;}
-		if(route[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
+	F_T f_field[ROW][COL];
+	for(int i=0;i<ROW*COL;i++){f_field[i/COL][i%COL]=field[i/COL][i%COL];}
+	int tgt=0;
+	string top="";
+	while(1){
+	if(route[tgt]==','){tgt++;break;}
+	top+=route[tgt];
+	tgt++;
+	}
+	int pos;
+	if((int)top.size()==2){int x=top[0]-'0';int y=(top[1]-'0')-5;pos=(y*COL)+x;}
+	else{int x=top[0]-'0';int y=5;pos=(y*COL)+x;}
+	int tesuu=(int)route.size()-tgt;
+	int cnt=0;
+	for(int j=tgt;j<(int)route.size();j++){
+	memo(f_field);
+	cnt++;
+	if(route[j]=='3'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)-1]);pos--;}
+	if(route[j]=='6'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)-1][pos%COL]);pos-=COL;}
+	if(route[j]=='1'){swap(f_field[pos/COL][pos%COL],f_field[(pos/COL)+1][pos%COL]);pos+=COL;}
+	if(route[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
         }
 }
 int main() {
@@ -684,12 +681,11 @@ int main() {
 	double start;
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
-
-    int acc=0;
-
-    bool start_test=false;
-
-    if(start_test){
+	
+	int acc=0;
+	
+	bool start_test=false;
+	if(start_test){
         ifstream myf ("data.txt");
 	    string ls;
 	    while(getline(myf,ls)){
@@ -705,19 +701,19 @@ int main() {
             cout<<"p="<<parent<<"/c="<<stoi(child)<<endl;
 	    }
 	myf.close();
-    }
+	}
     
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
-        if(i<TRAIN){go=false;}
-        else{go=true;}
-        if(i==TRAIN){
-            for (auto itr = data.begin(); itr != data.end(); ++itr){
+		if(i<TRAIN){go=false;}
+		else{go=true;}
+		if(i==TRAIN){
+		for (auto itr = data.begin(); itr != data.end(); ++itr){
                 ofstream fi("data.txt",ios::app);
                 string mystr=itr->first+'/'+to_string(itr->second)+'\n';
                 fi<<mystr;
                 fi.close();
-            }
-        }
+		}
+		}
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
@@ -764,9 +760,9 @@ int main() {
 		cout<<url<<endl;
 		printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
-        if(!go){
-        counting(field,route);
-        }        
+		if(!go){
+		counting(field,route);
+		}        
 		operation(field, tmp.first_te,tmp.moving);
 		printf("output:No.%d/%d\n", i + 1, PROBLEM);
 		show_field(field);
@@ -774,9 +770,9 @@ int main() {
 		int combo = sum_e(field);
 		int oti = sum_evaluate(oti_field);
 		if(combo!=tmp.maxcombo){mistake++;}
-        else if(go){acc++;}
+		else if(go){acc++;}
 		printf("mistake=%d\n",mistake);
-        printf("acc=%d\n",acc);
+		printf("acc=%d\n",acc);
 		printf("path_length=%d\n",path_length);
 		printf("Normal:%d/%dCombo\n", combo, tmp.maxcombo);
 		printf("Oti:%dCombo\n", oti);
