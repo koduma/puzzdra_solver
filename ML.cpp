@@ -708,7 +708,7 @@ int main() {
 		else{go=true;}
 		if(i==TRAIN){
 		for (auto itr = data.begin(); itr != data.end(); ++itr){
-                ofstream fi("data.txt",ios::app);
+                ofstream fi("data.txt");
                 string mystr=itr->first+'/'+to_string(itr->second)+'\n';
                 fi<<mystr;
                 fi.close();
