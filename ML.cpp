@@ -707,12 +707,13 @@ int main() {
 		if(i<TRAIN){go=false;}
 		else{go=true;}
 		if(i==TRAIN){
+		ofstream fi("data.txt");
+		string mystr="";
 		for (auto itr = data.begin(); itr != data.end(); ++itr){
-                ofstream fi("data.txt");
-                string mystr=itr->first+'/'+to_string(itr->second)+'\n';
-                fi<<mystr;
-                fi.close();
+		mystr+=itr->first+'/'+to_string(itr->second)+'\n';
 		}
+		fi<<mystr;
+		fi.close();
 		}
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
