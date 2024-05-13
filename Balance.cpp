@@ -1,6 +1,6 @@
 /*
 
-g++ -O2 -std=c++11 -fopenmp Fire.cpp -o Fire
+g++ -O2 -std=c++11 -fopenmp Balance.cpp -o Balance
 
 */
 #pragma warning(disable:4710)
