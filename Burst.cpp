@@ -954,7 +954,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	deque<int>vec[1001];
 	bool congrats=false;
 	for(int j=0;j<DIR*ks;j++){
-	if(ff[depth-1][j].path_length!=-1){
+	if(ff[depth-1][j].path_length!=-1&&ff[depth-1][j].path_length-i<10){
 	F_T g_field[ROW][COL];
 	memcpy(g_field,ff[depth-1][j].field,sizeof(g_field));
 	int combo = sum_e(g_field);
@@ -1014,8 +1014,10 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	//return bestAction;
 	congrats=true;
 	}
-	vec[ff[depth-1][j].path_length].push_front(j);
 	}
+	if(ff[depth-1][j].path_length!=-1){
+	vec[ff[depth-1][j].path_length].push_front(j);	
+	}	
 	}
 	if(depth==DEPTH){printf("depth=%d/%d\n",i+1,MAX_TRN);}	
 	if(congrats){
