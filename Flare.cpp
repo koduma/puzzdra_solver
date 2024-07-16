@@ -920,8 +920,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	cand.prev = j;
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=LIM;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];LIM=lim-1;}
-	if(i>=4){	
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];LIM=lim-1;}	
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -945,12 +944,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	if(cand.path_length<lim){	
 	pro_league.push_back(cand.path_length);
 	sort(pro_league.begin(),pro_league.end());
-	}
-	}
-	else{
-	memcpy(cand.field,f_field,sizeof(f_field));
-	cand.calc_hash();
-	cand.path_length=min(MLEN,TRN);
 	}
 	ff[(DIR * k) + j] = cand;
 	}//if(cand.prev
