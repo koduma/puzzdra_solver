@@ -859,7 +859,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	printf("\n-----search_start_2/2-----\n");
 	int cnt=0;
 
-	for(int i=0;i<TRN;i++){
+	for(int i=0;i<=TRN;i++){
 	if((int)pus[i].size()==0){continue;}
 	while(1){
 	if((int)pus[i].size()==0){break;}
