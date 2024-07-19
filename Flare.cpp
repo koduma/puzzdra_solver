@@ -970,13 +970,15 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	dque.clear();
 	deque<int>vec[1001];
 	for(int j=0;j<DIR*ks;j++){
-	if(ff[j].path_length!=-1){
+	if(ff[j].path_length!=-1&&(ff[j].path_length<10||i<5-ALPHA)){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
 	if(combo>=stop){return ff[j].true_path;}
+	}
+	if(ff[j].path_length!=-1){	
 	vec[ff[j].path_length].push_front(j);
-	}	
+	}
 	}
 	int push_node=0;
 	int possible_score=0;
