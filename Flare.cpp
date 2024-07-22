@@ -401,6 +401,9 @@ void push_data(F_T f_field[ROW][COL],string path){
 	}
 	}  
 }
+double logN(double b, double x) {
+    return log(x) / log(b);
+}
 
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
@@ -680,6 +683,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	}
 	
 	int ALPHA=1;
+	int Q=(int)floor(logN(3.0,(double)BEAM_WIDTH2/100.0))+2;
 
 	int stop=0;
 	int drop[DROP + 1] = { 0 };
@@ -921,7 +925,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=LIM;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];LIM=lim-1;}
-	if(i>=5-ALPHA){	
+	if(i>=Q-ALPHA){	
 	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
@@ -970,7 +974,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	dque.clear();
 	deque<int>vec[1001];
 	for(int j=0;j<DIR*ks;j++){
-	if(ff[j].path_length!=-1&&(ff[j].path_length<10||i<5-ALPHA)){
+	if(ff[j].path_length!=-1&&(ff[j].path_length<10||i<Q-ALPHA)){
 	F_T f_field[ROW][COL];
 	memcpy(f_field,ff[j].field,sizeof(f_field));
 	int combo = sum_e(f_field);
