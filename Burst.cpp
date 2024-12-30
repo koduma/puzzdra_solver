@@ -1048,7 +1048,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	int v=get<2>(vec[j]);
 	if(depth==DEPTH-1&&push_node==0){printf("predict=%d\n",i+1+ps);}	
 	if(push_node==0){opt1=ps;}	
-	if(possible_score==TRN&&push_node==0){counter++;if(counter%100==0){cout<<"error_counter="<<counter<<endl;}}
+	if(ps==TRN&&push_node==0){counter++;if(counter%100==0){cout<<"error_counter="<<counter<<endl;}}
 	node2 temp = ff[depth-1][v];
 	F_T g_field[ROW][COL];
 	memcpy(g_field,temp.field,sizeof(g_field));
