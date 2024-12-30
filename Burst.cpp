@@ -89,6 +89,7 @@ layout=053241405407470557104053134522
 #include <map>
 #include <array>
 #include <chrono>
+#include <tuple>
 #include <fstream>
 #include <functional>
 #include <unordered_map>
@@ -214,6 +215,7 @@ struct node2 {
 	ll hash;
 	string true_path;
 	int true_path_length;
+	int second_score;
 	void calc_path(){
 	path_length=0;
 	path=to_string(XX(first_te))+to_string(YY(first_te)+5)+",";
@@ -748,6 +750,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}  
 	stop=0;
+	int p_maxcombo[DROP+1]={0};  
 	int drop[DROP + 1] = { 0 };
 	for (int row = 0; row < ROW; row++) {
 		for (int col = 0; col < COL; col++) {
@@ -758,6 +761,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	for (int i = 1; i <= DROP; i++) {
 		stop += drop[i] / 3;
+		p_maxcombo[i]=drop[i]/3;
 	}
 	double start = omp_get_wtime();
 	vector<node2>dque;
@@ -922,6 +926,11 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if(tmp.maxcombo==0){
 	tmp = BEAM_SEARCH(depth-1,g_field,i+2,max(0,lim-1),cand.prev,cand.pos,stop,cand,root_field,fte,sumpl+i+1);
 	}
+	sc cmb;
+	ll ha;
+	F_T tmp_field[ROW][COL];
+	memcpy(tmp_field,g_field,sizeof(tmp_field));
+	cand.second_score = evaluate2(tmp_field, EVAL_FALL | EVAL_COMBO,&cmb ,&ha,p_maxcombo);	
 	cand.first_te = tmp.first_te;
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	cand.movei[trn] = tmp.moving[trn];
@@ -951,7 +960,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}//for(int j=0;
 	}//for(int k=0;
 	dque.clear();
-	deque<int>vec[1001];
+	vector<tuple<int, int, int> > vec;
 	bool congrats=false;
 	for(int j=0;j<DIR*ks;j++){
 	if(ff[depth-1][j].path_length!=-1&&ff[depth-1][j].path_length-i<10){
@@ -1016,7 +1025,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	}
 	if(ff[depth-1][j].path_length!=-1){
-	vec[ff[depth-1][j].path_length].push_front(j);	
+	vec.push_back(make_tuple(ff[depth-1][j].path_length,-ff[depth-1][j].second_score,j));
 	}	
 	}
 	if(depth==DEPTH){printf("depth=%d/%d\n",i+1,MAX_TRN);}	
@@ -1030,21 +1039,17 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	}
 	return bestAction;
 	}
+	sort(vec.begin(), vec.end());
 	int push_node=0;
-	int possible_score=0;
+	int ps=get<0>(vec[0]);
 	int opt1=TRN;	
 	for (int j = 0; push_node < BW[depth] ;j++) {
-	if(possible_score>1000){break;}
-	if((int)vec[possible_score].size()==0){
-	possible_score++;
-	continue;
-	}
-	if(depth==DEPTH-1&&push_node==0){printf("predict=%d\n",i+1+possible_score);}	
-	if(push_node==0){opt1=possible_score;}	
-	if(possible_score==TRN&&push_node==0){counter++;if(counter%100==0){cout<<"error_counter="<<counter<<endl;}}	
-	int v=vec[possible_score][0];
+	if(j>=(int)vec.size()){break;}
+	int v=get<2>(vec[j]);
+	if(depth==DEPTH-1&&push_node==0){printf("predict=%d\n",i+1+ps);}	
+	if(push_node==0){opt1=ps;}	
+	if(possible_score==TRN&&push_node==0){counter++;if(counter%100==0){cout<<"error_counter="<<counter<<endl;}}
 	node2 temp = ff[depth-1][v];
-	vec[possible_score].pop_front();
 	F_T g_field[ROW][COL];
 	memcpy(g_field,temp.field,sizeof(g_field));
 	int combo = sum_e(g_field);
@@ -1060,7 +1065,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 	if (i < MAX_TRN - 1) {
 	if(!checkNodeList[temp.pos][temp.hash]){
 	checkNodeList[temp.pos][temp.hash]=true;
-	if(possible_score<=opt1+DELTA_P[depth]){	
+	if(ps<=opt1+DELTA_P[depth]){	
 	dque.push_back(temp);
 	push_node++;
 	}	
