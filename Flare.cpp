@@ -155,6 +155,8 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
+bool CUT=false;
+
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -546,7 +548,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
-						if(i<Q&&MAX_TRN>20){
+						if(i<Q&&MAX_TRN>20&&CUT){
 						cand.score=0;
 						cand.combo=0;						
 						}
@@ -1643,8 +1645,10 @@ int main() {
 		show_field(f_field);//盤面表示
 		printf("\n");
 		double start = omp_get_wtime();
+		CUT=false;
 		string tmp_ans=SHORT_SEARCH(f_field);
 		if((int)tmp_ans.size()==0){
+		CUT=true;	
 		bestans=BEAM_SEARCH2(f_field,TRN);
 		}
 		else{
