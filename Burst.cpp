@@ -154,6 +154,7 @@ int LIM[DEPTH+1]={TRN,TRN,TRN,TRN};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
+bool CUT=false;
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -585,7 +586,7 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
-						if(i<Q&&MAX_TRN>20){
+						if(i<Q&&MAX_TRN>20&&CUT){
 						cand.score=0;
 						cand.combo=0;						
 						}
@@ -1810,9 +1811,11 @@ int main() {
 		printf("\n");
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
+		CUT=false;
 		string tmp_ans=SHORT_SEARCH(f_field);
 		if((int)tmp_ans.size()==0){
 		node2 customer;
+		CUT=true;	
 		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,0,0);
 		//act=BULB(f_field,act.score);
 		bestans=act.path;
