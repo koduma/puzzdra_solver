@@ -546,16 +546,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
-						//if(i<Q&&MAX_TRN>20){
-						//cand.score=0;
-						//cand.combo=0;						
-						//}
-						//else{
+						if(i<Q&&MAX_TRN>20){
+						cand.score=0;
+						cand.combo=0;						
+						}
+						else{
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.score -= adder(field);
 						cand.combo = cmb;
-						//}
+						}
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						//st = omp_get_wtime();
@@ -1036,6 +1036,49 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	return bestAction;
 
 }
+string SHORT_SEARCH(F_T f_field[ROW][COL]){
+F_T field[ROW][COL];
+memcpy(field,f_field,sizeof(field));
+int stop=0;
+int drop[DROP + 1] = { 0 };
+for (int row = 0; row < ROW; row++) {
+	for (int col = 0; col < COL; col++) {
+		if (1 <= field[row][col] && field[row][col] <= DROP) {
+			drop[field[row][col]]++;
+		}
+	}
+}
+for (int i = 1; i <= DROP; i++) {
+	stop += drop[i] / 3;
+}	
+Action tmp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
+stop=tmp.score;
+int Q=(int)floor(logN(3.0,(double)BEAM_WIDTH))+1;
+string ans="";
+int max_pl=TRN;	
+for (int i = 0; i < ROW; i++) {
+	for (int j = 0; j < COL; j++) {
+	node2 cand;
+	tmp=BEAM_SEARCH(field,1,Q,-1,(i*COL)+j,stop);
+	F_T g_field[ROW][COL];
+	memcpy(g_field,field,sizeof(g_field));
+	if(sum_e(g_field)>=stop){return "05,";}
+	if(stop<=tmp.score){	
+	cand.first_te = tmp.first_te;
+	for (int trn = 0; trn <= TRN/21; trn++) {
+	cand.movei[trn] = tmp.moving[trn];
+	}
+	cand.calc_path();
+	if(max_pl>cand.path_length){
+	ans=cand.path;
+	max_pl=cand.path_length;
+	}	
+	}
+	}
+	}
+return ans;	
+}
+
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -1600,7 +1643,13 @@ int main() {
 		show_field(f_field);//盤面表示
 		printf("\n");
 		double start = omp_get_wtime();
+		string tmp_ans=SHORT_SEARCH(f_field);
+		if((int)tmp_ans.size()==0){
 		bestans=BEAM_SEARCH2(f_field,TRN);
+		}
+		else{
+		bestans=tmp_ans;	
+		}
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
 		double diff = omp_get_wtime() - start;
