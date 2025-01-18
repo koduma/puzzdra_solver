@@ -313,6 +313,9 @@ int adder(F_T field[ROW][COL]){
 
     return ret;
 }
+double logN(double b, double x) {
+    return log(x) / log(b);
+}
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop); //ルート探索関数
 double part1 = 0, part2 = 0, part3 = 0, MAXCOMBO = 0;
 Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop) {
@@ -412,6 +415,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	}
 
+	int Q=(int)floor(logN(3.0,(double)BEAM_WIDTH))+1;
+
 	//2手目以降をビームサーチで探索
 	for (int i = 0; i < MAX_TRN; i++) {
 		int ks = (int)dque.size();
@@ -450,10 +455,16 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
+						if(i<Q&&MAX_TRN>20){
+						cand.score=0;
+						cand.combo=0;						
+						}
+						else{
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.score -= adder(field);
 						cand.combo = cmb;
+						}
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						//st = omp_get_wtime();
