@@ -585,16 +585,16 @@ Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev
 						cand.nowR += dy[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
-						if(i<Q&&MAX_TRN>20){
-						cand.score=0;
-						cand.combo=0;						
-						}
-						else{
+						//if(i<Q&&MAX_TRN>20){
+						//cand.score=0;
+						//cand.combo=0;						
+						//}
+						//else{
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
 						cand.score -= adder(field);
 						cand.combo = cmb;
-						}
+						//}
 						//part1 += omp_get_wtime() - st;
 						cand.prev = j;
 						//st = omp_get_wtime();
