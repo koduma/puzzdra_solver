@@ -8,7 +8,6 @@ g++ -O2 -std=c++11 -fopenmp -mbmi2 Dia.cpp -o Dia
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
-#pragma GCC target ("sse4.2")
 #include <vector>
 #include <cfloat>
 #include <cstdio>
@@ -36,6 +35,9 @@ g++ -O2 -std=c++11 -fopenmp -mbmi2 Dia.cpp -o Dia
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+#pragma GCC target ("sse4.2")
+
 using namespace std;
 #define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//時間差分
 #define XX(PT) ((PT)&15)
