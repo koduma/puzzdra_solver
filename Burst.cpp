@@ -67,7 +67,6 @@ layout=053241405407470557104053134522
 #pragma warning(disable:4710)
 #pragma warning(disable:4711)
 #pragma warning(disable:4820)
-#pragma GCC target ("sse4.2")
 #pragma GCC optimize("unroll-loops")
 #include <vector>
 #include <cfloat>
@@ -98,6 +97,9 @@ layout=053241405407470557104053134522
 #ifdef _OPENMP
 #include <omp.h>
 #endif
+
+#pragma GCC target ("sse4.2")
+
 using namespace std;
 #define DLT(ST,ED) ((double)((ED)-(ST))/CLOCKS_PER_SEC)//時間差分
 #define XX(PT) ((PT)&15)
