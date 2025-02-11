@@ -156,7 +156,6 @@ int LIM[DEPTH+1]={TRN,TRN,TRN,TRN};
 emilib::HashMap<ll, bool> visited2[DEPTH];
 int counter=0;
 int read_file_mode;
-bool CUT=false;
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -1261,52 +1260,6 @@ Action BULB(F_T f_field[ROW][COL],int stop){
 	}
 	return bestAction;
 }
-string SHORT_SEARCH(F_T f_field[ROW][COL]){
-F_T field[ROW][COL];
-memcpy(field,f_field,sizeof(field));
-int stop=0;
-int drop[DROP + 1] = { 0 };
-for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-		if (1 <= field[row][col] && field[row][col] <= DROP) {
-			drop[field[row][col]]++;
-		}
-	}
-}
-for (int i = 1; i <= DROP; i++) {
-	stop += drop[i] / 3;
-}
-node2 n;
-F_T g_field[ROW][COL];
-memcpy(g_field,f_field,sizeof(g_field));
-Action tmp=BEAM_SEARCH(0,field,1,TRN,-1,0,stop,n,g_field,0,0);
-stop=tmp.score;
-int Q=(int)floor(logN(3.0,(double)BEAM_WIDTH))+1;
-string ans="";
-int max_pl=TRN;	
-for (int i = 0; i < ROW; i++) {
-	for (int j = 0; j < COL; j++) {
-	node2 cand,customer;
-	tmp=BEAM_SEARCH(0,field,1,Q,-1,(i*COL)+j,stop,customer,field,(T_T)YX(i, j),0);	
-	F_T k_field[ROW][COL];
-	memcpy(k_field,field,sizeof(k_field));
-	if(sum_e(k_field)>=stop){return "05,";}
-	if(stop<=tmp.score){	
-	cand.first_te = tmp.first_te;
-	for (int trn = 0; trn <= TRN/21; trn++) {
-	cand.movei[trn] = tmp.moving[trn];
-	}
-	cand.calc_path();
-	if(max_pl>cand.path_length){
-	ans=cand.path;
-	max_pl=cand.path_length;
-	}	
-	}
-	}
-	}
-return ans;	
-}
-
 void show_field(F_T field[ROW][COL]) {
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
@@ -1813,18 +1766,10 @@ int main() {
 		printf("\n");
 		//Action BEAM_SEARCH(int depth,F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int now_pos,int stop,node2 customer);
 		double start = omp_get_wtime();
-		CUT=false;
-		string tmp_ans=SHORT_SEARCH(f_field);
-		if((int)tmp_ans.size()==0){
-		node2 customer;
-		CUT=true;	
+		node2 customer;	
 		Action act=BEAM_SEARCH(DEPTH,f_field,0,TRN,-1,-1,0,customer,f_field,0,0);
 		//act=BULB(f_field,act.score);
-		bestans=act.path;
-		}
-		else{
-		bestans=tmp_ans;	
-		}
+		bestans=act.path
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
 		double diff = omp_get_wtime() - start;
