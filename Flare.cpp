@@ -157,8 +157,6 @@ ll fallBB(ll p,ll rest,ll mask);
 multimap<ll, ll> visited;	
 ll zoblish_field2[ROW*COL];
 
-bool CUT=false;
-
 int MSB64bit(ll v) {
    if(v == 0ll){return 0;}
    int out =63-__builtin_clzll(v);
@@ -736,8 +734,11 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int MLEN=cand2.calc_pl(c_hash(field)^zoblish_field2[(i*COL)+j]);
 	if(i==0&&j==0){MLEN=TRN;}	
 	int lim=TRN;
-	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}		
-	Action tmp=BEAM_SEARCH(field,1,max(0,min(lim-1,MLEN-1)),-1,(i*COL)+j,stop);
+	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];}
+	Action tmp;
+	//if(MLEN==TRN){		
+	tmp=BEAM_SEARCH(field,1,max(0,min(lim-1,MLEN-1)),-1,(i*COL)+j,stop);
+	//}
 	if(i==0&&j==0){stop=0;}
 	stop=max(stop,tmp.score);
 	F_T f_field[ROW][COL];
@@ -941,8 +942,11 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	int MLEN=cand.calc_pl(c_hash(f_field)^zoblish_field2[cand.pos]);
 	int lim=LIM;
 	if((int)pro_league.size()>=BEAM_WIDTH2){lim=pro_league[BEAM_WIDTH2-1];LIM=lim-1;}
-	if(i>=Q-ALPHA){	
-	Action tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
+	if(i>=Q-ALPHA){
+	Action tmp;
+	//if(MLEN==TRN){
+	tmp = BEAM_SEARCH(f_field,i+2,max(0,min(lim-1,MLEN-1)),cand.prev,cand.pos,stop);
+	//}
 	sc cmb;
 	ll ha;
 	F_T tmp_field[ROW][COL];
@@ -1039,48 +1043,6 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 
 	return bestAction;
 
-}
-string SHORT_SEARCH(F_T f_field[ROW][COL]){
-F_T field[ROW][COL];
-memcpy(field,f_field,sizeof(field));
-int stop=0;
-int drop[DROP + 1] = { 0 };
-for (int row = 0; row < ROW; row++) {
-	for (int col = 0; col < COL; col++) {
-		if (1 <= field[row][col] && field[row][col] <= DROP) {
-			drop[field[row][col]]++;
-		}
-	}
-}
-for (int i = 1; i <= DROP; i++) {
-	stop += drop[i] / 3;
-}	
-Action tmp=BEAM_SEARCH(field,1,TRN,-1,0,stop);
-stop=tmp.score;
-int Q=(int)floor(logN(3.0,(double)BEAM_WIDTH))+1;
-string ans="";
-int max_pl=TRN;	
-for (int i = 0; i < ROW; i++) {
-	for (int j = 0; j < COL; j++) {
-	node2 cand;
-	tmp=BEAM_SEARCH(field,1,Q,-1,(i*COL)+j,stop);
-	F_T g_field[ROW][COL];
-	memcpy(g_field,field,sizeof(g_field));
-	if(sum_e(g_field)>=stop){return "05,";}
-	if(stop<=tmp.score){	
-	cand.first_te = tmp.first_te;
-	for (int trn = 0; trn <= TRN/21; trn++) {
-	cand.movei[trn] = tmp.moving[trn];
-	}
-	cand.calc_path();
-	if(max_pl>cand.path_length){
-	ans=cand.path;
-	max_pl=cand.path_length;
-	}	
-	}
-	}
-	}
-return ans;	
 }
 
 void show_field(F_T field[ROW][COL]) {
@@ -1646,16 +1608,8 @@ int main() {
 		printf("\n");
 		show_field(f_field);//盤面表示
 		printf("\n");
-		double start = omp_get_wtime();
-		CUT=false;
-		string tmp_ans=SHORT_SEARCH(f_field);
-		if((int)tmp_ans.size()==0){
-		CUT=true;	
+		double start = omp_get_wtime();	
 		bestans=BEAM_SEARCH2(f_field,TRN);
-		}
-		else{
-		bestans=tmp_ans;	
-		}
 		if(date=="null"){url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&ctwMode=false";}
 		else{url="http://serizawa.web5.jp/puzzdra_theory_maker/index.html?layout="+layout+"&route="+bestans+"&date="+date+"&ctwMode=false";}
 		double diff = omp_get_wtime() - start;
