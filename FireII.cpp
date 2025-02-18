@@ -270,7 +270,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+100].push_back(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+1000].push_back(j);
 			ks2++;
 			}
 		}
@@ -595,6 +595,32 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB^=linked[i];
 		}
 
+		//cmb2*=4;
+		cmb2+=cmb2;
+		cmb2+=cmb2;
+
+		for(int s=0;s<=COL-3;s++){
+		int same_num[DROP+1]={0};
+		ll bp=0ll;
+		for(int col=s;col<=s+2;col++){
+		bp+=file_bb[col];
+		}
+		for(int i=1;i<=DROP;i++){
+		if(p_maxcombo[i]!=d_maxcombo[i]){
+		same_num[i]+=__builtin_popcountll(bp&dropBB[i]);
+		cmb2+=same_num[i];
+		}
+		}
+		}
+
+		for(int col=0;col<COL;col++){
+		ll bp=file_bb[col];
+		for(int i=1;i<=DROP;i++){
+		int yb=__builtin_popcountll(bp&dropBB[i]);
+		if(yb>=3){cmb2+=20;}
+		}
+		}
+
 		*combo += cmb;
 		ev += cmb2;
 		//コンボが発生しなかったら終了
@@ -609,6 +635,30 @@ int evaluate3(ll dropBB[DROP+1], int flag, sc* combo, int p_maxcombo[DROP+1]) {
 		occBB=fallBB(occBB,occBB,mask);
 	}
 	ev += oti;
+	
+	int penalty=0;
+
+	ll board=occBB;
+
+	for(int i=1;i<=DROP;i++){
+	penalty+=(p_maxcombo[i]-d_maxcombo[i])*10;
+	}
+
+	int alone=0;
+	
+	bool find=false;
+
+	for(int x=0;x<COL;x++){
+	if(((board>>(po-((8*(x))+(ROW-1))))&1) == 0){
+	if(!find){alone++;}
+	find=true;	
+	}
+	else{find=false;}
+	}
+
+	ev-=penalty*alone;
+	
+	
 	return ev;
 }
 int sum_e3(ll dropBB[DROP+1], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
