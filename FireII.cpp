@@ -44,7 +44,7 @@ using namespace std;
 #define DIR 4//方向
 #define ROW 5//縦//MAX6
 #define COL 6//横//MAX7
-#define DROP 6//ドロップの種類//MAX9
+#define DROP 8//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
 #define BEAM_WIDTH 10000//ビーム幅//MAX200000
