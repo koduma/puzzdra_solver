@@ -699,36 +699,36 @@ int main() {
 			    if(slash){child+=ls[i];}
 			    else{parent+=ls[i];}
 		    }
-            int counter=0;
-            string xz[4]={"","","",""}; 
-            for(i=0;i<(int)parent.size();i++){
-            if(parent[i]==','){counter++;continue;}
-            xz[counter]+=parent[i];    
-            }
+		    int counter=0;
+		    string xz[4]={"","","",""}; 
+		    for(i=0;i<(int)parent.size();i++){
+			    if(parent[i]==','){counter++;continue;}
+			    xz[counter]+=parent[i];
+		    }
 		    data[stoi(xz[0])][stoi(xz[1])][stoi(xz[2])][stoi(xz[3])]=stoi(child);
-	    }
-	myf.close();
+		    }
+		myf.close();
 	}
     
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		if(i<TRAIN){go=false;}
 		else{go=true;}
-        if(i==TRAIN){
+		if(i==TRAIN){
  		ofstream fi("data.txt");
-        string mystr="";    
+		string mystr="";    
  		for (int a1=0;a1<10;a1++){
-        for(int a2=0;a2<ROW*COL;a2++){
-        for(int a3=0;a3<ROW*COL;a3++){
-        for(int a4=0;a4<ROW*COL;a4++){
-        int value=data[a1][a2][a3][a4];    
+		for(int a2=0;a2<ROW*COL;a2++){
+		for(int a3=0;a3<ROW*COL;a3++){
+		for(int a4=0;a4<ROW*COL;a4++){
+		int value=data[a1][a2][a3][a4];    
  		string ms=to_string(a1)+","+to_string(a2)+","+to_string(a3)+","+to_string(a4)+"/"+to_string(value);
-        if(value>0){
-        mystr+=ms+"\n";
-        }    
+		if(value>0){
+		mystr+=ms+"\n";
+		}    
  		}
-        }
-        }
-        }
+		}
+		}
+		}
  		fi<<mystr;
  		fi.close();
  		}
