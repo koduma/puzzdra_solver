@@ -44,8 +44,8 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 1000//ビーム幅//MAX200000
-#define PROBLEM 100//問題数
+#define BEAM_WIDTH 10000//ビーム幅//MAX200000
+#define PROBLEM 5//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -713,6 +713,25 @@ int main() {
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		if(i<TRAIN){go=false;}
 		else{go=true;}
+        if(i==TRAIN){
+ 		ofstream fi("data.txt");
+        string mystr="";    
+ 		for (int a1=0;a1<10;a1++){
+        for(int a2=0;a2<ROW*COL;a2++){
+        for(int a3=0;a3<ROW*COL;a3++){
+        for(int a4=0;a4<ROW*COL;a4++){
+        int value=data[a1][a2][a3][a4];    
+ 		string ms=to_string(a1)+","+to_string(a2)+","+to_string(a3)+","+to_string(a4)+"/"+to_string(value);
+        if(value>0){
+        mystr+=ms+"\n";
+        }    
+ 		}
+        }
+        }
+        }
+ 		fi<<mystr;
+ 		fi.close();
+ 		}
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
@@ -760,7 +779,7 @@ int main() {
 		printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
 		if(!go){
-		counting(field,route);
+		//counting(field,route);
 		}        
 		operation(field, tmp.first_te,tmp.moving);
 		printf("output:No.%d/%d\n", i + 1, PROBLEM);
