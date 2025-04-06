@@ -1,3 +1,4 @@
+
 /*
 
 g++ -O2 -std=c++11 -fopenmp ML.cpp -o ML
@@ -43,12 +44,12 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 10000//ビーム幅//MAX200000
-#define PROBLEM 20000//問題数
+#define BEAM_WIDTH 1000//ビーム幅//MAX200000
+#define PROBLEM 100//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
-#define TRAIN 10000
+#define TRAIN 0
 typedef char F_T;//盤面型
 typedef char T_T;//手数型
 typedef signed char sc;
@@ -76,7 +77,7 @@ ll zoblish_field[ROW][COL][DROP+1];
 int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]);
 int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]);
 
-unordered_map<string, int>data;
+int data[10][ROW*COL][ROW*COL][ROW*COL];
 
 bool go=false;
 
@@ -569,9 +570,7 @@ int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 	for(int i=0;i<10;i++){
         for(int j=0;j<(int)v[i].size();j+=3){
             if((int)v[i].size()<=j+2){break;}
-            string s="";
-            s=to_string(i)+","+to_string(v[i][j])+","+to_string(v[i][j+1])+","+to_string(v[i][j+2]);
-            ev+=data[s];
+            ev+=data[i][v[i][j]][v[i][j+1]][v[i][j+2]];
 	}
 	}
         return ev;    
@@ -632,9 +631,7 @@ void memo(F_T field[ROW][COL]){
     for(int i=0;i<10;i++){
         for(int j=0;j<(int)v[i].size();j+=3){
             if((int)v[i].size()<=j+2){break;}
-            string s="";
-            s=to_string(i)+","+to_string(v[i][j])+","+to_string(v[i][j+1])+","+to_string(v[i][j+2]);
-            data[s]++;
+            data[i][v[i][j]][v[i][j+1]][v[i][j+2]]++;
         }
     }
     
@@ -663,7 +660,12 @@ void counting(F_T field[ROW][COL],string route){
 	if(route[j]=='4'){swap(f_field[pos/COL][pos%COL],f_field[pos/COL][(pos%COL)+1]);pos++;}
         }
 }
+double logN(double b, double x) {
+    return log(x) / log(b);
+}
+
 int main() {
+
 
 	int i, j, k;
 
@@ -684,7 +686,7 @@ int main() {
 	
 	int acc=0;
 	
-	bool start_test=false;
+	bool start_test=true;
 	if(start_test){
         ifstream myf ("data.txt");
 	    string ls;
@@ -697,8 +699,13 @@ int main() {
 			    if(slash){child+=ls[i];}
 			    else{parent+=ls[i];}
 		    }
-		    data[parent]=stoi(child);
-            cout<<"p="<<parent<<"/c="<<stoi(child)<<endl;
+            int counter=0;
+            string xz[4]={"","","",""}; 
+            for(i=0;i<(int)parent.size();i++){
+            if(parent[i]==','){counter++;continue;}
+            xz[counter]+=parent[i];    
+            }
+		    data[stoi(xz[0])][stoi(xz[1])][stoi(xz[2])][stoi(xz[3])]=stoi(child);
 	    }
 	myf.close();
 	}
@@ -706,15 +713,6 @@ int main() {
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		if(i<TRAIN){go=false;}
 		else{go=true;}
-		if(i==TRAIN){
-		ofstream fi("data.txt");
-		string mystr="";
-		for (auto itr = data.begin(); itr != data.end(); ++itr){
-		mystr+=itr->first+'/'+to_string(itr->second)+'\n';
-		}
-		fi<<mystr;
-		fi.close();
-		}
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
