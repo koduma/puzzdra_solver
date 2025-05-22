@@ -220,8 +220,7 @@ struct node {//どういう手かの構造体
 	T_T first_te;
 	uc improving;//評価値改善回数
 	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
+	sc pos;//今どの座標にいるか
 	sc prev;//1手前は上下左右のどっちを選んだか
 	node() {//初期化
 		this->score = 0;
@@ -348,8 +347,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	for (int i = 0; i < ROW; i++) {
 		for (int j = 0; j < COL; j++) {
 			node cand;
-			cand.nowR = i;//y座標
-			cand.nowC = j;//x座標
+			cand.pos = (i*COL)+j;
 			cand.prev = -1;//1手前はない
 			cand.first_te = (T_T)YX(i, j);//1手目のyx座標
 			for (int trn = 0; trn <= TRN/21; trn++) {
@@ -368,15 +366,14 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 	}
 	else{
 	node ca;
-	ca.nowR = now_pos/COL;//y座標
-	ca.nowC = now_pos%COL;//x座標
+	ca.pos = now_pos;
 	if(maxi==1){
 	ca.prev = -1;
 	}
 	else{
 	ca.prev=prev_dir;
 	}
-	ca.first_te = (T_T)YX(ca.nowR,ca.nowC);
+	ca.first_te = (T_T)YX((ca.pos)/COL,(ca.pos)%COL);
 	for (int trn = 0; trn <= TRN/21; trn++) {
 	ca.movei[trn] = 0ll;
 	}
@@ -433,28 +430,29 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
 				node cand = temp;
-				if (0 <= cand.nowC + dx[j] && cand.nowC + dx[j] < COL &&
-					0 <= cand.nowR + dy[j] && cand.nowR + dy[j] < ROW) {
+                int xx = (cand.pos)%COL;
+                int yy = (cand.pos)/COL;
+				if (0 <= xx + dx[j] && xx + dx[j] < COL &&
+					0 <= yy + dy[j] && yy + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
-						int ny=cand.nowR + dy[j];
-						int nx=cand.nowC + dx[j];
+						int ny=yy + dy[j];
+						int nx=xx + dx[j];
 						F_T field[ROW][COL];//盤面
 						ll dropBB[DROP+1]={0};
 						memcpy(field,temp_field,sizeof(temp_field));//盤面をもどす
 						memcpy(dropBB,temp_dropBB,sizeof(temp_dropBB));
-						F_T tmp=field[cand.nowR][cand.nowC];
-						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
-						cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
+						F_T tmp=field[yy][xx];
+						cand.hash^=(zoblish_field[yy][xx][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
+						cand.hash^=(zoblish_field[yy][xx][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
 						int pre_drop=(int)tmp;
-						int pre_pos=po-((8*cand.nowC)+cand.nowR);
+						int pre_pos=po-((8*xx)+yy);
 						int next_drop=(int)field[ny][nx];
 						int next_pos=po-((8*nx)+ny);
 						dropBB[pre_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
 						dropBB[next_drop]^=(sqBB[pre_pos]|sqBB[next_pos]);
-						field[cand.nowR][cand.nowC]=field[ny][nx];
+						field[yy][xx]=field[ny][nx];
 						field[ny][nx]=tmp;
-						cand.nowC += dx[j];
-						cand.nowR += dy[j];
+						cand.pos += (dy[j]*COL)+dx[j];
 						cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
 						//st = omp_get_wtime();
 						//if(i<Q&&MAX_TRN>20&&CUT){
@@ -534,7 +532,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			}
 			if(fff[j].score>fff[j].prev_score){fff[j].improving=fff[j].improving+1;}
 			fff[j].prev_score=fff[j].score;
-			vec[fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3)+2000].push_front(j);
+			vec[fff[j].score+(BONUS*fff[j].improving)+(((fff[j].pos)/COL)*3)+2000].push_front(j);
 			ks2++;
 			}
 		}
@@ -561,7 +559,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 				memcpy(bestAction.moving, temp.movei, sizeof(temp.movei));
 			}
 			if (i < MAX_TRN - 1) {
-			int pos=(temp.nowR*COL)+temp.nowC;
+			int pos=temp.pos;
 			if(!checkNodeList[pos][temp.hash]){
 				checkNodeList[pos][temp.hash]=true;
 				dque.push_back(temp);
@@ -581,8 +579,7 @@ string BEAM_SEARCH2(F_T field[ROW][COL],int MAX_TRN) {
 	ll movei[(TRN/21)+1];//スワイプ移動座標
 	int score;//評価値
 	sc combo;//コンボ数
-	sc nowC;//今どのx座標にいるか
-	sc nowR;//今どのy座標にいるか
+	sc pos;//今どの座標にいるか
 	sc prev;//1手前は上下左右のどっちを選んだか
 	int prev_score;//1手前の評価値
 	uc improving;//評価値改善回数
