@@ -430,8 +430,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL],int maxi,int MAX_TRN,int prev_dir,int n
 			operation(temp_field, temp.first_te,temp.movei,temp_dropBB);
 			for (int j = 0; j < DIR; j++) {//上下左右の4方向が発生
 				node cand = temp;
-                int xx = (cand.pos)%COL;
-                int yy = (cand.pos)/COL;
+				int xx = (cand.pos)%COL;
+				int yy = (cand.pos)/COL;
 				if (0 <= xx + dx[j] && xx + dx[j] < COL &&
 					0 <= yy + dy[j] && yy + dy[j] < ROW) {
 					if (cand.prev + j != 3) {
