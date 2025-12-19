@@ -44,8 +44,8 @@ using namespace std;
 #define DROP 8//ドロップの種類//MAX9
 #define TRN  150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 200//ビーム幅//MAX200000
-#define PROBLEM 100
+#define BEAM_WIDTH 10000//ビーム幅//MAX200000
+#define PROBLEM 10000
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -78,8 +78,6 @@ int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]);
 int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]);
 
 int data[15][ROW*COL][ROW*COL];
-
-bool go=false;
 
 struct node {//どういう手かの構造体
 	T_T first_te;
@@ -479,12 +477,6 @@ int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 	*combo = 0;
 	int oti = 0;
 	int d_maxcombo[DROP+1]={0};
-	vector<int>v[10];
-	for(int i=0;i<ROW*COL;i++){
-        int a = (int)(field[i/COL][i%COL]);
-        v[a].push_back(i);
-	}
-	for(int i=0;i<10;i++){sort(v[i].begin(),v[i].end());}
 
 	while (1) {
 		int cmb = 0;
@@ -564,22 +556,7 @@ int evaluate3(F_T field[ROW][COL], int flag, sc* combo, int p_maxcombo[DROP+1]) 
 
 	}
 	ev += oti;
-	if(!go){return ev;}
-	else{
-	ev=0;
-	for(int i=0;i<10;i++){
-        for(int j=0;j<(int)v[i].size();j+=3){
-            if((int)v[i].size()<=j+2){break;}
-            int p1 = v[i][j];
-            int p2 = v[i][j+1];
-            int p3 = v[i][j+2];
-            int d1 = p2 - p1; 
-            int d2 = p3 - p1;
-            ev+=data[i][d1][d2];
-	}
-	}
-        return ev;    
-    }
+	return ev;
 }
 int sum_e3(F_T field[ROW][COL], sc* combo, int p_maxcombo[DROP+1]) {//落とし有り、落ちコン無し評価関数
 	return evaluate3(field, EVAL_FALL | EVAL_COMBO, combo,p_maxcombo);
@@ -631,10 +608,9 @@ void memo(F_T field[ROW][COL]){
         int a = (int)(field[i/COL][i%COL]);
         v[a].push_back(i);
     }
-    for(int i=0;i<10;i++){sort(v[i].begin(),v[i].end());}
 
     for(int i=0;i<10;i++){
-        for(int j=0;j<(int)v[i].size();j+=3){
+        for(int j=0;j<(int)v[i].size();j++){
             if((int)v[i].size()<=j+2){break;}
             int p1 = v[i][j];
             int p2 = v[i][j+1];
@@ -722,11 +698,7 @@ int main() {
 	}
     
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
-		if(i<TRAIN){go=false;}
-		else{go=true;}
-        /*
-		if(i%10==0&&!go){
- 		ofstream fi("data.txt");
+		if(i%100==0){
 		string mystr="";    
  		for (int a1=0;a1<10;a1++){
 		for(int a2=0;a2<ROW*COL;a2++){
@@ -739,10 +711,10 @@ int main() {
  		}
 		}
 		}
+        ofstream fi("data.txt");
  		fi<<mystr;
  		fi.close();
  		}
-        */
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
 		F_T field[ROW][COL]; //盤面
 		F_T oti_field[ROW][COL];//落ちコン用盤面
@@ -789,9 +761,7 @@ int main() {
 		cout<<url<<endl;
 		printf("\n");
 		memcpy(field, f_field, sizeof(f_field));
-		if(!go){
-		//counting(field,route);
-		}        
+		counting(field,route);        
 		operation(field, tmp.first_te,tmp.moving);
 		printf("output:No.%d/%d\n", i + 1, PROBLEM);
 		show_field(field);
