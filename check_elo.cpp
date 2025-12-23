@@ -1,6 +1,6 @@
 /*
 
-g++ -O2 -std=c++11 -fopenmp -mbmi2 Dia.cpp -o Dia
+g++ -O2 -std=c++11 -fopenmp -mbmi2 check_elo.cpp -o check_elo
 
 検証用プログラム
 
@@ -49,8 +49,8 @@ using namespace std;
 #define DROP 6//ドロップの種類//MAX9
 #define TRN 150//手数//MAX155
 #define MAX_TURN 150//最大ルート長//MAX150
-#define BEAM_WIDTH 28000//ビーム幅//MAX200000
-#define PROBLEM 10000//問題数
+#define BEAM_WIDTH 1//ビーム幅//MAX200000
+#define PROBLEM 1000//問題数
 #define BONUS 10//評価値改善係数
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define NODE_SIZE MAX(500,4*BEAM_WIDTH)
@@ -238,6 +238,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
 						st = omp_get_wtime();
 						sc cmb;
 						cand.score = evaluate3(dropBB, EVAL_FALL | EVAL_COMBO, &cmb,p_maxcombo);
+                        cand.score = 0;
 						cand.combo = cmb;
 						part1 += omp_get_wtime() - st;
 						cand.prev = j;
@@ -744,7 +745,7 @@ int main() {
 	double t_sum = 0;
 	double oti_avg = 0;//平均落ちコンボ数
 
-	int win=0;
+	double win=0;
 
 	for (i = 0; i < PROBLEM; i++) {//PROBLEM問解く
 		F_T f_field[ROW][COL]; //スワイプ前の盤面
@@ -753,13 +754,20 @@ int main() {
 		printf("input:No.%d/%d\n", i + 1, PROBLEM);
 		init(f_field); set(f_field, 0);//初期盤面生成
 		hook=false;
-		Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
+		//Action tmp = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
+        Action tmp;
+        memcpy(field,f_field,sizeof(f_field));
+        int cb=sum_e(field);
+        for(j=0;j<=TRN/21;j++){
+        tmp.moving[j]=0ll;
+        }
+        tmp.score=cb;
 		hook=true;
 		Action tmp2 = BEAM_SEARCH(f_field);//ビームサーチしてtmpに最善手を保存
-		if(tmp2.score>tmp.score||((tmp2.score==tmp.score)&&calc_pl(tmp2)<calc_pl(tmp))){win++;}
-		if(tmp2.score<tmp.score||((tmp2.score==tmp.score)&&calc_pl(tmp2)>calc_pl(tmp))){win--;}
+		if(tmp2.score>tmp.score||((tmp2.score==tmp.score)&&calc_pl(tmp2)<calc_pl(tmp))){win+=1.0;}
+		else if(tmp2.score==tmp.score&&calc_pl(tmp2)==calc_pl(tmp)){win+=0.5;}
 
-		printf("win=%d\n",win);
+		printf("win=%lf\n",win);
 	}
 	printf("TotalDuration:%fSec\n", t_sum);
 	printf("Avg.NormalCombo #:%f/%f\n", avg / (double)i, MAXCOMBO / (double)i);
