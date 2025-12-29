@@ -144,6 +144,30 @@ int NNUE_init_score(F_T board[ROW][COL]) {
     return score;
 }
 
+int NNUE_score(F_T board[ROW][COL],int c1) {
+    int v[ROW*COL]={0};
+    int cnty=0;
+    for(int i=0;i<ROW*COL;i++){
+        int a = (int)(board[i/COL][i%COL]);
+        if(a==c1){
+        v[cnty]=i;
+        cnty++;
+        }
+    }
+
+    int score=0;
+
+    for(int j=0;j<cnty;j+=3){
+    if(cnty<=j+2){break;}
+    int p1 = v[j];
+    int p2 = v[j+1];
+    int p3 = v[j+2];
+    score += data[c1][p1][p2][p3];
+    }
+   
+    return score;
+}
+
 // --- ビームサーチ ---
 Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
     int stop = 0;
@@ -180,8 +204,8 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
             memcpy(ff_field,f_field,sizeof(ff_field));
             sc cmb;
             ll ha;
-            cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
-            //cand.score=NNUE_init_score(ff_field);
+            //cand.prev_score=sum_e2(ff_field,&cmb,&ha,p_maxcombo);
+            cand.score=NNUE_init_score(ff_field);
             cand.improving=0;
             cand.hash=ha;
             dque.push_back(cand);
@@ -219,6 +243,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
                         F_T tmp=field[cand.nowR][cand.nowC];
                         int c1=(int)field[cand.nowR][cand.nowC];
                         int c2=(int)field[ny][nx];
+                        int OLD=NNUE_score(field,c1)+NNUE_score(field,c2);
                         cand.hash^=(zoblish_field[cand.nowR][cand.nowC][tmp])^(zoblish_field[ny][nx][field[ny][nx]]);
                         cand.hash^=(zoblish_field[cand.nowR][cand.nowC][field[ny][nx]])^(zoblish_field[ny][nx][tmp]);
                         field[cand.nowR][cand.nowC]=field[ny][nx];
@@ -227,7 +252,10 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
                         cand.nowR += dy[j];
                         cand.movei[i/21] |= (((ll)(j+1))<<((3*i)%63));
                         //cand.score += NNUE_score(field,c1,c2); // NNUE評価
-                        cand.score = NNUE_init_score(field);
+                        int NEW=NNUE_score(field,c1)+NNUE_score(field,c2);
+                        //cand.score = NNUE_init_score(field);
+                        cand.score-=OLD;
+                        cand.score+=NEW;
                         cand.combo = (sc)evaluate(field, EVAL_FALL | EVAL_COMBO);
                         cand.prev = j;
                         fff[(4 * k) + j] = cand;
@@ -251,7 +279,7 @@ Action BEAM_SEARCH(F_T f_field[ROW][COL]) {
                 fff[j].prev_score=fff[j].score;
                 int sc=fff[j].score+(BONUS*fff[j].improving)+(fff[j].nowR*3);
 				int cb=(int)(-fff[j].combo);
-                vec.emplace_back(cb, -sc, j);    
+                vec.emplace_back(0, -sc, j);    
                 ks2++;
             }
         }
